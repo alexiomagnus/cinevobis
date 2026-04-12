@@ -1,2 +1,2 @@
-admins: vobis
-users: film
+- admins: vobis
+- users: film
