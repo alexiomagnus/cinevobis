@@ -1,0 +1,8 @@
+{
+    "name": "alexio/cinevobis",
+    "description": "PHP project with a MySQL Database",
+    "require": {
+        "kiwilan/php-tmdb": "^0.1.12",
+        "vlucas/phpdotenv": "^5.6"
+    }
+}

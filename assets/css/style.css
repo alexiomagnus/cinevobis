@@ -1,0 +1,43 @@
+:root {
+    --primary-color: #f8f9fa;
+    --secondary-color: #2d3436;
+    --font-family: 'Inter', -apple-system, sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-family);
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    line-height: 1.8;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    min-height: 100vh;
+}
+
+.navbar,
+footer {
+    width: 100%;
+    margin: 0;
+}
+
+.table {
+    --bs-table-bg: var(--primary-color);
+    --bs-table-striped-bg: #eef0f2;
+    --bs-table-hover-bg: #e9ecef;
+}
+
+.card-hover {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+}
+
+input::placeholder {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
