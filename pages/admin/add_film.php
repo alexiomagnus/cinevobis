@@ -2,6 +2,7 @@
 session_start();
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');
+require_once(__DIR__ . '/../../includes/header_logic.php');
 
 $username = $_SESSION["username"] ?? '';
 
@@ -14,7 +15,6 @@ if (isset($_POST['upload']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
     // gestione upload immagine
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -28,7 +28,7 @@ if (isset($_POST['upload']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
 
     <?php require_once(__DIR__ . '/../../includes/header.php'); ?>
 
-    titolo, trama, durata_minuti, data_uscita, nazione, copertina_path, trailer_id, aggiungi_persona (tom select)
+    <!-- titolo, trama, durata_minuti, data_uscita, nazione, copertina_path, trailer_id, aggiungi_persona (tom select) -->
 
     <div class="container mt-4 flex-grow-1">
 

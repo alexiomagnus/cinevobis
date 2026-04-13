@@ -12,8 +12,8 @@ services:
       - .env
 
   db:
-    image: mariadb:11
-    restart: always
+    image: docker.io/library/mariadb:11
+    restart: no
     environment:
       MARIADB_ROOT_PASSWORD: root
       MARIADB_DATABASE: cinevobis

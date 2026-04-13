@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once(__DIR__ . '/../../config/connection.php');
+require_once(__DIR__ . '/../../includes/header_logic.php');
 
 $username   = $_SESSION['username']   ?? '';
 $id_profilo = $_SESSION['id_profilo'] ?? 0;
@@ -10,7 +11,6 @@ if (!$username || $id_profilo != 1) {
     exit();
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="it">
 <head>

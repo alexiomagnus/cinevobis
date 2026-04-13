@@ -10,7 +10,7 @@ if (!isset($_SESSION['username'])) {
 
 try {
     $id_sessione = session_id();
-    $username    = $_SESSION['username'];
+    $username = $_SESSION['username'];
 
     $user = new userObj($conn, $username);
     $user->setDataLogout(date('Y-m-d H:i:s'), $id_sessione);
@@ -23,4 +23,3 @@ try {
     header("Location: /index.php");
     exit();
 }
-?>

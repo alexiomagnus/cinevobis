@@ -2,6 +2,7 @@
 session_start();
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');
+require_once(__DIR__ . '/../../includes/header_logic.php');
 
 $username = $_SESSION["username"] ?? '';
 
@@ -15,7 +16,6 @@ $utenti = $user->readAll();
 $righe = $_GET['righe'] ?? 10;
 $sessioni = $user->readAccess($righe);
 ?>
-
 <!DOCTYPE html>
 <html lang="it">
 <head>

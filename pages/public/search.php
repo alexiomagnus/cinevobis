@@ -2,6 +2,7 @@
 session_start();
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');
+require_once(__DIR__ . '/../../includes/header_logic.php');
 require_once(__DIR__ . '/../../vendor/autoload.php');
 
 use Dotenv\Dotenv;
@@ -26,7 +27,6 @@ if ($searched !== '') {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
