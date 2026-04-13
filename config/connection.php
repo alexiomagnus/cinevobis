@@ -1,5 +1,5 @@
 <?php
-$host = 'db';
+$host = '127.0.0.1';
 $dbname = 'cinevobis';
 $user = 'root';
 $password = 'root';
