@@ -14,7 +14,7 @@ if (!$username) {
 
 $user = new userObj($conn, $username);
 $utenti = $user->readAll();
-$righe = $_GET['righe'] ?? 10;
+$righe = $_GET['righe'] ?? 15;
 $sessioni = $user->readAccess($righe);
 ?>
 <!DOCTYPE html>

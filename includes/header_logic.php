@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
     if (isset($_POST['profile'])) {
-        header("Location: /actions/profile.php");
+        header("Location: /actions/settings.php");
         exit();
     }
 }
