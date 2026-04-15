@@ -1,16 +1,19 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 session_start();
+
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');
 require_once(__DIR__ . '/../../vendor/autoload.php');
 
 use Dotenv\Dotenv;
+use Kiwilan\Tmdb\Tmdb;
 
 $dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
 $dotenv->load();
-
-use Kiwilan\Tmdb\Tmdb;
 
 $tmdb = Tmdb::client($_ENV['API_KEY']);
 
@@ -19,8 +22,12 @@ $results = [];
 $searched = isset($_GET['search']) ? trim($_GET['search']) : '';
 
 if ($searched !== '') {
-    $search = $tmdb->search()->movie($searched);
-    $results = $search->getResults() ?? [];
+    $raw = $tmdb->raw()->url('/search/movie', [
+        'query' => $searched,
+        'language' => 'it-IT'
+    ]);
+
+    $results = $raw?->getBody()['results'] ?? [];
 
     if (empty($results)) {
         $errore = "Nessun risultato trovato per: " . htmlspecialchars($searched);
@@ -66,13 +73,14 @@ if ($searched !== '') {
                 <div class="d-flex flex-column gap-3">
                     <?php foreach ($results as $movie): ?>
                         <?php
-                            $id       = $movie->getId();
-                            $titolo   = $movie->getTitle() ?? 'Titolo non disponibile';
-                            $anno = $movie->getReleaseDate()
-                                        ? $movie->getReleaseDate()->format('Y')
+                            $id     = $movie['id'];
+                            $titolo = $movie['title'] ?? 'Titolo non disponibile';
+                            $anno   = isset($movie['release_date']) && $movie['release_date'] !== ''
+                                        ? substr($movie['release_date'], 0, 4)
                                         : null;
-
-                            $poster   = $movie->getPosterUrl(); // null se non disponibile
+                            $poster = isset($movie['poster_path']) && $movie['poster_path']
+                                        ? 'https://image.tmdb.org/t/p/w92' . $movie['poster_path']
+                                        : null;
                         ?>
                         <a href="film.php?tmdb_id=<?= urlencode($id) ?>" class="text-decoration-none">
                             <div class="card border-0 shadow-sm rounded-3 card-hover bg-white">

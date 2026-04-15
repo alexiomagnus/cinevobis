@@ -9,7 +9,9 @@ $nazioni = [];
 try {
     $stmt    = $conn->query("SELECT iso_code, nome_nazione FROM nazioni ORDER BY nome_nazione");
     $nazioni = $stmt->fetchAll();
-} catch (PDOException $e) {}
+} catch (PDOException $e) {
+    $errore = "Errore nel database: " . $e->getMessage();
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username   = trim($_POST['username']   ?? '');
@@ -18,19 +20,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $cognome    = trim($_POST['cognome']    ?? '');
     $citta      = trim($_POST['citta']      ?? '');
     $email      = trim($_POST['email']      ?? '');
-    $iso_code   = $_POST['iso_code']      ?? null;
+    $iso_code   = !empty($_POST['iso_code']) ? $_POST['iso_code'] : null;
     $id_profilo = 2; // utente standard
     $attivo     = 1; // utente attivo
 
-    if (!$username || !$password || !$nome || !$cognome || !$email) {
-        $errore = "Compila tutti i campi obbligatori";
+    if (empty($username) || empty($password) || empty($nome) || empty($cognome) || empty($email)) {
+        $errore = "Compila tutti i campi obbligatori.";
     } else {
         try {
-            $user = new userObj($conn, $username, $password, $nome, $cognome, $citta, $email, $attivo, $id_profilo, $iso_code ?: null);
+            $user = new userObj($conn, $username, $password, $nome, $cognome, $citta, $email, $attivo, $id_profilo, $iso_code);
             $user->create();
-            $messaggio = "Registrazione completata";
+            $messaggio = "Registrazione completata con successo!";
         } catch (PDOException $e) {
-            $errore = "Errore: " . $e->getMessage();
+            $errore = "Errore durante la registrazione: " . $e->getMessage();
         }
     }
 }
@@ -48,12 +50,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <?php require_once(__DIR__ . '/../includes/header.php'); ?>
 
-    <div class="container flex-grow-1 d-flex justify-content-center align-items-start align-items-md-center py-4">
+    <div class="container flex-grow-1 d-flex justify-content-center align-items-center py-4">
         <div class="card shadow-sm border-0 p-3 p-md-4" style="width: 100%; max-width: 640px;">
             <div class="card-body">
 
                 <h4 class="fw-bold mb-2">Crea un account</h4>
-                <p class="text-muted small mb-4">Compila i campi per registrarti</p>
+                <p class="text-muted small mb-4">Compila i campi obbligatori contrassegnati con (*)</p>
 
                 <?php if ($errore): ?>
                     <div class="alert alert-danger py-2" role="alert">
@@ -68,60 +70,66 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </div>
                 <?php endif; ?>
 
-                <form method="POST">
+                <form method="POST" action="">
                     <div class="row g-3">
-                        <div class="col-6">
+                        <div class="col-md-6">
                             <label class="form-label fw-semibold">Username <span>*</span></label>
-                            <input type="text" name="username" class="form-control" required>
+                            <input type="text" name="username" class="form-control" 
+                                   placeholder="mario" value="<?= htmlspecialchars($username ?? '') ?>" required>
                         </div>
-                        <div class="col-6">
+                        <div class="col-md-6">
                             <label class="form-label fw-semibold">Password <span>*</span></label>
-                            <input type="password" name="password" class="form-control" required>
+                            <input type="password" name="password" class="form-control" 
+                                   placeholder="••••••••" required>
                         </div>
 
-                        <div class="col-6">
+                        <div class="col-md-6">
                             <label class="form-label fw-semibold">Nome <span>*</span></label>
-                            <input type="text" name="nome" class="form-control" required>
+                            <input type="text" name="nome" class="form-control" 
+                                   placeholder="Mario" value="<?= htmlspecialchars($nome ?? '') ?>" required>
                         </div>
-                        <div class="col-6">
+                        <div class="col-md-6">
                             <label class="form-label fw-semibold">Cognome <span>*</span></label>
-                            <input type="text" name="cognome" class="form-control" required>
+                            <input type="text" name="cognome" class="form-control" 
+                                   placeholder="Rossi" value="<?= htmlspecialchars($cognome ?? '') ?>" required>
                         </div>
 
-                        <div class="col-6">
+                        <div class="col-md-6">
                             <label class="form-label fw-semibold">Email <span>*</span></label>
-                            <input type="email" name="email" class="form-control" placeholder="esempio@mail.it" required>
+                            <input type="email" name="email" class="form-control" 
+                                   placeholder="mariorossi@gmail.com" value="<?= htmlspecialchars($email ?? '') ?>" required>
                         </div>
-                        <div class="col-6">
+                        <div class="col-md-6">
                             <label class="form-label fw-semibold">Città</label>
-                            <input type="text" name="citta" class="form-control">
+                            <input type="text" name="citta" class="form-control" 
+                                   placeholder="Roma" value="<?= htmlspecialchars($citta ?? '') ?>">
                         </div>
 
                         <div class="col-12">
                             <label class="form-label fw-semibold">Nazione</label>
                             <select name="iso_code" class="form-select">
-                                <option value="">— Seleziona —</option>
+                                <option value="">— Nazione —</option>
                                 <?php foreach ($nazioni as $n): ?>
-                                    <option value="<?= $n['iso_code'] ?>">
+                                    <option value="<?= $n['iso_code'] ?>" <?= (isset($iso_code) && $iso_code == $n['iso_code']) ? 'selected' : '' ?>>
                                         <?= htmlspecialchars($n['nome_nazione']) ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
 
-                        <div class="mt-4">
-                            <input type="checkbox" id="termini" required>
-                            <label for="termini">
-                                Accetto l'Informativa sulla 
-                                <a href="/pages/public/privacy.php" class="text-decoration-none">Privacy</a> 
-                                e i 
-                                <a href="/pages/public/terms_of_service.php" class="text-decoration-none">Termini di servizio</a> 
-                                di Cinevobis
-                            </label>
+                        <div class="col-12 mt-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="termini" required>
+                                <label class="form-check-label small" for="termini">
+                                    Accetto l'Informativa sulla 
+                                    <a href="/pages/public/privacy.php" class="text-decoration-none">Privacy</a> 
+                                    e i <a href="/pages/public/terms_of_service.php" class="text-decoration-none">Termini di servizio</a>.
+                                </label>
+                            </div>
                         </div>
 
                         <div class="col-12 mt-4">
-                            <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">Crea Account</button>
+                            <button type="submit" class="btn btn-dark w-100 py-2 fw-bold">Crea Account</button>
                         </div>
 
                     </div>

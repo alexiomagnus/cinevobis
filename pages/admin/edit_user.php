@@ -1,5 +1,6 @@
 <?php
 session_start();
+
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');
@@ -23,7 +24,9 @@ $nazioni = [];
 try {
     $stmt    = $conn->query("SELECT iso_code, nome_nazione FROM nazioni ORDER BY nome_nazione");
     $nazioni = $stmt->fetchAll();
-} catch (PDOException $e) {}
+} catch (PDOException $e) {
+    $errore = "Errore: " . $e->getMessage();
+}
 
 if (isset($_POST['salva'])) {
     $nome       = trim($_POST['nome']       ?? '');
@@ -42,11 +45,23 @@ if (isset($_POST['salva'])) {
                 $nome, $cognome, $citta, $email,
                 $attivo, null, $iso_code ?: null
             );
+
             $userUpdate->update($username);
             $messaggio = "Utente aggiornato";
         } catch (PDOException $e) {
             $errore = "Errore: " . $e->getMessage();
         }
+    }
+}
+
+if (isset($_POST['elimina'])) {
+    try {
+        $user = new userObj($conn, $username);
+        $user->delete();
+
+        $messaggio = "Utente eliminato";
+    } catch (PDOException $e) {
+        $errore = "Errore: " . $e->getMessage();
     }
 }
 
@@ -153,6 +168,7 @@ if (!$utente) {
                         <div class="col-12 d-flex gap-2 mt-2">
                             <button type="submit" name="salva" class="btn btn-primary">Salva modifiche</button>
                             <button type="submit" name="indietro" class="btn btn-secondary">Indietro</button>
+                            <button type="submit" name="elimina" class="btn btn-danger">Elimina Utente</button>
                         </div>
 
                     </div>

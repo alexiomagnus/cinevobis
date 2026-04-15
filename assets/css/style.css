@@ -1,15 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans+Code:ital,wght@0,400;0,500;0,700;1,400&display=swap');
+
 :root {
-    --primary-color: #f8f9fa;
-    --secondary-color: #2d3436;
-    --font-family: 'Inter', -apple-system, sans-serif;
+    /* Palette Black & Gold Elegance */
+    --bg-light: #E5E5E5;        /* Grigio chiaro (Sfondo principale) */
+    --bg-white: #FFFFFF;        /* Bianco (Elementi in risalto, card, tabelle) */
+    --bg-dark: #14213D;         /* Blu scuro (Navbar, footer) */
+    --text-main: #14213D;       /* Blu scuro (Testo principale per ottima leggibilità) */
+    --text-light: #FFFFFF;      /* Bianco (Testo su sfondi scuri) */
+    --text-dark: #000000;       /* Nero (Titoli, hover) */
+    --accent-color: #FCA311;    /* Oro (Link, bottoni, call to action) */
+    
+    --font-family: 'Google Sans Code', 'Courier New', monospace;
 }
 
 body {
     margin: 0;
     padding: 0;
     font-family: var(--font-family);
-    background-color: var(--primary-color);
-    color: var(--secondary-color);
+    background-color: var(--bg-light);
+    color: var(--text-main);
     line-height: 1.8;
     display: flex;
     flex-direction: column;
@@ -21,16 +30,30 @@ body {
 footer {
     width: 100%;
     margin: 0;
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+}
+
+.navbar a,
+footer a {
+    color: var(--bg-white);
+}
+
+.navbar a:hover,
+footer a:hover {
+    color: var(--bg-white);
 }
 
 .table {
-    --bs-table-bg: var(--primary-color);
-    --bs-table-striped-bg: #eef0f2;
-    --bs-table-hover-bg: #e9ecef;
+    --bs-table-bg: var(--bg-light);
+    --bs-table-striped-bg: var(--bg-light);
+    --bs-table-hover-bg: #d1d1d1;
+    color: var(--text-main);
 }
 
 .card-hover {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background-color: var(--bg-white);
 }
 
 .card-hover:hover {
@@ -39,5 +62,15 @@ footer {
 }
 
 input::placeholder {
-    color: rgba(255, 255, 255, 0.5) !important;
+    color: rgba(20, 33, 61, 0.5) !important; 
+}
+
+a {
+    color: var(--accent-color);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--text-dark);
+    text-decoration: underline;
 }

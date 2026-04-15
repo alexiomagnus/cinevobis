@@ -1,5 +1,6 @@
 <?php
 session_start();
+
 require_once(__DIR__ . '/../config/connection.php');
 require_once(__DIR__ . '/../includes/user_obj.php');
 
@@ -57,7 +58,7 @@ if (isset($_POST['login'])) {
     <div class="container flex-grow-1 d-flex justify-content-center align-items-center">
         <div class="card shadow-sm border-0 p-4" style="max-width: 520px; width: 100%;">
             <div class="card-body">
-                <h2 class="text-center mb-4 fw-bold text-primary">Login</h2>
+                <h2 class="text-center mb-4 fw-bold text-dark">Login</h2>
 
                 <?php if ($errore): ?>
                     <div class="alert alert-danger py-2 small text-center" role="alert">
@@ -77,7 +78,7 @@ if (isset($_POST['login'])) {
                                placeholder="••••••••" required>
                     </div>
                     <div class="d-grid gap-2 mt-4">
-                        <button type="submit" name="login" class="btn btn-primary py-2">Accedi</button>
+                        <button type="submit" name="login" class="btn btn-dark py-2">Accedi</button>
                     </div>
                 </form>
 
