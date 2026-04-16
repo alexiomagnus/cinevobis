@@ -1,0 +1,26 @@
+{
+  "name": "cinevobis",
+  "version": "1.0.0",
+  "description": "PHP project with a MySQL Database",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexiomagnus/cinevobis.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/alexiomagnus/cinevobis/issues"
+  },
+  "homepage": "https://github.com/alexiomagnus/cinevobis#readme",
+  "dependencies": {
+    "bootstrap": "^5.3.8",
+    "bootstrap-icons": "^1.13.1",
+    "tom-select": "^2.2.2"
+  }
+}

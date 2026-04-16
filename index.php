@@ -18,26 +18,55 @@ if (isset($_SESSION['id_profilo']) && $_SESSION['id_profilo'] == 1) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cinevobis</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        /* Tipografia Homepage */
+        .headline {
+            font-size: clamp(2.4rem, 5vw, 4rem);
+            letter-spacing: -0.02em;
+            font-weight: 800;
+        }
+
+        .headline em {
+            font-style: italic;
+            color: var(--accent-color);
+        }
+    </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
 
-    <?php require_once("includes/header.php"); ?>
+    <?php include("includes/header.php"); ?>
 
-    <main class="home-main flex-grow-1">
+    <main class="flex-grow-1 d-flex align-items-center">
+        <div class="container text-center">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    
+                    <span class="text-uppercase mb-3 d-block opacity-50 small fw-bold" style="letter-spacing: 0.14em;">
+                        Cinevobis Collection
+                    </span>
 
-        <h1 class="headline">Scopri. Organizza. <em>Condividi.</em></h1>
-        <p class="subtext">La tua cineteca virtuale</p>
+                    <h1 class="headline mb-3">
+                        Scopri. Organizza. <em>Condividi.</em>
+                    </h1>
 
-        <form action="/pages/public/search.php" method="GET" class="search-wrap d-flex w-100 mb-5">
-            <input type="text" name="search" placeholder="Cerca un film..." class="flex-grow-1" autocomplete="off">
-            <button type="submit" class="btn btn-brand px-4">Cerca</button>
-        </form>
+                    <p class="text-muted mb-5 mx-auto" style="max-width: 340px; font-weight: 300;">
+                        La tua cineteca virtuale personale sempre a portata di mano.
+                    </p>
+
+                    <form action="/pages/public/search.php" method="GET" class="search-wrap d-flex align-items-center mx-auto">
+                        <input type="text" name="search" placeholder="Cerca un film..." class="flex-grow-1" autocomplete="off">
+                        <button type="submit" class="btn btn-brand rounded-3 px-4">Cerca</button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
     </main>
 
-    <?php require_once("includes/footer.php"); ?>
+    <?php require_once('includes/footer.php'); ?>
 
+    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

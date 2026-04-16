@@ -46,9 +46,8 @@ if (isset($_POST['cambia_password'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cambia password - Cinevobis</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/css/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body class="d-flex flex-column min-vh-100">
     <?php require_once(__DIR__ . '/../includes/header.php'); ?>
@@ -95,5 +94,7 @@ if (isset($_POST['cambia_password'])) {
     </div>
 
     <?php require_once(__DIR__ . '/../includes/footer.php'); ?>
+
+    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

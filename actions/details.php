@@ -36,34 +36,42 @@ if ($userData) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profilo - Cinevobis</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/css/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body class="d-flex flex-column min-vh-100">
     <?php require_once(__DIR__ . '/../includes/header.php'); ?>
 
-    <div class="container flex-grow-1 d-flex justify-content-center align-items-center">
-        <div class="w-100" style="max-width: 640px;">
-            <div class="p-4 bg-white shadow-sm" style="border-radius: 1rem;">
-                <h4 class="fw-bold mb-4">Dettagli Utente</h4>
+    <div class="container flex-grow-1 d-flex justify-content-center align-items-center my-5">
+        <div class="w-100" style="max-width: 900px;"> 
+            <div class="p-5 bg-white shadow-sm" style="border-radius: 1.5rem; border: 1px solid #eee;">
+                <h2 class="fw-bold mb-4 text-primary">Dettagli Utente</h2>
+                <hr class="mb-4">
+                
                 <?php if ($userData): ?>
-                    <p><strong>Username:</strong> <?= htmlspecialchars($userData['username']) ?></p>
-                    <p><strong>Nome:</strong> <?= htmlspecialchars($userData['nome']) ?></p>
-                    <p><strong>Cognome:</strong> <?= htmlspecialchars($userData['cognome']) ?></p>
-                    <p><strong>Città:</strong> <?= htmlspecialchars($userData['citta']) ?></p>
-                    <p><strong>Email:</strong> <?= htmlspecialchars($userData['email']) ?></p>
-                    <p><strong>Profilo:</strong> <?= htmlspecialchars($profilo) ?></p>
-                    <p><strong>Nazione:</strong> <?= htmlspecialchars($nazione) ?></p>
-                    <p><strong>Data Registrazione:</strong> <?= htmlspecialchars($userData['data_registrazione']) ?></p>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>Username:</strong><br> <?= htmlspecialchars($userData['username']) ?></p>
+                            <p class="mb-2"><strong>Nome:</strong><br> <?= htmlspecialchars($userData['nome']) ?></p>
+                            <p class="mb-2"><strong>Cognome:</strong><br> <?= htmlspecialchars($userData['cognome']) ?></p>
+                            <p class="mb-2"><strong>Città:</strong><br> <?= htmlspecialchars($userData['citta']) ?></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>Email:</strong><br> <?= htmlspecialchars($userData['email']) ?></p>
+                            <p class="mb-2"><strong>Profilo:</strong><br> <?= htmlspecialchars($profilo) ?></p>
+                            <p class="mb-2"><strong>Nazione:</strong><br> <?= htmlspecialchars($nazione) ?></p>
+                            <p class="mb-2"><strong>Data Registrazione:</strong><br> <?= htmlspecialchars($userData['data_registrazione']) ?></p>
+                        </div>
+                    </div>
                 <?php else: ?>
-                    <p class="text-muted">Utente non trovato.</p>
+                    <div class="alert alert-warning">Utente non trovato.</div>
                 <?php endif; ?>
             </div>
         </div>
     </div>
 
     <?php require_once(__DIR__ . '/../includes/footer.php'); ?>
+
+    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

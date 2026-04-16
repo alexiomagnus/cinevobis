@@ -79,9 +79,8 @@ if (!$utente) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modifica utente - Cinevobis</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/css/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body class="d-flex flex-column min-vh-100">
 
@@ -168,8 +167,8 @@ if (!$utente) {
 
                         <div class="col-12 d-flex gap-2 mt-4">
                             <button type="submit" name="salva" class="btn btn-sm btn-brand">Salva modifiche</button>
-                            <button type="submit" name="indietro" class="btn btn-sm btn-secondary">Indietro</button>
-                            <button type="submit" name="elimina" class="btn btn-sm btn-maroon">Elimina Utente</button>
+                            <button type="submit" name="indietro" class="btn btn-secondary">Indietro</button>
+                            <button type="submit" name="elimina" class="btn btn-sm btn-danger">Elimina Utente</button>
                         </div>
 
                     </div>
@@ -180,5 +179,7 @@ if (!$utente) {
     </div>
 
     <?php require_once(__DIR__ . '/../../includes/footer.php'); ?>
+
+    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

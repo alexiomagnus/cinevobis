@@ -7,11 +7,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
     if (isset($_POST['login']) && $currentPage !== 'login.php') {
-        header("Location: /actions/login.php");
+        header("Location: /pages/public/login.php");
         exit();
     }
     if (isset($_POST['signup']) && $currentPage !== 'signup.php') {
-        header("Location: /actions/signup.php");
+        header("Location: /pages/public/signup.php");
         exit();
     }
     if (isset($_POST['profile'])) {
