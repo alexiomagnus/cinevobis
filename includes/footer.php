@@ -1,3 +1,3 @@
-<footer class="bg-dark text-white text-center p-3 mt-auto">
-    <p class="mb-0">© <?= date("Y"); ?> Cinevobis</p>
+<footer class="text-center py-3 mt-auto">
+    © <?= date("Y"); ?> Cinevobis
 </footer>

@@ -12,7 +12,7 @@ if (!$username) {
     exit();
 }
 
-if (isset($_POST['change_pwd'])) {
+if (isset($_POST['change_password'])) {
     header("Location: /actions/change_password.php");
     exit();
 }
@@ -54,8 +54,8 @@ if ($userData) {
     <?php require_once(__DIR__ . '/../includes/header.php'); ?>
 
     <div class="container flex-grow-1 d-flex justify-content-center align-items-center">
-        <div class="card shadow-sm border-0" style="width: 100%; max-width: 640px;">
-            <div class="card-body p-4">
+        <div class="w-100" style="max-width: 640px;">
+            <div class="p-4 bg-white shadow-sm" style="border-radius: 1rem;">
                 <h4 class="fw-bold mb-4">Dettagli Utente</h4>
                 <?php if ($userData): ?>
                     <p><strong>Username:</strong> <?= htmlspecialchars($userData['username']) ?></p>
@@ -67,10 +67,10 @@ if ($userData) {
                     <p><strong>Nazione:</strong> <?= htmlspecialchars($nazione) ?></p>
                     <p><strong>Data Registrazione:</strong> <?= htmlspecialchars($userData['data_registrazione']) ?></p>
 
-                    <div class="mt-4">
-                        <form method="POST">
-                            <button class="btn btn-primary" name="change_pwd">Cambia password</button>
-                            <button class="btn btn-danger" name="logout">Logout</button>
+                    <div class="mt-4 d-flex flex-wrap gap-2">
+                        <form method="POST" class="d-flex flex-wrap gap-2">
+                            <button type="submit" class="btn btn-sm btn-brand" name="change_password">Cambia password</button>
+                            <button class="btn btn-sm btn-maroon" name="logout">Logout</button>
                         </form>
                     </div>
                 <?php else: ?>

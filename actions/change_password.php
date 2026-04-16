@@ -86,7 +86,7 @@ if (isset($_POST['cambia_password'])) {
                         <input type="password" name="conferma_password" class="form-control"
                                placeholder="••••••••" required>
                     </div>
-                    <button type="submit" name="cambia_password" class="btn btn-primary w-100">Aggiorna password</button>
+                    <button type="submit" name="cambia_password" class="btn btn-dark w-100">Aggiorna password</button>
                 </form>
 
             </div>

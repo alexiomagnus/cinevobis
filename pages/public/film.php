@@ -19,6 +19,7 @@ $tmdb = Tmdb::client($_ENV['API_KEY']);
 
 $errore = "";
 $movie = null;
+$searched = "";
 
 $movie_id = $_GET['tmdb_id'] ?? null;
 
@@ -68,6 +69,14 @@ if ($movie) {
     <?php require_once(__DIR__ . '/../../includes/header.php'); ?>
 
     <main class="container mt-5 mb-5 flex-grow-1">
+
+        <div class="mx-auto mb-5 px-3" style="max-width: 650px;">
+            <form action="search.php" method="GET" class="search-wrap d-flex w-100 mb-0">
+                <input type="text" name="search" class="flex-grow-1" placeholder="Cerca un film..." autocomplete="off"
+                    aria-label="Cerca" value="<?= htmlspecialchars($searched) ?>" autofocus>
+                <button type="submit" class="btn btn-brand px-4">Cerca</button>
+            </form>
+        </div>
 
         <?php if ($errore): ?>
             <div class="alert alert-danger text-center shadow-sm rounded-3">

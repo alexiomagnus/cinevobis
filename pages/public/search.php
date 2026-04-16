@@ -50,13 +50,11 @@ if ($searched !== '') {
 
     <main class="container mt-5 mb-5 flex-grow-1 d-flex flex-column align-items-center">
 
-        <div class="w-100 mb-5 px-3 search-wrapper" style="max-width: 650px;">
-            <form action="search.php" method="GET" class="position-relative">
-                <input type="search" name="search" class="form-control form-control-lg py-3 border-0 shadow-sm rounded-pill ps-5"
-                    placeholder="Cerca un film..." aria-label="Cerca"
-                    value="<?= htmlspecialchars($searched) ?>" autofocus>
-                <i class="bi bi-search position-absolute text-muted fs-5"
-                    style="top: 50%; left: 20px; transform: translateY(-50%);"></i>
+        <div class="w-100 mb-5 px-3" style="max-width: 650px;">
+            <form action="search.php" method="GET" class="search-wrap d-flex w-100 mb-0">
+                <input type="text" name="search" class="flex-grow-1" placeholder="Cerca un film..." autocomplete="off"
+                    aria-label="Cerca" value="<?= htmlspecialchars($searched) ?>" autofocus>
+                <button type="submit" class="btn btn-brand px-4">Cerca</button>
             </form>
         </div>
 
@@ -83,7 +81,7 @@ if ($searched !== '') {
                                         : null;
                         ?>
                         <a href="film.php?tmdb_id=<?= urlencode($id) ?>" class="text-decoration-none">
-                            <div class="card border-0 shadow-sm rounded-3 card-hover bg-white">
+                            <div class="card border-0 shadow-sm rounded-3 card-hover bg-white search-result-card">
                                 <div class="card-body px-4 py-3 d-flex align-items-center gap-3">
 
                                     <?php if ($poster): ?>

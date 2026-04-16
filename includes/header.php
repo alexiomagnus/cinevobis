@@ -1,41 +1,23 @@
 <?php 
-$currentPage = basename($_SERVER['SCRIPT_NAME']);
-
-$publicPages = ['index.php', 'search.php', 'film.php'];
-$privatePages = ['sessions.php', 'add_film.php', 'users.php', 'edit_user.php', 'settings.php', 'admin_area.php'];
-
 $isLogged = isset($_SESSION['username']);
+$currentPage = basename($_SERVER['SCRIPT_NAME']);
+$publicPages = ['login.php', 'signup.php'];
+$isPublicPage = in_array($currentPage, $publicPages);
 ?>
 
-<nav class="navbar navbar-dark bg-dark">
-    <div class="container-fluid">
-        <a href="/index.php" class="navbar-brand text-decoration-none">Cinevobis</a>
+<nav class="navbar px-4">
+    <a href="/index.php" class="navbar-brand">Cinevobis</a>
 
-        <form method="POST" class="d-flex gap-3 align-items-center mb-0">
-
-            <?php if (in_array($currentPage, $publicPages)): ?>
-
-                <?php if ($isLogged): ?>
-                    <button class="bg-transparent border-0 text-light fs-2 p-0 lh-1" name="profile" title="Profile">
-                        <i class="bi bi-person-circle"></i>
-                    </button>
-                <?php else: ?>
-                    <button class="btn btn-light" name="login">Login</button>
-                    <button class="btn btn-warning" name="signup">Sign up</button>
-                <?php endif; ?>
-
-            <?php elseif (in_array($currentPage, $privatePages)): ?>
-
-                <?php if ($isLogged): ?>
-                    <button class="bg-transparent border-0 text-light fs-2 p-0 lh-1" name="profile" title="Profile">
-                        <i class="bi bi-person-circle"></i>
-                    </button>
-                <?php else: ?>
-                    <button class="btn btn-light" name="login">Login</button>
-                <?php endif; ?>
-
+    <form method="POST" class="d-flex gap-2 align-items-center mb-0">
+        <?php if (!$isPublicPage): ?>
+            
+            <?php if (!$isLogged): ?>
+                <button class="btn btn-sm btn-outline-dark" name="login">Accedi</button>
+                <button type="submit" class="btn btn-sm btn-brand" name="signup">Registrati</button>
+            <?php else: ?>
+                <button class="btn btn-sm btn-outline-dark" name="profile">Il mio profilo</button>
             <?php endif; ?>
 
-        </form>
-    </div>
+        <?php endif; ?>
+    </form>
 </nav>
