@@ -70,7 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 <div style="max-width: 480px; width: 100%;">
                     <h1 class="display-6 fw-bolder mb-2">Crea il tuo account</h1>
-                    <p class="text-secondary mb-5">Unisci alla community</p>
+                    <p class="text-secondary mb-5">Unisciti alla community</p>
 
                     <?php if ($errore): ?>
                         <div class="alert alert-danger border-0 small py-2 mb-4"><?= htmlspecialchars($errore) ?></div>
