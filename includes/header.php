@@ -8,16 +8,28 @@ $isPublicPage = in_array($currentPage, $publicPages);
 <nav class="navbar px-4">
     <a href="/index.php" class="navbar-brand">Cinevobis</a>
 
-    <form method="POST" class="d-flex gap-2 align-items-center mb-0">
+    <div class="d-flex gap-2 align-items-center mb-0">
         <?php if (!$isPublicPage): ?>
             
             <?php if (!$isLogged): ?>
-                <button class="btn btn-sm btn-outline-dark" name="login">Accedi</button>
-                <button type="submit" class="btn btn-sm btn-brand" name="signup">Registrati</button>
+                <form method="POST" class="d-flex gap-2 mb-0">
+                    <button class="btn btn-sm btn-outline-dark" name="login">Accedi</button>
+                    <button type="submit" class="btn btn-sm btn-brand" name="signup">Registrati</button>
+                </form>
             <?php else: ?>
-                <button class="btn btn-sm btn-outline-dark" name="profile">Il mio profilo</button>
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-dark dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        Il mio profilo
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="/actions/details.php">Dettagli</a></li>
+                        <li><a class="dropdown-item" href="/actions/change_password.php">Cambia password</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="/actions/logout.php">Esci</a></li>
+                    </ul>
+                </div>
             <?php endif; ?>
 
         <?php endif; ?>
-    </form>
+    </div>
 </nav>

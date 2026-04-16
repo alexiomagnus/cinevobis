@@ -25,6 +25,7 @@ $sessioni = $user->readAccess($righe);
     <title>Area sessioni - Cinevobis</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/assets/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body class="d-flex flex-column min-vh-100">
 
@@ -36,7 +37,7 @@ $sessioni = $user->readAccess($righe);
         <form method="GET" class="d-flex align-items-center gap-2 mb-3">
             <label class="mb-0">Righe</label>
             <input type="number" name="righe" class="form-control form-control-sm" style="width: 80px;" min="1" value="<?= htmlspecialchars($righe) ?>">
-            <button type="submit" class="btn btn-primary btn-sm">Invia</button>
+            <button type="submit" class="btn btn-sm btn-brand">Invia</button>
         </form>
 
         <table class="table table-sm mb-5">

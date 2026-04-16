@@ -24,6 +24,7 @@ if (isset($_POST['upload']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
     <title>Aggiungi film - Cinevobis</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/assets/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body class="d-flex flex-column min-vh-100">
 
@@ -37,8 +38,8 @@ if (isset($_POST['upload']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
             <label for="image" class="form-label">Inserisci una foto:</label>
             <div class="d-flex gap-2 align-items-center">
                 <input type="file" name="image" id="image" class="form-control w-auto" accept="image/*">
-                <button type="submit" name="upload" class="btn btn-primary">Carica</button>
-                <button type="submit" name="cancel" class="btn btn-secondary">Annulla</button>
+                <button type="submit" name="upload" class="btn btn-sm btn-brand">Carica</button>
+                <button type="submit" name="cancel" class="btn btn-sm btn-secondary">Annulla</button>
             </div>
         </form>
 
