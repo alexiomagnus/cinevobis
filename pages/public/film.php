@@ -18,8 +18,9 @@ $dotenv->load();
 $tmdb = Tmdb::client($_ENV['API_KEY']);
 
 $errore = "";
-$movie = null;
 $searched = "";
+
+$movie = null;
 
 $movie_id = $_GET['tmdb_id'] ?? null;
 
@@ -111,7 +112,7 @@ if ($movie) {
                                     <?php if (!empty($generi)): ?>
                                         <div class="d-flex flex-wrap gap-2 mb-3">
                                             <?php foreach ($generi as $genre): ?>
-                                                <span class="badge rounded-pill bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-2">
+                                                <span class="badge rounded-pill badge-genre px-3 py-2">
                                                     <?= htmlspecialchars($genre['name']) ?>
                                                 </span>
                                             <?php endforeach; ?>
@@ -120,7 +121,7 @@ if ($movie) {
 
                                     <?php if ($voto): ?>
                                         <div class="mb-3">
-                                            <i class="bi bi-star-fill text-warning me-1"></i>
+                                            <i class="bi bi-star-fill icon-star me-1"></i>
                                             <span class="fw-semibold"><?= number_format($voto, 1) ?></span>
                                             <span class="text-muted small">/ 10</span>
                                         </div>
@@ -139,21 +140,21 @@ if ($movie) {
                                 <div class="col-md-4">
                                     <div class="text-uppercase text-muted small fw-bold mb-1">Durata</div>
                                     <div class="fs-5 fw-medium">
-                                        <i class="bi bi-clock text-primary me-2"></i>
+                                        <i class="bi bi-clock icon-accent me-2"></i>
                                         <?= $durata ? $durata . ' min' : '?' ?>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="text-uppercase text-muted small fw-bold mb-1">Anno di uscita</div>
                                     <div class="fs-5 fw-medium">
-                                        <i class="bi bi-calendar3 text-primary me-2"></i>
+                                        <i class="bi bi-calendar3 icon-accent me-2"></i>
                                         <?= htmlspecialchars($anno) ?>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="text-uppercase text-muted small fw-bold mb-1">Paese di produzione</div>
                                     <div class="fs-5 fw-medium">
-                                        <i class="bi bi-globe text-primary me-2"></i>
+                                        <i class="bi bi-globe icon-accent me-2"></i>
                                         <?= htmlspecialchars($paese) ?>
                                     </div>
                                 </div>
@@ -164,8 +165,8 @@ if ($movie) {
                                 <h5 class="text-muted fw-semibold mb-3">Cast</h5>
                                 <div class="d-flex flex-wrap gap-2">
                                     <?php foreach ($cast as $actor): ?>
-                                        <span class="badge bg-light text-dark border px-3 py-2 rounded-pill fs-6 fw-normal">
-                                            <i class="bi bi-person-circle me-1 text-secondary"></i>
+                                        <span class="badge badge-cast px-3 py-2 rounded-pill fs-6 fw-normal">
+                                            <i class="bi bi-person-circle me-1 text-muted"></i>
                                             <?= htmlspecialchars($actor['name'] ?? 'Sconosciuto') ?>
                                             <?php if (!empty($actor['character'])): ?>
                                                 <span class="text-muted fst-italic">

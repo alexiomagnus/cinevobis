@@ -1,67 +1,99 @@
 :root {
-    --accent-color: #FCA311;
-    --bg-light: #E5E5E5;
-    --text-dark: #000000;
+    --accent-color: #A8C5DA;
+    --accent-hover: #8EB5CC;
+    --accent-dark: #5A8FA8;
+    --bg-base: #F7F5F2;
+    --bg-surface: #FFFFFF;
+    --bg-muted: #EEE9E3;
+    --border-color: #E2DDD8;
+    --text-primary: #3A3A3A;
+    --text-secondary: #8A8480;
+    --text-accent: #5A8FA8;
 }
 
 body {
-    background-color: var(--bg-light);
+    background-color: var(--bg-base);
+    color: var(--text-primary);
     font-family: 'DM Sans', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* Colore Personalizzato Brand */
+/* =====================
+   Bottoni Brand
+===================== */
 .btn-brand {
     background-color: var(--accent-color);
-    color: var(--text-dark);
-    border: 2px solid var(--accent-color); 
+    color: var(--text-primary);
+    border: 1.5px solid var(--accent-color);
     font-weight: 500;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .btn-brand:hover {
-    background-color: #e5940f;
+    background-color: var(--accent-hover);
+    border-color: var(--accent-hover);
+    color: var(--text-primary);
 }
 
-/* Navbar */
-.nav-link:hover {
-    color: var(--accent-color) !important;
+/* Bottone scuro → diventa antracite morbido */
+.btn-dark {
+    background-color: var(--text-primary) !important;
+    border-color: var(--text-primary) !important;
+    color: #FFFFFF !important;
+}
+
+.btn-dark:hover {
+    background-color: #555555 !important;
+    border-color: #555555 !important;
+}
+
+/* =====================
+   Navbar
+===================== */
+.navbar {
+    background-color: var(--bg-base) !important;
+    border-color: var(--border-color) !important;
 }
 
 .navbar-brand {
-    position: relative;
     text-decoration: none;
+    color: var(--text-primary) !important;
 }
 
-.navbar-brand {
-    position: relative;
-    text-decoration: none;
+.nav-link {
+    color: var(--text-secondary) !important;
+    transition: color 0.2s ease;
 }
 
-.navbar-brand {
-    text-decoration: none;
-    background: linear-gradient(currentColor, currentColor) no-repeat bottom center;
-    background-size: 0% 2px;
-    transition: background-size 0.3s ease;
+.nav-link:hover,
+.nav-link.text-dark {
+    color: var(--text-primary) !important;
 }
 
-.navbar-brand:hover {
-    background-size: 100% 2px;
+/* Link attivo nella navbar */
+.nav-link.active-nav {
+    color: var(--text-primary) !important;
+    border-bottom: 2px solid var(--accent-dark);
+    padding-bottom: 2px;
 }
 
-/* Barra di ricerca */
+/* =====================
+   Barra di Ricerca
+===================== */
 .search-wrap {
-    background: #FFFFFF;
-    border: 1px solid rgba(0,0,0,0.12);
+    background: var(--bg-surface);
+    border: 1.5px solid var(--border-color);
     border-radius: 0.75rem;
     padding: 8px 10px 8px 22px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-    transition: all 0.3s ease;
-    cursor: pointer;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+    transition: all 0.25s ease;
+    cursor: text;
 }
 
-.search-wrap:hover {
-    box-shadow: 0 0 0 3px rgba(229, 148, 15, 0.25);
+.search-wrap:hover,
+.search-wrap:focus-within {
+    box-shadow: 0 0 0 3px rgba(168, 197, 218, 0.35);
     border-color: var(--accent-color);
     outline: 0;
 }
@@ -72,25 +104,129 @@ body {
     font-size: 14px;
     background: transparent;
     width: 100%;
+    color: var(--text-primary);
 }
 
-/* Dropdown */
+.search-wrap input::placeholder {
+    color: var(--text-secondary);
+}
+
+/* =====================
+   Dropdown
+===================== */
+.dropdown-menu {
+    border: 1px solid var(--border-color) !important;
+    background-color: var(--bg-surface);
+}
+
+.dropdown-item:hover {
+    background-color: var(--bg-muted) !important;
+    color: var(--text-primary) !important;
+}
+
 .dropdown-item:active,
 .dropdown-item.active {
-    background-color: var(--bg-light) !important;
-    color: var(--bg-white) !important;
+    background-color: var(--bg-muted) !important;
+    color: var(--text-primary) !important;
 }
 
-/* Cards & Effetti */
+/* =====================
+   Cards & Effetti
+===================== */
 .search-result-card {
     border-radius: 0.75rem;
+    background-color: var(--bg-surface) !important;
+    border: 1px solid var(--border-color) !important;
 }
 
-.card-hover { 
-    transition: transform 0.2s, box-shadow 0.2s; 
+.card {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-color) !important;
 }
 
-.card-hover:hover { 
-    transform: translateY(-4px); 
-    box-shadow: 0 .5rem 1rem rgba(0,0,0,.12); 
+.card-hover {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* =====================
+   Badge Generi
+===================== */
+.badge-genre {
+    background-color: #DDE8F0 !important;
+    color: var(--accent-dark) !important;
+    border: 1px solid #BDD2E2 !important;
+}
+
+/* =====================
+   Badge Cast
+===================== */
+.badge-cast {
+    background-color: var(--bg-muted) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+/* =====================
+   Icone colorazione
+===================== */
+.icon-accent {
+    color: var(--accent-dark) !important;
+}
+
+.icon-star {
+    color: #E8C97A !important;
+}
+
+/* =====================
+   Form Inputs
+===================== */
+.form-control {
+    background-color: var(--bg-muted) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.form-control::placeholder {
+    color: var(--text-secondary) !important;
+}
+
+.form-control:focus {
+    background-color: var(--bg-surface) !important;
+    border-color: var(--accent-color) !important;
+    box-shadow: 0 0 0 0.2rem rgba(168, 197, 218, 0.3) !important;
+    color: var(--text-primary) !important;
+}
+
+/* =====================
+   Footer
+===================== */
+footer {
+    border-color: var(--border-color) !important;
+    background-color: var(--bg-base);
+}
+
+/* =====================
+   Alert
+===================== */
+.alert-danger {
+    background-color: #FAE8E8 !important;
+    color: #9B4545 !important;
+    border-color: #F2CECE !important;
+}
+
+.alert-success {
+    background-color: #E8F4EC !important;
+    color: #3D7A52 !important;
+    border-color: #C4E2CE !important;
+}
+
+.alert-warning {
+    background-color: #FDF4E3 !important;
+    color: #8A6A2E !important;
+    border-color: #F5E0B0 !important;
 }

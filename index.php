@@ -46,7 +46,7 @@ if (isset($_SESSION['id_profilo']) && $_SESSION['id_profilo'] == 1) {
                     <h1 class="headline mb-3">Cinevobis</h1>
 
                     <form action="/pages/public/search.php" method="GET" class="search-wrap d-flex align-items-center mx-auto mt-5">
-                        <input type="text" name="search" placeholder="Cerca un film..." class="flex-grow-1" autocomplete="off">
+                        <input type="text" name="search" placeholder="Cerca un film..." class="flex-grow-1">
                         <button type="submit" class="btn btn-brand rounded-3 px-4">Cerca</button>
                     </form>
 

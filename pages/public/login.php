@@ -40,6 +40,7 @@ if (isset($_POST['login'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Cinevobis</title>
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
 
@@ -53,7 +54,7 @@ if (isset($_POST['login'])) {
                     aria-label="Close">
                 </a>
 
-                <div style="max-width: 400px; width: 100%;">
+                <div style="max-width: 450px; width: 100%;">
                     <h1 class="display-6 fw-bolder mb-2">Accedi</h1>
                     <p class="text-secondary mb-5">Usa il tuo username</p>
 
@@ -62,7 +63,7 @@ if (isset($_POST['login'])) {
                     <?php endif; ?>
 
                     <form method="POST">
-                        <div class="mb-4">
+                        <div class="mb-3">
                             <input type="text" name="username" class="form-control bg-light border-light py-3" 
                                    placeholder="Username" required>
                         </div>
@@ -75,9 +76,7 @@ if (isset($_POST['login'])) {
                         <button type="submit" name="login" class="btn btn-dark btn-lg w-100 py-3 fw-bold mb-4">Accedi</button>
                     </form>
 
-                    <div class="text-center small">
-                        <p class="text-secondary">Non hai un account? <a href="signup.php" class="text-dark text-decoration-none fw-bold">Registrati</a></p>
-                    </div>
+                    <p class="text-center small text-secondary">Non hai un account? <a href="signup.php" class="text-dark fw-bold text-decoration-none">Registrati</a></p>
                 </div>
             </div>
 

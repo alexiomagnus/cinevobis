@@ -6,7 +6,7 @@ $isPublicPage = in_array($currentPage, $publicPages);
 ?>
 
 <nav class="navbar navbar-expand-lg px-4 py-3 border-bottom mb-0" 
-     style="position: relative; border-color: #000000 !important;">
+     style="position: relative;">
     <div class="container-fluid">
         
         <a href="/" class="navbar-brand fw-bold text-dark" style="font-size: 20px; z-index: 2;">
@@ -15,18 +15,18 @@ $isPublicPage = in_array($currentPage, $publicPages);
 
         <div class="d-none d-lg-flex align-items-center gap-4" 
              style="position: absolute; left: 50%; transform: translateX(-50%); z-index: 1;">
-            <a href="/" class="nav-link text-secondary text-uppercase fw-semibold small" style="letter-spacing: 1px;">Recensioni</a>
-            <a href="/" class="nav-link text-secondary text-uppercase fw-semibold small" style="letter-spacing: 1px;">Preferiti</a>
-            <a href="/" class="nav-link text-secondary text-uppercase fw-semibold small" style="letter-spacing: 1px;">Watched</a>
-            <a href="/" class="nav-link text-secondary text-uppercase fw-semibold small" style="letter-spacing: 1px;">Watchlist</a>
+            <a href="/pages/user/reviews.php" class="nav-link text-uppercase fw-semibold small <?= $currentPage === 'reviews.php' ? 'text-dark' : 'text-secondary' ?>" style="letter-spacing: 1px;">Recensioni</a>
+            <a href="/pages/user/favorites.php" class="nav-link text-uppercase fw-semibold small <?= $currentPage === 'favorites.php' ? 'text-dark' : 'text-secondary' ?>" style="letter-spacing: 1px;">Preferiti</a>
+            <a href="/pages/user/watched.php" class="nav-link text-uppercase fw-semibold small <?= $currentPage === 'watched.php' ? 'text-dark' : 'text-secondary' ?>" style="letter-spacing: 1px;">Watched</a>
+            <a href="/pages/user/watchlist.php" class="nav-link text-uppercase fw-semibold small <?= $currentPage === 'watchlist.php' ? 'text-dark' : 'text-secondary' ?>" style="letter-spacing: 1px;">Watchlist</a>
         </div>
         
         <div class="ms-auto d-flex align-items-center" style="z-index: 2;">
             <?php if (!$isPublicPage): ?>
                 <?php if (!$isLogged): ?>
                     <div class="d-flex gap-2">
-                        <button type="submit" name="login" class="btn btn-sm btn-brand px-3 shadow-none">Accedi</button>
-                        <button type="submit" name="signup" class="btn btn-sm btn-dark px-3 shadow-none">Registrati</button>
+                        <a href="/pages/public/login.php" class="btn btn-sm btn-brand px-3 shadow-none">Accedi</a>
+                        <a href="/pages/public/signup.php" class="btn btn-sm btn-dark px-3 shadow-none">Registrati</a>
                     </div>
                 <?php else: ?>
                     <div class="dropdown">

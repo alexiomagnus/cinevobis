@@ -27,6 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign up - Cinevobis</title>
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
     <style>
         .ts-wrapper .ts-control {
             min-height: calc(1.5em + 1rem + 2px) !important;
@@ -58,7 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     aria-label="Close">
                 </a>
 
-                <div style="max-width: 480px; width: 100%;">
+                <div style="max-width: 450px; width: 100%;">
                     <h1 class="display-6 fw-bolder mb-2">Crea il tuo account</h1>
                     <p class="text-secondary mb-5">Unisciti alla community</p>
 
@@ -71,15 +72,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     <form method="POST">
                         <div class="row g-3 mb-3">
-                            <div class="col-md-6"><input type="text" name="nome" class="form-control bg-light border-light py-3" placeholder="Nome" required></div>
-                            <div class="col-md-6"><input type="text" name="cognome" class="form-control bg-light border-light py-3" placeholder="Cognome" required></div>
+                            <div class="col-md-6">
+                                <input type="text" name="nome" class="form-control bg-light border-light py-3" placeholder="Nome" required>
+                            </div>
+                            <div class="col-md-6">
+                                <input type="text" name="cognome" class="form-control bg-light border-light py-3" placeholder="Cognome" required>
+                            </div>
                         </div>
 
-                        <input type="email" name="email" class="form-control bg-light border-light py-3 mb-3" placeholder="Email" required>
+                        <div class="mb-3">
+                            <input type="email" name="email" class="form-control bg-light border-light py-3" placeholder="Email" required>
+                        </div>
                         
-                        <input type="text" name="username" class="form-control bg-light border-light py-3 mb-3" placeholder="Username" required>
+                        <div class="mb-3">
+                            <input type="text" name="username" class="form-control bg-light border-light py-3" placeholder="Username" required>
+                        </div>
                         
-                        <input type="password" name="password" class="form-control bg-light border-light py-3 mb-5" placeholder="Password" required>
+                        <div class="mb-5">
+                            <input type="password" name="password" class="form-control bg-light border-light py-3" placeholder="Password" required>
+                        </div>
                         
                         <button type="submit" class="btn btn-dark btn-lg w-100 py-3 fw-bold mb-4">Crea un account</button>
                     </form>
