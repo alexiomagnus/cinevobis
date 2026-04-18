@@ -59,4 +59,5 @@ if (isset($_SESSION['id_profilo']) && $_SESSION['id_profilo'] == 1) {
 
     <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

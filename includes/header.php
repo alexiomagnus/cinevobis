@@ -13,6 +13,7 @@ $isPublicPage = in_array($currentPage, $publicPages);
             Cinevobis
         </a>
 
+        <?php if($currentPage == $isPublicPage): ?>
         <div class="d-none d-lg-flex align-items-center gap-4" 
              style="position: absolute; left: 50%; transform: translateX(-50%); z-index: 1;">
             <a href="/pages/user/reviews.php" class="nav-link text-uppercase fw-semibold small <?= $currentPage === 'reviews.php' ? 'text-dark' : 'text-secondary' ?>" style="letter-spacing: 1px;">Recensioni</a>
@@ -20,6 +21,7 @@ $isPublicPage = in_array($currentPage, $publicPages);
             <a href="/pages/user/watched.php" class="nav-link text-uppercase fw-semibold small <?= $currentPage === 'watched.php' ? 'text-dark' : 'text-secondary' ?>" style="letter-spacing: 1px;">Watched</a>
             <a href="/pages/user/watchlist.php" class="nav-link text-uppercase fw-semibold small <?= $currentPage === 'watchlist.php' ? 'text-dark' : 'text-secondary' ?>" style="letter-spacing: 1px;">Watchlist</a>
         </div>
+        <?php endif; ?>
         
         <div class="ms-auto d-flex align-items-center" style="z-index: 2;">
             <?php if (!$isPublicPage): ?>

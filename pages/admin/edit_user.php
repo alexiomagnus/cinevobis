@@ -20,21 +20,12 @@ if (isset($_POST['indietro'])) {
     exit();
 }
 
-$nazioni = [];
-try {
-    $stmt    = $conn->query("SELECT iso_code, nome_nazione FROM nazioni ORDER BY nome_nazione");
-    $nazioni = $stmt->fetchAll();
-} catch (PDOException $e) {
-    $errore = "Errore: " . $e->getMessage();
-}
 
 if (isset($_POST['salva'])) {
-    $nome       = trim($_POST['nome']       ?? '');
-    $cognome    = trim($_POST['cognome']    ?? '');
-    $citta      = trim($_POST['citta']      ?? '');
-    $email      = trim($_POST['email']      ?? '');
-    $iso_code   = $_POST['iso_code']      ?? null;
-    $attivo     = $_POST['attivo']          ?? 0;
+    $nome    = trim($_POST['nome']    ?? '');
+    $cognome = trim($_POST['cognome'] ?? '');
+    $email   = trim($_POST['email']   ?? '');
+    $attivo  = $_POST['attivo']       ?? 0;
 
     if (!$nome || !$cognome || !$email) {
         $errore = "Nome, cognome ed email sono obbligatori";
@@ -42,8 +33,8 @@ if (isset($_POST['salva'])) {
         try {
             $userUpdate = new userObj(
                 $conn, $username, null,
-                $nome, $cognome, $citta, $email,
-                $attivo, null, $iso_code ?: null
+                $nome, $cognome, null, $email,
+                $attivo, null, null
             );
 
             $userUpdate->update($username);
@@ -129,24 +120,6 @@ if (!$utente) {
                             <label class="form-label fw-semibold">Email</label>
                             <input type="email" name="email" class="form-control"
                                    value="<?= htmlspecialchars($utente['email'] ?? '') ?>" required>
-                        </div>
-                        <div class="col-6">
-                            <label class="form-label fw-semibold">Città</label>
-                            <input type="text" name="citta" class="form-control"
-                                   value="<?= htmlspecialchars($utente['citta'] ?? '') ?>">
-                        </div>
-
-                        <div class="col-12">
-                            <label class="form-label fw-semibold">Nazione</label>
-                            <select name="iso_code" class="form-select">
-                                <option value="">— Seleziona —</option>
-                                <?php foreach ($nazioni as $n): ?>
-                                    <option value="<?= $n['iso_code'] ?>"
-                                        <?= $utente['iso_code'] == $n['iso_code'] ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($n['nome_nazione']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
                         </div>
 
                         <div class="col-12">
