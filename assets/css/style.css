@@ -46,7 +46,7 @@ body {
 }
 
 .navbar-brand:hover {
-    background-size: 100% 2px; /* Si allunga al passaggio del mouse */
+    background-size: 100% 2px;
 }
 
 /* Barra di ricerca */
@@ -61,8 +61,9 @@ body {
 }
 
 .search-wrap:hover {
+    box-shadow: 0 0 0 3px rgba(229, 148, 15, 0.25);
     border-color: var(--accent-color);
-    box-shadow: 0 0 12px rgba(0, 123, 255, 0.3);
+    outline: 0;
 }
 
 .search-wrap input {

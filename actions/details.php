@@ -18,12 +18,6 @@ $userData = $user->findByUsername();
 $nazione = "";
 
 if ($userData) {
-    if ($userData['iso_code']) {
-        $stmt = $conn->prepare("SELECT nome_nazione FROM nazioni WHERE iso_code = ?");
-        $stmt->execute([$userData['iso_code']]);
-        $nazione = $stmt->fetchColumn();
-    }
-
     if ($userData['data_registrazione']) {
         $date = new DateTime($userData['data_registrazione']);
         $dataRegistrazione = $date->format('Y');
@@ -45,7 +39,7 @@ if ($userData) {
     <div class="container flex-grow-1 d-flex justify-content-center align-items-center my-5">
         <div class="w-100" style="max-width: 900px;"> 
             <div class="p-5 bg-white shadow-sm" style="border-radius: 1.5rem; border: 1px solid #eee;">
-                <h2 class="fw-bold mb-4 text-primary">Dettagli Utente</h2>
+                <h2 class="fw-bold mb-4 text">Dettagli Utente</h2>
                 <hr class="mb-4">
                 
                 <?php if ($userData): ?>
@@ -54,11 +48,9 @@ if ($userData) {
                             <p class="mb-2"><strong>Username:</strong><br> <?= htmlspecialchars($userData['username']) ?></p>
                             <p class="mb-2"><strong>Nome:</strong><br> <?= htmlspecialchars($userData['nome']) ?></p>
                             <p class="mb-2"><strong>Cognome:</strong><br> <?= htmlspecialchars($userData['cognome']) ?></p>
-                            <p class="mb-2"><strong>Città:</strong><br> <?= htmlspecialchars($userData['citta']) ?></p>
                         </div>
                         <div class="col-md-6">
                             <p class="mb-2"><strong>Email:</strong><br> <?= htmlspecialchars($userData['email']) ?></p>
-                            <p class="mb-2"><strong>Nazione:</strong><br> <?= htmlspecialchars($nazione) ?></p>
                             <p class="mb-2"><strong>Data Registrazione:</strong><br> <?= htmlspecialchars($dataRegistrazione); ?></p>
                         </div>
                     </div>

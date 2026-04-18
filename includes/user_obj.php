@@ -4,28 +4,21 @@ class userObj {
     private $password;
     private $nome;
     private $cognome;
-    private $citta;
     private $email;
     private $id_profilo;
-    private $iso_code;
     private $attivo;
-    private $foto_profilo;
     private $db;
 
     public function __construct($db, $username, $password = null, $nome = null, $cognome = null,
-                                $citta = null, $email = null, $attivo = null,
-                                $id_profilo = null, $iso_code = null, $foto_profilo = null) {
+                                $email = null, $attivo = null, $id_profilo = null) {
         $this->db           = $db;
         $this->username     = $username;
         $this->password     = $password ? password_hash($password, PASSWORD_DEFAULT) : null;
         $this->nome         = $nome;
         $this->cognome      = $cognome;
-        $this->citta        = $citta;
         $this->email        = $email;
         $this->attivo       = $attivo;
         $this->id_profilo   = $id_profilo;
-        $this->iso_code     = $iso_code;
-        $this->foto_profilo = $foto_profilo;
     }
 
     public function get($property) {
@@ -36,6 +29,7 @@ class userObj {
     }
 
     public function set($property, $value) {
+        // Impedisce la modifica diretta di db e username tramite questo metodo
         if (property_exists($this, $property) && $property !== 'db' && $property !== 'username') {
             if ($property === 'password') {
                 $value = password_hash($value, PASSWORD_DEFAULT);
@@ -50,28 +44,25 @@ class userObj {
 
     public function create() {
         $sql = "INSERT INTO utenti 
-                    (username, password, nome, cognome, citta, email, attivo, id_profilo, iso_code, foto_profilo, data_registrazione)
+                    (username, password, nome, cognome, email, attivo, id_profilo, data_registrazione)
                 VALUES 
-                    (:username, :password, :nome, :cognome, :citta, :email, :attivo, :id_profilo, :iso_code, :foto_profilo, :data_registrazione)";
+                    (:username, :password, :nome, :cognome, :email, :attivo, :id_profilo, :data_registrazione)";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
             ':username'           => $this->username,
             ':password'           => $this->password,
             ':nome'               => $this->nome,
             ':cognome'            => $this->cognome,
-            ':citta'              => $this->citta,
             ':email'              => $this->email,
             ':attivo'             => $this->attivo ?? 1,
             ':id_profilo'         => $this->id_profilo,
-            ':iso_code'           => $this->iso_code,
-            ':foto_profilo'       => $this->foto_profilo,
             ':data_registrazione' => date('Y-m-d H:i:s')
         ]);
     }
 
     public function findByUsername() {
-        $sql = "SELECT id_utente, username, password, nome, cognome, citta, email,
-                       attivo, id_profilo, iso_code, foto_profilo, data_registrazione
+        $sql = "SELECT id_utente, username, password, nome, cognome, email,
+                       attivo, id_profilo, data_registrazione
                 FROM utenti WHERE username = :username";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':username', $this->username);
@@ -80,11 +71,10 @@ class userObj {
     }
 
     public function readAll() {
-        $sql = "SELECT u.id_utente, u.username, u.nome, u.cognome, u.citta, u.email,
-                       u.attivo, p.nome_profilo, n.nome_nazione
+        $sql = "SELECT u.id_utente, u.username, u.nome, u.cognome, u.email,
+                       u.attivo, p.nome_profilo
                 FROM utenti u
                 LEFT JOIN profili p ON p.id_profilo = u.id_profilo
-                LEFT JOIN nazioni n ON n.iso_code   = u.iso_code
                 ORDER BY u.username";
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
@@ -95,19 +85,17 @@ class userObj {
         $sql = "UPDATE utenti SET
                     nome       = :nome,
                     cognome    = :cognome,
-                    citta      = :citta,
                     email      = :email,
                     attivo     = :attivo,
-                    iso_code = :iso_code
+                    id_profilo = :id_profilo
                 WHERE username = :username";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
             ':nome'       => $this->nome,
             ':cognome'    => $this->cognome,
-            ':citta'      => $this->citta,
             ':email'      => $this->email,
             ':attivo'     => $this->attivo,
-            ':iso_code'   => $this->iso_code,
+            ':id_profilo' => $this->id_profilo,
             ':username'   => $usernameOriginale
         ]);
     }
@@ -167,3 +155,4 @@ class userObj {
         return $stmt->fetchAll();
     }
 }
+?>

@@ -51,7 +51,7 @@ if ($movie) {
                         ? substr($movie['release_date'], 0, 4) : '?';                     // Prendere solo l'anno (i primi quattro caratteri)
     $generi          = $movie['genres'] ?? [];
     $paesi           = $movie['production_countries'] ?? [];
-    $paese           = !empty($paesi) ? strtoupper($paesi[0]['iso_3166_1'] ?? '?') : '?';
+    $paese           = !empty($paesi) ? strtoupper($paesi[0]['name'] ?? '?') : '?';
     $cast            = array_slice($movie['credits']['cast'] ?? [], 0, 10);               // Prendere solo i primi 10 attori
 }
 ?>
