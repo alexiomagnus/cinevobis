@@ -46,8 +46,12 @@ if (isset($_POST['login'])) {
     <div class="container-fluid p-0 overflow-hidden">
         <div class="row g-0 vh-100">
             <div class="col-lg-6 d-flex flex-column justify-content-center align-items-center position-relative px-4">
-                
-                <a href="/" class="btn-close position-absolute top-0 start-0 m-4" aria-label="Close"></a>
+
+                <a href="javascript:void(0)" 
+                    onclick="closeAndRedirect()" 
+                    class="btn-close position-absolute top-0 start-0 m-4" 
+                    aria-label="Close">
+                </a>
 
                 <div style="max-width: 400px; width: 100%;">
                     <h1 class="display-6 fw-bolder mb-2">Accedi</h1>
@@ -82,6 +86,7 @@ if (isset($_POST['login'])) {
             </div>
         </div>
     </div>
-
+    
+    <script src="/assets/js/script.js"></script>
 </body>
 </html>

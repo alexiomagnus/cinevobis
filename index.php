@@ -42,20 +42,10 @@ if (isset($_SESSION['id_profilo']) && $_SESSION['id_profilo'] == 1) {
         <div class="container text-center">
             <div class="row justify-content-center">
                 <div class="col-md-8 col-lg-6">
-                    
-                    <span class="text-uppercase mb-3 d-block opacity-50 small fw-bold" style="letter-spacing: 0.14em;">
-                        Cinevobis Collection
-                    </span>
 
-                    <h1 class="headline mb-3">
-                        Scopri. Organizza. <em>Condividi.</em>
-                    </h1>
+                    <h1 class="headline mb-3">Cinevobis</h1>
 
-                    <p class="text-muted mb-5 mx-auto" style="max-width: 340px; font-weight: 300;">
-                        La tua cineteca virtuale personale sempre a portata di mano.
-                    </p>
-
-                    <form action="/pages/public/search.php" method="GET" class="search-wrap d-flex align-items-center mx-auto">
+                    <form action="/pages/public/search.php" method="GET" class="search-wrap d-flex align-items-center mx-auto mt-5">
                         <input type="text" name="search" placeholder="Cerca un film..." class="flex-grow-1" autocomplete="off">
                         <button type="submit" class="btn btn-brand rounded-3 px-4">Cerca</button>
                     </form>

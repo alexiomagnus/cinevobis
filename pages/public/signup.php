@@ -4,10 +4,13 @@ require_once(__DIR__ . '/../../includes/user_obj.php');
 
 $errore    = ""; $messaggio = "";
 $nazioni = [];
+
 try {
     $stmt    = $conn->query("SELECT iso_code, nome_nazione FROM nazioni ORDER BY nome_nazione");
     $nazioni = $stmt->fetchAll();
-} catch (PDOException $e) { $errore = "Errore: " . $e->getMessage(); }
+} catch (PDOException $e) { 
+    $errore = "Errore: " . $e->getMessage(); 
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = trim($_POST['username']);
@@ -66,7 +69,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="container-fluid p-0 overflow-hidden">
         <div class="row g-0 vh-100">
             <div class="col-lg-6 d-flex flex-column justify-content-center align-items-center position-relative px-4 py-5 overflow-auto">
-                <a href="/" class="btn-close position-absolute top-0 start-0 m-4" aria-label="Close"></a>
+
+                <a href="javascript:void(0)" 
+                    onclick="closeAndRedirect()" 
+                    class="btn-close position-absolute top-0 start-0 m-4" 
+                    aria-label="Close">
+                </a>
 
                 <div style="max-width: 480px; width: 100%;">
                     <h1 class="display-6 fw-bolder mb-2">Crea il tuo account</h1>
@@ -118,6 +126,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
         </div>
     </div>
+
+    <script src="/assets/js/script.js"></script>
 
     <script src="/node_modules/tom-select/dist/js/tom-select.complete.min.js"></script>
     <script>

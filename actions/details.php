@@ -15,18 +15,18 @@ if (!$username) {
 $user = new userObj($conn, $username);
 $userData = $user->findByUsername();
 
-$profilo = "";
 $nazione = "";
+
 if ($userData) {
-    if ($userData['id_profilo']) {
-        $stmt = $conn->prepare("SELECT nome_profilo FROM profili WHERE id_profilo = ?");
-        $stmt->execute([$userData['id_profilo']]);
-        $profilo = $stmt->fetchColumn();
-    }
     if ($userData['iso_code']) {
         $stmt = $conn->prepare("SELECT nome_nazione FROM nazioni WHERE iso_code = ?");
         $stmt->execute([$userData['iso_code']]);
         $nazione = $stmt->fetchColumn();
+    }
+
+    if ($userData['data_registrazione']) {
+        $date = new DateTime($userData['data_registrazione']);
+        $dataRegistrazione = $date->format('Y');
     }
 }
 ?>
@@ -58,9 +58,8 @@ if ($userData) {
                         </div>
                         <div class="col-md-6">
                             <p class="mb-2"><strong>Email:</strong><br> <?= htmlspecialchars($userData['email']) ?></p>
-                            <p class="mb-2"><strong>Profilo:</strong><br> <?= htmlspecialchars($profilo) ?></p>
                             <p class="mb-2"><strong>Nazione:</strong><br> <?= htmlspecialchars($nazione) ?></p>
-                            <p class="mb-2"><strong>Data Registrazione:</strong><br> <?= htmlspecialchars($userData['data_registrazione']) ?></p>
+                            <p class="mb-2"><strong>Data Registrazione:</strong><br> <?= htmlspecialchars($dataRegistrazione); ?></p>
                         </div>
                     </div>
                 <?php else: ?>
