@@ -6,7 +6,7 @@ require_once(__DIR__ . '/../includes/user_obj.php');
 $username = $_SESSION['username'] ?? '';
 
 if (!$username) {
-    header("Location: /index.php");
+    header("Location: /pages/login.php");
     exit();
 }
 
@@ -14,23 +14,23 @@ $errore    = '';
 $messaggio = '';
 
 if (isset($_POST['cambia_password'])) {
-    $password_attuale = $_POST['password_attuale']       ?? '';
-    $nuova_password = $_POST['nuova_password']         ?? '';
-    $conferma = $_POST['conferma_password']      ?? '';
+    $password_attuale = $_POST['password_attuale'] ?? '';
+    $nuova_password   = $_POST['nuova_password']   ?? '';
+    $conferma         = $_POST['conferma_password'] ?? '';
 
     if (!$password_attuale || !$nuova_password || !$conferma) {
         $errore = "Compila tutti i campi";
     } elseif ($nuova_password !== $conferma) {
-        $errore = "La nuova password e la conferma non coincidono";
+        $errore = "Le nuove password non coincidono";
     } elseif ($password_attuale === $nuova_password) {
-        $errore = "La nuova password deve essere diversa da quella attuale";
+        $errore = "La nuova password deve essere diversa dalla attuale";
     } else {
         try {
             $user = new userObj($conn, $username);
             $risultato = $user->changePassword($password_attuale, $nuova_password);
 
             if ($risultato['ok']) {
-                $messaggio = "Password aggiornata";
+                $messaggio = "Password aggiornata con successo";
             } else {
                 $errore = $risultato['errore'];
             }
@@ -45,97 +45,60 @@ if (isset($_POST['cambia_password'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cambia password - Cinevobis</title>
+    <title>Cambia Password - Cinevobis</title>
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/css/style.css">
-    
-    <style>
-        .card-auth {
-            border: 1px solid #dee2e6;
-            border-radius: 0.75rem;
-        }
-        .form-label {
-            font-size: 0.875rem;
-            color: #495057;
-            margin-bottom: 0.4rem;
-        }
-        .form-control {
-            padding: 0.6rem 0.75rem;
-            border-radius: 0.5rem;
-        }
-        .form-control:focus {
-            box-shadow: 0 0 0 3px rgba(229, 148, 15, 0.25);
-            border-color: #e5940f;
-            outline: 0;
-        }
-        .btn-action {
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            transition: all 0.2s;
-        }
-    </style>
 </head>
-<body class="d-flex flex-column min-vh-100">
-    <?php require_once(__DIR__ . '/../includes/header.php'); ?>
+<body>
 
-    <main class="container flex-grow-1 d-flex justify-content-center align-items-center py-5">
-        <div class="card card-auth shadow-sm" style="width: 100%; max-width: 400px;">
-            <div class="card-body p-4">
+    <div class="container-fluid">
+        <a href="/profilo.php" class="btn-close position-absolute top-0 start-0 m-4" aria-label="Close"></a>
+
+        <div class="row vh-100 justify-content-center align-items-center">
+            <div class="col-12 col-sm-8 col-md-6 col-lg-4 px-4">
                 
-                <div class="mb-4">
-                    <h4 class="fw-bold m-0">Cambia password</h4>
+                <div class="text-center mb-5">
+                    <h1 class="display-6 fw-bolder mb-2">Sicurezza</h1>
+                    <p class="text-secondary">Aggiorna la password</p>
                 </div>
 
                 <?php if ($errore): ?>
-                    <div class="alert alert-danger py-2 border-0 mb-3" role="alert">
-                        <small><?= htmlspecialchars($errore) ?></small>
-                    </div>
+                    <div class="alert alert-danger border-0 small py-2 mb-4 text-center"><?= htmlspecialchars($errore) ?></div>
                 <?php endif; ?>
-
+                
                 <?php if ($messaggio): ?>
-                    <div class="alert alert-success py-2 border-0 mb-3" role="alert">
-                        <small><?= htmlspecialchars($messaggio) ?></small>
-                    </div>
+                    <div class="alert alert-success border-0 small py-2 mb-4 text-center"><?= htmlspecialchars($messaggio) ?></div>
                 <?php endif; ?>
 
                 <form method="POST">
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Password attuale</label>
-                        <input type="password" name="password_attuale" class="form-control" 
+                        <label class="form-label small text-secondary">Password attuale</label>
+                        <input type="password" name="password_attuale" class="form-control bg-light border-light py-3" 
                                placeholder="Password attuale" required>
                     </div>
-
-                    <hr class="my-4 text-muted opacity-25">
+                    
+                    <hr class="my-4 opacity-25">
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Nuova password</label>
-                        <input type="password" name="nuova_password" class="form-control" 
+                        <label class="form-label small text-secondary">Nuova password</label>
+                        <input type="password" name="nuova_password" class="form-control bg-light border-light py-3" 
                                placeholder="Nuova password" required>
                     </div>
 
-                    <div class="mb-4">
-                        <label class="form-label fw-semibold">Conferma nuova password</label>
-                        <input type="password" name="conferma_password" class="form-control" 
-                               placeholder="Conferma password" required>
+                    <div class="mb-5">
+                        <label class="form-label small text-secondary">Conferma nuova password</label>
+                        <input type="password" name="conferma_password" class="form-control bg-light border-light py-3" 
+                               placeholder="Ripeti nuova password" required>
                     </div>
 
-                    <button type="submit" name="cambia_password" class="btn btn-dark btn-action w-100 fw-bold">
+                    <button type="submit" name="cambia_password" class="btn btn-dark btn-lg w-100 py-3 fw-bold mb-4">
                         Salva modifiche
                     </button>
-                    
-                    <div class="text-center mt-4">
-                        <a href="/profilo.php" class="text-decoration-none small text-secondary">
-                            Torna al profilo
-                        </a>
-                    </div>
                 </form>
-
             </div>
         </div>
-    </main>
-
-    <?php require_once(__DIR__ . '/../includes/footer.php'); ?>
-
-    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    </div>
+    
+    <script src="/assets/js/script.js"></script>
 </body>
 </html>

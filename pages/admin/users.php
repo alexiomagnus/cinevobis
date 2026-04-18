@@ -28,7 +28,7 @@ $utenti   = $user->readAll();
 
     <?php require_once(__DIR__ . '/../../includes/header.php'); ?>
 
-    <div class="container mt-4 flex-grow-1">
+    <div class="container mt-4 mb-5 pb-5 flex-grow-1">
         <h1 class="fs-4 fw-bold mb-4">Gestione utenti</h1>
         
         <div class="card shadow-sm border-0">
@@ -37,7 +37,7 @@ $utenti   = $user->readAll();
                     <thead class="table-dark">
                         <tr>
                             <th class="ps-3">Username</th>
-                            <th>Nominativo</th> <th>Città</th>
+                            <th>Identità</th>
                             <th>Email</th>
                             <th>Profilo</th>
                             <th class="text-center">Attivo</th>
@@ -50,9 +50,7 @@ $utenti   = $user->readAll();
                                 <td class="ps-3 fw-bold"><?= htmlspecialchars($utente['username']) ?></td>
                                 <td>
                                     <div class="small fw-semibold"><?= htmlspecialchars($utente['nome'] ?? '') ?> <?= htmlspecialchars($utente['cognome'] ?? '') ?></div>
-                                    <div class="text-muted smaller"><?= htmlspecialchars($utente['nome_nazione'] ?? '') ?></div>
                                 </td>
-                                <td><?= htmlspecialchars($utente['citta'] ?? '') ?></td>
                                 <td class="small"><?= htmlspecialchars($utente['email'] ?? '') ?></td>
                                 <td><span><?= htmlspecialchars($utente['nome_profilo'] ?? '') ?></span></td>
                                 <td class="text-center">
@@ -76,9 +74,7 @@ $utenti   = $user->readAll();
                 </table>
             </div>
         </div>
-    <div>
-
-    <?php require_once(__DIR__ . '/../../includes/footer.php'); ?>
+    </div> <?php require_once(__DIR__ . '/../../includes/footer.php'); ?>
 
     <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>

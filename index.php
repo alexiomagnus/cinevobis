@@ -4,13 +4,6 @@ session_start();
 require_once(__DIR__ . '/config/connection.php');
 require_once(__DIR__ . '/includes/user_obj.php');
 require_once(__DIR__ . '/includes/header_logic.php');
-
-$username = $_SESSION["username"] ?? '';
-
-if (isset($_SESSION['id_profilo']) && $_SESSION['id_profilo'] == 1) {
-    header("Location: /pages/admin/admin_area.php");
-    exit();
-}
 ?>
 <!DOCTYPE html>
 <html lang="it">

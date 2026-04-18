@@ -20,17 +20,26 @@ if (isset($_POST['login'])) {
         if ($utente && password_verify($password, $utente['password'])) {
             if ($utente['attivo'] != 0) {
                 session_regenerate_id(true);
+
                 $_SESSION['id_utente'] = $utente['id_utente'];
                 $_SESSION['username']  = $utente['username'];
                 $_SESSION['id_profilo'] = $utente['id_profilo'];
 
                 $user->createDataLogin(date('Y-m-d H:i:s'), session_id(), $utente['id_utente']);
 
-                header("Location: " . ($utente['id_profilo'] == 1 ? "/pages/admin/admin_area.php" : "/index.php"));
+                header("Location: /index.php");
                 exit();
-            } else { $errore = "Utente non attivo"; }
-        } else { $errore = "Dati non validi"; }
-    } catch (PDOException $e) { $errore = "Errore: " . $e->getMessage(); }
+            } else { 
+                $errore = "Utente non attivo"; 
+            }
+            
+        } else { 
+            $errore = "Dati non validi"; 
+        }
+
+    } catch (PDOException $e) { 
+        $errore = "Errore: " . $e->getMessage(); 
+    }
 }
 ?>
 <!DOCTYPE html>

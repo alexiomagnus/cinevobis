@@ -3,7 +3,6 @@ session_start();
 
 require_once(__DIR__ . '/../config/connection.php');
 require_once(__DIR__ . '/../includes/user_obj.php');
-require_once(__DIR__ . '/../includes/header_logic.php');
 
 $username = $_SESSION['username'] ?? '';
 
@@ -15,13 +14,11 @@ if (!$username) {
 $user = new userObj($conn, $username);
 $userData = $user->findByUsername();
 
-$nazione = "";
+$dataRegistrazione = "N/D";
 
-if ($userData) {
-    if ($userData['data_registrazione']) {
-        $date = new DateTime($userData['data_registrazione']);
-        $dataRegistrazione = $date->format('Y');
-    }
+if ($userData && $userData['data_registrazione']) {
+    $date = new DateTime($userData['data_registrazione']);
+    $dataRegistrazione = $date->format('Y');
 }
 ?>
 <!DOCTYPE html>
@@ -33,36 +30,55 @@ if ($userData) {
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/css/style.css">
 </head>
-<body class="d-flex flex-column min-vh-100">
-    <?php require_once(__DIR__ . '/../includes/header.php'); ?>
+<body>
 
-    <div class="container flex-grow-1 d-flex justify-content-center align-items-center my-5">
-        <div class="w-100" style="max-width: 900px;"> 
-            <div class="p-5 bg-white shadow-sm" style="border-radius: 1.5rem; border: 1px solid #eee;">
-                <h2 class="fw-bold mb-4 text">Dettagli Utente</h2>
-                <hr class="mb-4">
-                
+    <div class="container-fluid p-0">
+        <div class="row g-0 vh-100 justify-content-center align-items-center position-relative">
+            
+            <a href="javascript:void(0)" 
+                onclick="window.location.href='/index.php'" 
+                class="btn-close position-absolute top-0 start-0 m-4" 
+                aria-label="Close">
+            </a>
+
+            <div class="col-12 col-md-10 col-lg-8 col-xl-6 px-4">
+                <div class="text-center mb-5">
+                    <h1 class="display-6 fw-bolder mb-2">Dettagli Profilo</h1>
+                    <p class="text-secondary">Informazioni del tuo account Cinevobis</p>
+                </div>
+
                 <?php if ($userData): ?>
-                    <div class="row g-3">
+                    <div class="row g-4">
                         <div class="col-md-6">
-                            <p class="mb-2"><strong>Username:</strong><br> <?= htmlspecialchars($userData['username']) ?></p>
-                            <p class="mb-2"><strong>Nome:</strong><br> <?= htmlspecialchars($userData['nome']) ?></p>
-                            <p class="mb-2"><strong>Cognome:</strong><br> <?= htmlspecialchars($userData['cognome']) ?></p>
+                            <label class="small text-uppercase text-muted fw-bold">Username</label>
+                            <p class="fs-5 mb-4 border-bottom pb-2"><?= htmlspecialchars($userData['username']) ?></p>
+                            
+                            <label class="small text-uppercase text-muted fw-bold">Nome</label>
+                            <p class="fs-5 mb-4 border-bottom pb-2"><?= htmlspecialchars($userData['nome'] ?? 'Non specificato') ?></p>
+                            
+                            <label class="small text-uppercase text-muted fw-bold">Cognome</label>
+                            <p class="fs-5 mb-4 border-bottom pb-2"><?= htmlspecialchars($userData['cognome'] ?? 'Non specificato') ?></p>
                         </div>
                         <div class="col-md-6">
-                            <p class="mb-2"><strong>Email:</strong><br> <?= htmlspecialchars($userData['email']) ?></p>
-                            <p class="mb-2"><strong>Data Registrazione:</strong><br> <?= htmlspecialchars($dataRegistrazione); ?></p>
+                            <label class="small text-uppercase text-muted fw-bold">Email</label>
+                            <p class="fs-5 mb-4 border-bottom pb-2"><?= htmlspecialchars($userData['email']) ?></p>
+                            
+                            <label class="small text-uppercase text-muted fw-bold">Membro dal</label>
+                            <p class="fs-5 mb-4 border-bottom pb-2"><?= htmlspecialchars($dataRegistrazione); ?></p>
                         </div>
                     </div>
+                    
+                    <div class="mt-5 text-center">
+                        <a href="/logout.php" class="btn btn-outline-danger px-5">Scollegati</a>
+                    </div>
                 <?php else: ?>
-                    <div class="alert alert-warning">Utente non trovato.</div>
+                    <div class="alert alert-warning text-center">Utente non trovato.</div>
                 <?php endif; ?>
             </div>
         </div>
     </div>
-
-    <?php require_once(__DIR__ . '/../includes/footer.php'); ?>
-
+    
+    <script src="/assets/js/script.js"></script>
     <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

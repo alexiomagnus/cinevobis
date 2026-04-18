@@ -30,7 +30,7 @@ $sessioni = $user->readAccess($righe);
 
     <?php require_once(__DIR__ . '/../../includes/header.php'); ?>
 
-    <div class="container mt-4 flex-grow-1">
+    <div class="container mt-4 mb-5 pb-5 flex-grow-1">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="fs-4 fw-bold mb-0">Sessioni registrate</h1>
             

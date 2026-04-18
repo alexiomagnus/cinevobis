@@ -1,19 +1,29 @@
 <?php 
+// Session_start() deve essere chiamato all'inizio di ogni files
 $isLogged = isset($_SESSION['username']);
 $currentPage = basename($_SERVER['SCRIPT_NAME']);
+
 $publicPages = ['login.php', 'signup.php'];
+$adminPages = ['add_film.php', 'admin_area.php', 'sessions.php', 'users.php'];
+
 $isPublicPage = in_array($currentPage, $publicPages);
+$isAdminPage = in_array($currentPage, $adminPages);
 ?>
 
-<nav class="navbar navbar-expand-lg px-4 py-3 border-bottom mb-0" 
-     style="position: relative;">
+<nav class="navbar navbar-expand-lg px-4 py-3 border-bottom mb-0" style="position: relative;">
     <div class="container-fluid">
         
+        <?php if($isAdminPage): ?>
+        <a href="/pages/admin/admin_area.php" class="navbar-brand fw-bold text-dark" style="font-size: 20px; z-index: 2;">
+            Cinevobis
+        </a>
+        <?php else: ?>
         <a href="/" class="navbar-brand fw-bold text-dark" style="font-size: 20px; z-index: 2;">
             Cinevobis
         </a>
+        <?php endif; ?>
 
-        <?php if($currentPage == $isPublicPage): ?>
+        <?php if($isLogged && !$isAdminPage): ?>
         <div class="d-none d-lg-flex align-items-center gap-4" 
              style="position: absolute; left: 50%; transform: translateX(-50%); z-index: 1;">
             <a href="/pages/user/reviews.php" class="nav-link text-uppercase fw-semibold small <?= $currentPage === 'reviews.php' ? 'text-dark' : 'text-secondary' ?>" style="letter-spacing: 1px;">Recensioni</a>
@@ -36,16 +46,26 @@ $isPublicPage = in_array($currentPage, $publicPages);
                             <span class="navbar-toggler-icon"></span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg mt-2">
-                            <li><h6 class="dropdown-header text-uppercase small fw-bold">Profilo Utente</h6></li>
-                            <li><a class="dropdown-item py-2 small" href="/actions/details.php">Dettagli</a></li>
+                            <li><h6 class="dropdown-header text-uppercase small fw-bold">Ciao <?= htmlspecialchars($_SESSION['username']) ?></h6></li>
+                            <li><a class="dropdown-item py-2 small" href="/actions/details.php">Dettagli Profilo</a></li>
                             <li><a class="dropdown-item py-2 small" href="/actions/change_password.php">Cambia password</a></li>
+
+                            <?php if(isset($_SESSION['id_profilo']) && $_SESSION['id_profilo'] == '1' && !$isAdminPage): ?>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item py-2 small fw-bold text" href="/pages/admin/admin_area.php">Area admin</a></li>
+                            <?php endif; ?>
+
+                            <?php if($isAdminPage): ?>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item py-2 small fw-bold text-danger" href="/">Torna alla home</a></li>
+                            <?php endif; ?>
+
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item py-2 small text-danger" href="/actions/logout.php">Esci</a></li>
+                            <li><a class="dropdown-item py-2 small fw-bold text-danger" href="/actions/logout.php">Logout</a></li>
                         </ul>
                     </div>
                 <?php endif; ?>
             <?php endif; ?>
         </div>
-
     </div>
 </nav>

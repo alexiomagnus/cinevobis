@@ -2,7 +2,8 @@
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');
 
-$errore    = ""; $messaggio = "";
+$errore = ""; 
+$messaggio = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = trim($_POST['username']);
@@ -10,9 +11,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nome = trim($_POST['nome']);
     $cognome = trim($_POST['cognome']);
     $email = trim($_POST['email']);
+    $attivo = 1;                            // Default: account attivo
+    $id_profilo = 2;                        // Default: ruolo utente
     
-    try {
-        $user = new userObj($conn, $username, $password, $nome, $cognome, "", $email, 1, 2, "");
+    try {  
+        $user = new userObj($conn, $username, $password, $nome, $cognome, $email, $attivo, $id_profilo);
         $user->create();
         $messaggio = "Account creato con successo";
     } catch (PDOException $e) { 
@@ -67,7 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <div class="alert alert-danger border-0 small py-2 mb-4"><?= htmlspecialchars($errore) ?></div>
                     <?php endif; ?>
                     <?php if ($messaggio): ?>
-                        <div class="alert alert-success border-0 small py-2 mb-4"><?= htmlspecialchars($messaggio) ?> — <a href="login.php">Login</a></div>
+                        <div class="alert alert-success border-0 small py-2 mb-4"><?= htmlspecialchars($messaggio) ?></div>
                     <?php endif; ?>
 
                     <form method="POST">
