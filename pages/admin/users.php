@@ -12,8 +12,8 @@ if (!$username) {
     exit();
 }
 
-$user     = new userObj($conn, $username);
-$utenti   = $user->readAll();
+$user = new userObj($conn, $username);
+$utenti = $user->readAll();
 ?>
 <!DOCTYPE html>
 <html lang="it">
@@ -55,9 +55,9 @@ $utenti   = $user->readAll();
                                 <td><span><?= htmlspecialchars($utente['nome_profilo'] ?? '') ?></span></td>
                                 <td class="text-center">
                                     <?php if ($utente['attivo']): ?>
-                                        <span class="text-success" title="Attivo">Si</span>
+                                        <span class="text-success" title="Attivo">True</span>
                                     <?php else: ?>
-                                        <span class="text-danger" title="Inattivo">No</span>
+                                        <span class="text-danger" title="Inattivo">False</span>
                                     <?php endif; ?>
                                 </td>
                                 <td class="text-end pe-3">

@@ -50,7 +50,7 @@ require_once(__DIR__ . '/includes/header_logic.php');
 
     <?php require_once('includes/footer.php'); ?>
 
+    <!-- Per Tom Select -->
     <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>

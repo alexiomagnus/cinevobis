@@ -10,7 +10,7 @@ class userObj {
     private $db;
 
     public function __construct($db, $username, $password = null, $nome = null, $cognome = null,
-                                $email = null, $attivo = null, $id_profilo = null) {
+                            $email = null, $attivo = null, $id_profilo = null) {
         $this->db           = $db;
         $this->username     = $username;
         $this->password     = $password ? password_hash($password, PASSWORD_DEFAULT) : null;

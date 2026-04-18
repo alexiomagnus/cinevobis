@@ -4,7 +4,7 @@ $isLogged = isset($_SESSION['username']);
 $currentPage = basename($_SERVER['SCRIPT_NAME']);
 
 $publicPages = ['login.php', 'signup.php'];
-$adminPages = ['add_film.php', 'admin_area.php', 'sessions.php', 'users.php'];
+$adminPages = ['add_film.php', 'admin_area.php', 'sessions.php', 'users.php', 'edit_user.php'];
 
 $isPublicPage = in_array($currentPage, $publicPages);
 $isAdminPage = in_array($currentPage, $adminPages);
@@ -47,7 +47,7 @@ $isAdminPage = in_array($currentPage, $adminPages);
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg mt-2">
                             <li><h6 class="dropdown-header text-uppercase small fw-bold">Ciao <?= htmlspecialchars($_SESSION['username']) ?></h6></li>
-                            <li><a class="dropdown-item py-2 small" href="/actions/details.php">Dettagli Profilo</a></li>
+                            <li><a class="dropdown-item py-2 small" href="/actions/profile.php">Profilo</a></li>
                             <li><a class="dropdown-item py-2 small" href="/actions/change_password.php">Cambia password</a></li>
 
                             <?php if(isset($_SESSION['id_profilo']) && $_SESSION['id_profilo'] == '1' && !$isAdminPage): ?>

@@ -36,14 +36,14 @@ if ($userData && $userData['data_registrazione']) {
         <div class="row g-0 vh-100 justify-content-center align-items-center position-relative">
             
             <a href="javascript:void(0)" 
-                onclick="window.location.href='/index.php'" 
-                class="btn-close position-absolute top-0 start-0 m-4" 
+                onclick="history.back()"
+                class="btn-close position-absolute top-0 start-0 m-4"
                 aria-label="Close">
             </a>
 
             <div class="col-12 col-md-10 col-lg-8 col-xl-6 px-4">
                 <div class="text-center mb-5">
-                    <h1 class="display-6 fw-bolder mb-2">Dettagli Profilo</h1>
+                    <h1 class="display-6 fw-bolder mb-2">Profilo</h1>
                     <p class="text-secondary">Informazioni del tuo account Cinevobis</p>
                 </div>
 
@@ -69,16 +69,14 @@ if ($userData && $userData['data_registrazione']) {
                     </div>
                     
                     <div class="mt-5 text-center">
-                        <a href="/logout.php" class="btn btn-outline-danger px-5">Scollegati</a>
+                        <a href="logout.php" class="btn btn-outline-danger px-5">Logout</a>
                     </div>
+
                 <?php else: ?>
                     <div class="alert alert-warning text-center">Utente non trovato.</div>
                 <?php endif; ?>
             </div>
         </div>
     </div>
-    
-    <script src="/assets/js/script.js"></script>
-    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

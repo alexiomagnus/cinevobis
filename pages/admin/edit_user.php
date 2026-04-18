@@ -20,6 +20,14 @@ if (isset($_POST['indietro'])) {
     exit();
 }
 
+// Carichiamo i dati attuali dell'utente per non perdere l'id_profilo
+$user   = new userObj($conn, $username);
+$utente = $user->findByUsername();
+
+if (!$utente) {
+    header("Location: admin_area.php");
+    exit();
+}
 
 if (isset($_POST['salva'])) {
     $nome    = trim($_POST['nome']    ?? '');
@@ -32,13 +40,21 @@ if (isset($_POST['salva'])) {
     } else {
         try {
             $userUpdate = new userObj(
-                $conn, $username, null,
-                $nome, $cognome, null, $email,
-                $attivo, null, null
+                $conn, 
+                $username, 
+                null, 
+                $nome, 
+                $cognome, 
+                $email, 
+                $attivo, 
+                $utente['id_profilo'] // Manteniamo il profilo esistente
             );
 
             $userUpdate->update($username);
-            $messaggio = "Utente aggiornato";
+            $messaggio = "Utente aggiornato con successo";
+            
+            // Ricarichiamo i dati aggiornati per il form
+            $utente = $userUpdate->findByUsername();
         } catch (PDOException $e) {
             $errore = "Errore: " . $e->getMessage();
         }
@@ -47,21 +63,12 @@ if (isset($_POST['salva'])) {
 
 if (isset($_POST['elimina'])) {
     try {
-        $user = new userObj($conn, $username);
         $user->delete();
-
-        $messaggio = "Utente eliminato";
+        header("Location: users.php?msg=eliminato");
+        exit();
     } catch (PDOException $e) {
         $errore = "Errore: " . $e->getMessage();
     }
-}
-
-$user   = new userObj($conn, $username);
-$utente = $user->findByUsername();
-
-if (!$utente) {
-    header("Location: admin_area.php");
-    exit();
 }
 ?>
 <!DOCTYPE html>
@@ -141,7 +148,8 @@ if (!$utente) {
                         <div class="col-12 d-flex gap-2 mt-4">
                             <button type="submit" name="salva" class="btn btn-sm btn-brand">Salva modifiche</button>
                             <button type="submit" name="indietro" class="btn btn-secondary">Indietro</button>
-                            <button type="submit" name="elimina" class="btn btn-sm btn-danger">Elimina Utente</button>
+                            
+                            <button type="submit" name="elimina" class="btn btn-sm btn-danger ms-auto">Elimina Utente</button>
                         </div>
 
                     </div>

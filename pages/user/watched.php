@@ -16,7 +16,7 @@ session_start();
     <?php require_once(__DIR__ . '/../../includes/header.php'); ?>
 
     <main class="container mt-4 mb-5 flex-grow-1">
-        <h1 class="fw-bold mb-4">La tua Watched</h1>
+        <h1 class="fw-bold mb-4">Watched</h1>
         <p class="small text-secondary mb-4">I film che hai visto</p>
         
     </main>

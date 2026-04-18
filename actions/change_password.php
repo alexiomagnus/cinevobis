@@ -52,7 +52,12 @@ if (isset($_POST['cambia_password'])) {
 <body>
 
     <div class="container-fluid">
-        <a href="/profilo.php" class="btn-close position-absolute top-0 start-0 m-4" aria-label="Close"></a>
+
+        <a href="javascript:void(0)" 
+                onclick="history.back()"
+                class="btn-close position-absolute top-0 start-0 m-4"
+                aria-label="Close">
+            </a>
 
         <div class="row vh-100 justify-content-center align-items-center">
             <div class="col-12 col-sm-8 col-md-6 col-lg-4 px-4">
@@ -98,7 +103,5 @@ if (isset($_POST['cambia_password'])) {
             </div>
         </div>
     </div>
-    
-    <script src="/assets/js/script.js"></script>
 </body>
 </html>

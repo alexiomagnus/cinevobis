@@ -90,7 +90,7 @@ if (isset($_POST['login'])) {
             </div>
 
             <div class="col-lg-6 d-none d-lg-block bg-secondary" 
-                 style="background-image: url('/assets/img/interstellar.jpg'); background-size: cover; background-position: center;">
+                 style="background-image: url('/assets/img/breakingbad.jpeg'); background-size: cover; background-position: center;">
             </div>
         </div>
     </div>

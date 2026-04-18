@@ -60,7 +60,7 @@ $sessioni = $user->readAccess($righe);
                                     <?php if (!empty($sessione['data_logout'])): ?>
                                         <span class="badge bg-light text-muted fw-normal border"><?= htmlspecialchars($sessione['data_logout']) ?></span>
                                     <?php else: ?>
-                                        <span class="text-primary small italic">In corso...</span>
+                                        <span class="text small italic">In corso...</span>
                                     <?php endif; ?>
                                 </td>
                             </tr>
