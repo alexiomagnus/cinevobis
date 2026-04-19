@@ -10,10 +10,12 @@ document.addEventListener("DOMContentLoaded", function() {
         // Prendiamo l'URL da cui proviene l'utente
         const referrer = document.referrer;
         
-        if (referrer) {
-            if (!sessionStorage.getItem('origin_url')) {
-                sessionStorage.setItem('origin_url', referrer);
-            }
+        console.log('Current Page:', currentPage);
+        console.log('Referrer:', referrer);
+
+        if (referrer && !sessionStorage.getItem('origin_url')) {
+            sessionStorage.setItem('origin_url', referrer);
+            console.log('Origin URL set to:', referrer);
         }
     }
 });
@@ -22,10 +24,12 @@ document.addEventListener("DOMContentLoaded", function() {
 function closeAndRedirect() {
     const destination = sessionStorage.getItem('origin_url');
     
+    console.log('Destination from session storage:', destination);
+
     if (destination) {
-        sessionStorage.removeItem('origin_url');
         window.location.href = destination;
+        sessionStorage.removeItem('origin_url');
     } else {
-        window.location.href = 'index.php';
+        window.location.href = '/index.php';
     }
 }
