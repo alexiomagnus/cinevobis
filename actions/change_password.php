@@ -103,6 +103,11 @@ if (isset($_POST['cambia_password'])) {
                     <button type="submit" name="cambia_password" class="btn btn-dark btn-lg w-100 py-3 fw-bold mb-4">
                         Salva modifiche
                     </button>
+
+                    <p class="text-center small text-secondary">Non ricordi la password? 
+                        <a href="mailto:alessio.gualtieri24@istitutotecnicomarconipilla.edu.it?subject=Reset%20Password&body=Salve,%20ho%20dimenticato%20la%20mia%20password.%20Il%20mio%20username%20è:%20<?php echo urlencode($username); ?>" class="text-dark fw-bold text-decoration-none">
+                            Contatta l'amministratore
+                        </a>
                 </form>
             </div>
         </div>
