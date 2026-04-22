@@ -1,6 +1,7 @@
 <?php
 session_start();
 
+require_once(__DIR__ . '/../config/config.php');
 require_once(__DIR__ . '/../config/connection.php');
 require_once(__DIR__ . '/../includes/user_obj.php');
 
@@ -19,8 +20,11 @@ try {
     session_destroy();
     header("Location: /index.php");
     exit();
+
 } catch (PDOException $e) {
-    session_destroy();
-    header("Location: /index.php");
-    exit();
+    // Scrivere l'errore dettagliato nel log (grazie al config.php)
+    error_log("Errore critico: " . $e->getMessage());
+            
+    // Mostrare all'utente un messaggio generico
+    die("Spiacenti, il servizio è momentaneamente non disponibile.");
 }

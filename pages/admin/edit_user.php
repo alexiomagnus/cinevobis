@@ -1,6 +1,7 @@
 <?php
 session_start();
 
+require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');
@@ -56,7 +57,11 @@ if (isset($_POST['salva'])) {
             // Ricarichiamo i dati aggiornati per il form
             $utente = $userUpdate->findByUsername();
         } catch (PDOException $e) {
-            $errore = "Errore: " . $e->getMessage();
+            // Scrivere l'errore dettagliato nel log (grazie al config.php)
+            error_log("Errore critico: " . $e->getMessage());
+            
+            // Mostrare all'utente un messaggio generico
+            die("Spiacenti, il servizio è momentaneamente non disponibile.");
         }
     }
 }

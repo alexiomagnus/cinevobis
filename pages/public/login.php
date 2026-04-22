@@ -1,9 +1,7 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 session_start();
 
+require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');
 
@@ -37,8 +35,12 @@ if (isset($_POST['login'])) {
             $errore = "Dati non validi"; 
         }
 
-    } catch (PDOException $e) { 
-        $errore = "Errore: " . $e->getMessage(); 
+    } catch (PDOException $e) {
+        // Scrivere l'errore dettagliato nel log (grazie al config.php)
+        error_log("Errore critico: " . $e->getMessage());
+            
+        // Mostrare all'utente un messaggio generico
+        die("Spiacenti, il servizio è momentaneamente non disponibile.");
     }
 }
 ?>

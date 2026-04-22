@@ -9,5 +9,9 @@ try {
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    die("Errore di connessione: " . $e->getMessage());
+    // Scrivere l'errore dettagliato nel log (grazie al config.php)
+    error_log("Errore critico DB: " . $e->getMessage());
+    
+    // Mostrare all'utente un messaggio generico
+    die("Spiacenti, il servizio è momentaneamente non disponibile.");
 }
