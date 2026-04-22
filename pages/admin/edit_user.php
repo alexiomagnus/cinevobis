@@ -57,11 +57,8 @@ if (isset($_POST['salva'])) {
             // Ricarichiamo i dati aggiornati per il form
             $utente = $userUpdate->findByUsername();
         } catch (PDOException $e) {
-            // Scrivere l'errore dettagliato nel log (grazie al config.php)
-            error_log("Errore critico: " . $e->getMessage());
-            
-            // Mostrare all'utente un messaggio generico
-            die("Spiacenti, il servizio è momentaneamente non disponibile.");
+            $errore = "Errore"; 
+            error_log("Errore: " . $e->getMessage());
         }
     }
 }

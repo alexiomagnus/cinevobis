@@ -17,7 +17,6 @@ session_start();
 
     <main class="container mt-4 mb-5 flex-grow-1">
         <h1 class="fw-bold mb-4">Preferiti</h1>
-        <p class="small text-secondary mb-4">I film che più ti sono piaciuti</p>
 
     </main>
 

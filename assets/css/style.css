@@ -202,3 +202,25 @@ footer {
 .alert-danger  { background-color: #FAE8E8 !important; color: #9B4545 !important; border-color: #F2CECE !important; }
 .alert-success { background-color: #E8F4EC !important; color: #3D7A52 !important; border-color: #C4E2CE !important; }
 .alert-warning { background-color: #FDF4E3 !important; color: #8A6A2E !important; border-color: #F5E0B0 !important; }
+
+/* =====================
+   Password
+===================== */
+.password-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.password-wrapper {
+    position: relative;
+}
+
+.toggle-icon {
+    position: absolute;
+    right: 15px;
+    bottom: 15px; 
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 1.25rem;
+    z-index: 10;
+}

@@ -37,11 +37,8 @@ if (isset($_POST['cambia_password'])) {
                 $errore = $risultato['errore'];
             }
         } catch (PDOException $e) {
-            // Scrivere l'errore dettagliato nel log (grazie al config.php)
-            error_log("Errore critico: " . $e->getMessage());
-            
-            // Mostrare all'utente un messaggio generico
-            die("Spiacenti, il servizio è momentaneamente non disponibile.");
+            $errore = "Errore"; 
+            error_log("Errore: " . $e->getMessage());
         }
     }
 }
@@ -53,6 +50,7 @@ if (isset($_POST['cambia_password'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cambia Password - Cinevobis</title>
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
@@ -82,24 +80,24 @@ if (isset($_POST['cambia_password'])) {
                 <?php endif; ?>
 
                 <form method="POST">
-                    <div class="mb-3">
+                    <div class="mb-4 position-relative password-wrapper">
                         <label class="form-label small text-secondary">Password attuale</label>
-                        <input type="password" name="password_attuale" class="form-control bg-light border-light py-3" 
-                               placeholder="Password attuale" required>
+                        <input type="password" name="password_attuale" id="password_attuale" class="form-control bg-light border-light py-3" placeholder="Password attuale" required>
+                        <i class="bi bi-eye toggle-icon" data-target="password_attuale"></i>
                     </div>
-                    
+
                     <hr class="my-4 opacity-25">
 
-                    <div class="mb-3">
+                    <div class="mb-4 position-relative password-wrapper">
                         <label class="form-label small text-secondary">Nuova password</label>
-                        <input type="password" name="nuova_password" class="form-control bg-light border-light py-3" 
-                               placeholder="Nuova password" required>
+                        <input type="password" name="nuova_password" id="nuova_password" class="form-control bg-light border-light py-3" placeholder="Nuova password" required>
+                        <i class="bi bi-eye toggle-icon" data-target="nuova_password"></i>
                     </div>
 
-                    <div class="mb-5">
+                    <div class="mb-5 position-relative password-wrapper">
                         <label class="form-label small text-secondary">Conferma nuova password</label>
-                        <input type="password" name="conferma_password" class="form-control bg-light border-light py-3" 
-                               placeholder="Ripeti nuova password" required>
+                        <input type="password" name="conferma_password" id="conferma_password" class="form-control bg-light border-light py-3" placeholder="Ripeti nuova password" required>
+                        <i class="bi bi-eye toggle-icon" data-target="conferma_password"></i>
                     </div>
 
                     <button type="submit" name="cambia_password" class="btn btn-dark btn-lg w-100 py-3 fw-bold mb-4">

@@ -35,12 +35,9 @@ if (isset($_POST['login'])) {
             $errore = "Dati non validi"; 
         }
 
-    } catch (PDOException $e) {
-        // Scrivere l'errore dettagliato nel log (grazie al config.php)
-        error_log("Errore critico: " . $e->getMessage());
-            
-        // Mostrare all'utente un messaggio generico
-        die("Spiacenti, il servizio è momentaneamente non disponibile.");
+    } catch (PDOException $e) { 
+        $errore = "Errore"; 
+        error_log("Errore: " . $e->getMessage());
     }
 }
 ?>
@@ -51,6 +48,7 @@ if (isset($_POST['login'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Cinevobis</title>
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
@@ -79,9 +77,10 @@ if (isset($_POST['login'])) {
                                    placeholder="Username" required>
                         </div>
                         
-                        <div class="mb-5">
-                            <input type="password" name="password" class="form-control bg-light border-light py-3" 
-                                   placeholder="Password" required>
+                        <div class="mb-5 position-relative password-wrapper">
+                            <input type="password" name="password" id="password" class="form-control bg-light border-light py-3" 
+                                placeholder="Password" required>
+                            <i class="bi bi-eye toggle-icon" id="togglePassword"></i>
                         </div>
 
                         <button type="submit" name="login" class="btn btn-dark btn-lg w-100 py-3 fw-bold mb-4">Accedi</button>

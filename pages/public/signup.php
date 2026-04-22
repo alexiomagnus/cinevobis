@@ -21,12 +21,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $user = new userObj($conn, $username, $password, $nome, $cognome, $email, $attivo, $id_profilo);
         $user->create();
         $messaggio = "Account creato con successo";
-    } catch (PDOException $e) {
-        // Scrivere l'errore dettagliato nel log (grazie al config.php)
-        error_log("Errore critico: " . $e->getMessage());
-            
-        // Mostrare all'utente un messaggio generico
-        die("Spiacenti, il servizio è momentaneamente non disponibile.");
+    } catch (PDOException $e) { 
+        $errore = "Username non disponibile";
+        error_log("Username non disponibile: " . $e->getMessage());
     }
 }
 ?>
@@ -37,6 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign up - Cinevobis</title>
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="/assets/css/style.css">
     <style>
         .ts-wrapper .ts-control {
@@ -98,8 +96,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <input type="text" name="username" class="form-control bg-light border-light py-3" placeholder="Username" required>
                         </div>
                         
-                        <div class="mb-5">
-                            <input type="password" name="password" class="form-control bg-light border-light py-3" placeholder="Password" required>
+                        <div class="mb-5 position-relative password-wrapper">
+                            <input type="password" name="password" id="password" class="form-control bg-light border-light py-3" 
+                                placeholder="Password" required>
+                            <i class="bi bi-eye toggle-icon" id="togglePassword"></i>
                         </div>
                         
                         <button type="submit" class="btn btn-dark btn-lg w-100 py-3 fw-bold mb-4">Crea un account</button>

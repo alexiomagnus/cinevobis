@@ -12,26 +12,10 @@ $isAdminPage = in_array($currentPage, $adminPages);
 
 <nav class="navbar navbar-expand-lg px-4 py-3 border-bottom mb-0" style="position: relative;">
     <div class="container-fluid">
-        
-        <?php if($isAdminPage): ?>
+
         <a href="/pages/admin/admin_area.php" class="navbar-brand fw-bold text-dark" style="font-size: 20px; z-index: 2;">
             Cinevobis
         </a>
-        <?php else: ?>
-        <a href="/" class="navbar-brand fw-bold text-dark" style="font-size: 20px; z-index: 2;">
-            Cinevobis
-        </a>
-        <?php endif; ?>
-
-        <?php if($isLogged && !$isAdminPage): ?>
-        <div class="d-none d-lg-flex align-items-center gap-4" 
-             style="position: absolute; left: 50%; transform: translateX(-50%); z-index: 1;">
-            <a href="/pages/user/reviews.php" class="nav-link text-uppercase fw-semibold small <?= $currentPage === 'reviews.php' ? 'text-dark' : 'text-secondary' ?>" style="letter-spacing: 1px;">Recensioni</a>
-            <a href="/pages/user/favorites.php" class="nav-link text-uppercase fw-semibold small <?= $currentPage === 'favorites.php' ? 'text-dark' : 'text-secondary' ?>" style="letter-spacing: 1px;">Preferiti</a>
-            <a href="/pages/user/watched.php" class="nav-link text-uppercase fw-semibold small <?= $currentPage === 'watched.php' ? 'text-dark' : 'text-secondary' ?>" style="letter-spacing: 1px;">Watched</a>
-            <a href="/pages/user/watchlist.php" class="nav-link text-uppercase fw-semibold small <?= $currentPage === 'watchlist.php' ? 'text-dark' : 'text-secondary' ?>" style="letter-spacing: 1px;">Watchlist</a>
-        </div>
-        <?php endif; ?>
         
         <div class="ms-auto d-flex align-items-center" style="z-index: 2;">
             <?php if (!$isPublicPage): ?>

@@ -33,3 +33,26 @@ function closeAndRedirect() {
         window.location.href = '/index.php';
     }
 }
+
+// --- Funzione per vedere la password ---
+document.addEventListener("DOMContentLoaded", function() {
+    // Seleziona tutte le icone con classe toggle-icon
+    const toggleIcons = document.querySelectorAll('.toggle-icon');
+
+    toggleIcons.forEach(icon => {
+        icon.addEventListener('click', function() {
+            // Trova l'input collegato tramite l'ID o il target data
+            const targetId = this.getAttribute('data-target') || 'password';
+            const passwordInput = document.getElementById(targetId);
+
+            if (passwordInput) {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                
+                // Cambia l'icona
+                this.classList.toggle('bi-eye');
+                this.classList.toggle('bi-eye-slash');
+            }
+        });
+    });
+});
