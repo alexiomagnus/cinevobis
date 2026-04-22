@@ -48,14 +48,6 @@ if ($searched !== '') {
 
     <main class="container mt-5 mb-5 flex-grow-1 d-flex flex-column align-items-center">
 
-        <div class="w-100 mb-5 px-3" style="max-width: 650px;">
-            <form action="search.php" method="GET" class="search-wrap d-flex w-100 mb-0">
-                <input type="text" name="search" class="flex-grow-1" placeholder="Cerca un film..."
-                    aria-label="Cerca" value="<?= htmlspecialchars($searched) ?>" autofocus>
-                <button type="submit" class="btn btn-brand px-4">Cerca</button>
-            </form>
-        </div>
-
         <div class="w-100" style="max-width: 650px;">
 
             <?php if ($errore): ?>

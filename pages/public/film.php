@@ -13,19 +13,15 @@ use Kiwilan\Tmdb\Tmdb;
 $dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
 $dotenv->load();
 
-$tmdb = Tmdb::client($_ENV['API_KEY']);
-
-$errore = "";
-$searched = "";
-
+$tmdb  = Tmdb::client($_ENV['API_KEY']);
 $movie = null;
+$errore = "";
 
 $movie_id = $_GET['tmdb_id'] ?? null;
 
 if (!empty($movie_id)) {
-    // Estrazione dei dati grezzi
     $results = $tmdb->raw()->url("/movie/{$movie_id}", [
-        'language' => 'it-IT',
+        'language'          => 'it-IT',
         'append_to_response' => 'credits'
     ]);
 
@@ -40,18 +36,36 @@ if (!empty($movie_id)) {
 
 // Variabili estratte dall'array
 if ($movie) {
-    $titolo          = $movie['title'] ?? 'Titolo non disponibile';
-    $titolo_orig     = $movie['original_title'] ?? '';
-    $overview        = $movie['overview'] ?? 'Nessuna trama disponibile.';
-    $poster_path     = $movie['poster_path'] ?? null;
-    $voto            = $movie['vote_average'] ?? null;
-    $durata          = $movie['runtime'] ?? null;
-    $anno            = isset($movie['release_date']) && $movie['release_date'] !== ''
-                        ? substr($movie['release_date'], 0, 4) : '?';                     // Prendere solo l'anno (i primi quattro caratteri)
-    $generi          = $movie['genres'] ?? [];
-    $paesi           = $movie['production_countries'] ?? [];
-    $paese           = !empty($paesi) ? strtoupper($paesi[0]['name'] ?? '?') : '?';
-    $cast            = array_slice($movie['credits']['cast'] ?? [], 0, 10);               // Prendere solo i primi 10 attori
+    $titolo = $movie['title'] ?? 'Titolo non disponibile';
+    $titolo_orig = $movie['original_title'] ?? '';
+    $overview = !empty($movie['overview']) ? $movie['overview'] : 'Nessuna trama disponibile.';
+    $poster_path = $movie['poster_path'] ?? null;
+    $voto = $movie['vote_average'] ?? null;
+    $durata = $movie['runtime'] ?? null;
+    $generi = $movie['genres']  ?? [];
+    $cast = array_slice($movie['credits']['cast'] ?? [], 0, 10);
+
+    // Anno: prendi solo i primi 4 caratteri della data di uscita
+    $anno = !empty($movie['release_date'])
+        ? substr($movie['release_date'], 0, 4)
+        : '?';
+
+    // Paese: primo paese di produzione
+    $paesi = $movie['production_countries'] ?? [];
+    $paese = !empty($paesi) ? strtoupper($paesi[0]['name'] ?? '?') : '?';
+
+    // Regista: filtra i membri del crew con job === 'Director'
+    $regista = implode(', ', array_column(
+        array_filter($movie['credits']['crew'] ?? [], fn($m) => ($m['job'] ?? '') === 'Director'),
+        'name'
+    ));
+
+    // Sottotitolo: regista + titolo originale (se diverso)
+    $subtitle = array_filter([
+        $regista    ? 'Diretto da: ' . htmlspecialchars($regista) : '',
+        $titolo_orig !== $titolo ? htmlspecialchars($titolo_orig) : '',
+    ]);
+
 }
 ?>
 <!DOCTYPE html>
@@ -69,17 +83,10 @@ if ($movie) {
 
     <main class="container mt-5 mb-5 flex-grow-1">
 
-        <div class="mx-auto mb-5 px-3" style="max-width: 650px;">
-            <form action="search.php" method="GET" class="search-wrap d-flex w-100 mb-0">
-                <input type="text" name="search" class="flex-grow-1" placeholder="Cerca un film..." autocomplete="off"
-                    aria-label="Cerca" value="<?= htmlspecialchars($searched) ?>" autofocus>
-                <button type="submit" class="btn btn-brand px-4">Cerca</button>
-            </form>
-        </div>
-
         <?php if ($errore): ?>
             <div class="alert alert-danger text-center shadow-sm rounded-3">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i> <?= htmlspecialchars($errore) ?>
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <?= htmlspecialchars($errore) ?>
             </div>
 
         <?php elseif ($movie): ?>
@@ -88,23 +95,33 @@ if ($movie) {
                     <div class="card border-0 shadow-sm rounded-4">
                         <div class="card-body p-5">
 
+                            <!-- Poster + info principali -->
                             <div class="row g-4 mb-4">
 
-                                <?php if ($poster_path): ?>
                                 <div class="col-md-3 text-center">
-                                    <img
-                                        src="https://image.tmdb.org/t/p/w342<?= $poster_path ?>"
-                                        alt="<?= htmlspecialchars($titolo) ?>"
-                                        class="img-fluid rounded-3 shadow-sm"
-                                    >
+                                    <?php if ($poster_path): ?>
+                                        <img
+                                            src="https://image.tmdb.org/t/p/w342<?= $poster_path ?>"
+                                            alt="<?= htmlspecialchars($titolo) ?>"
+                                            class="img-fluid rounded-3 shadow-sm"
+                                        >
+                                    <?php else: ?>
+                                        <div class="ratio ratio-2x3 rounded-3 bg-secondary-subtle d-flex align-items-center justify-content-center">
+                                            <div class="text-center text-muted">
+                                                <i class="bi bi-film fs-1"></i>
+                                                <p class="small mt-2 mb-0">Poster non disponibile</p>
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
-                                <?php endif; ?>
 
-                                <div class="col-md-<?= $poster_path ? '9' : '12' ?>">
+                                <div class="col-md-9">
                                     <h1 class="fw-bold mb-1"><?= htmlspecialchars($titolo) ?></h1>
 
-                                    <?php if ($titolo_orig !== $titolo): ?>
-                                        <p class="text-muted fst-italic mb-3"><?= htmlspecialchars($titolo_orig) ?></p>
+                                    <?php if (!empty($subtitle)): ?>
+                                        <p class="text-muted fst-italic mb-3">
+                                            <?= implode(' — ', $subtitle) ?>
+                                        </p>
                                     <?php endif; ?>
 
                                     <?php if (!empty($generi)): ?>
@@ -134,6 +151,7 @@ if ($movie) {
 
                             <hr class="text-muted opacity-25 mb-4">
 
+                            <!-- Metadati: durata, anno, paese -->
                             <div class="row text-center text-md-start g-4 mb-4">
                                 <div class="col-md-4">
                                     <div class="text-uppercase text-muted small fw-bold mb-1">Durata</div>
@@ -158,6 +176,7 @@ if ($movie) {
                                 </div>
                             </div>
 
+                            <!-- Cast -->
                             <?php if (!empty($cast)): ?>
                                 <hr class="text-muted opacity-25 mb-4">
                                 <h5 class="text-muted fw-semibold mb-3">Cast</h5>

@@ -3,11 +3,11 @@ session_start();
 
 require_once(__DIR__ . '/config/config.php');
 require_once(__DIR__ . '/config/connection.php');
-require_once(__DIR__ . '/includes/user_obj.php');
 require_once(__DIR__ . '/includes/header_logic.php');
 ?>
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,9 +17,9 @@ require_once(__DIR__ . '/includes/header_logic.php');
     <style>
         /* Tipografia Homepage */
         .headline {
-            font-size: clamp(2.4rem, 5vw, 4rem);
-            letter-spacing: -0.02em;
-            font-weight: 800;
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            letter-spacing: -0.01em;
+            font-weight: 700;
         }
 
         .headline em {
@@ -28,24 +28,14 @@ require_once(__DIR__ . '/includes/header_logic.php');
         }
     </style>
 </head>
+
 <body class="d-flex flex-column min-vh-100">
 
     <?php include("includes/header.php"); ?>
 
-    <main class="flex-grow-1 d-flex align-items-center">
-        <div class="container text-center">
-            <div class="row justify-content-center">
-                <div class="col-md-8 col-lg-6">
-
-                    <h1 class="headline mb-3">Cinevobis</h1>
-
-                    <form action="/pages/public/search.php" method="GET" class="search-wrap d-flex align-items-center mx-auto mt-5">
-                        <input type="text" name="search" placeholder="Cerca un film..." class="flex-grow-1">
-                        <button type="submit" class="btn btn-brand rounded-3 px-4">Cerca</button>
-                    </form>
-
-                </div>
-            </div>
+    <main class="container mt-4 mb-5 flex-grow-1">
+        <div class="container">
+            <h1 class="fw-bold mb-4">Ciao <?= htmlspecialchars($_SESSION['username']) ?></h1>
         </div>
     </main>
 
@@ -54,4 +44,5 @@ require_once(__DIR__ . '/includes/header_logic.php');
     <!-- Per Tom Select -->
     <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

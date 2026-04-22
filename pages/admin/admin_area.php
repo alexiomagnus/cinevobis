@@ -32,7 +32,6 @@ if (!$username || $id_profilo != 1) {
         <div class="row mb-5">
             <div class="col-12 text-center">
                 <h1 class="fw-bold">Profilo Amministratore</h1>
-                <p class="text-secondary">Gestisci i contenuti del sito da qui</p>
             </div>
         </div>
 
