@@ -42,11 +42,12 @@ $isAdminPage = in_array($currentPage, $adminPages);
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg mt-2">
                         <?php if(!$isAdminPage): ?>
-                            <li><a class="dropdown-item py-2 small" href="/pages/user/profile.php">Profilo</a></li>
+                            
                             <li><a class="dropdown-item py-2 small" href="/pages/user/favorites.php">Preferiti</a></li>
                             <li><a class="dropdown-item py-2 small" href="/pages/user/reviews.php">Recensioni</a></li>
                             <li><a class="dropdown-item py-2 small" href="/pages/user/watchlist.php">Watchlist</a></li>
                             <li><a class="dropdown-item py-2 small" href="/pages/user/watched.php">Watched</a></li>
+                            <li><a class="dropdown-item py-2 small" href="/pages/user/profile.php">Profilo</a></li>
                         <?php endif; ?>
 
                         <?php if (isset($_SESSION['id_profilo']) && $_SESSION['id_profilo'] == '1' && !$isAdminPage): ?>

@@ -159,26 +159,6 @@ body {
     box-shadow: 0 6px 20px rgba(0,0,0,.08) !important;
 }
 
-/* =====================
-   Badge
-===================== */
-.badge-genre {
-    background-color: #DDE8F0 !important;
-    color: var(--accent-dark) !important;
-    border: 1px solid #BDD2E2 !important;
-}
-
-.badge-cast {
-    background-color: var(--bg-muted) !important;
-    color: var(--text) !important;
-    border: 1px solid var(--border) !important;
-}
-
-/* =====================
-   Icone
-===================== */
-.icon-accent { color: var(--accent-dark) !important; }
-.icon-star   { color: #E8C97A !important; }
 
 /* =====================
    Form
@@ -221,10 +201,6 @@ footer {
 .password-wrapper {
     position: relative;
     width: 100%;
-}
-
-.password-wrapper {
-    position: relative;
 }
 
 .toggle-icon {

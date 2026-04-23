@@ -32,11 +32,10 @@ $movie_id = $_GET['tmdb_id'] ?? null;
 if (!empty($movie_id)) {
     $results = $tmdb->raw()->url("/movie/{$movie_id}", [
         'language' => 'it-IT',
-        'append_to_response' => 'credits'
+        'append_to_response' => 'credits,videos'
     ]);
 
     $body = $results?->getBody();
-
     if ($body) {
         $movie_api = is_string($body) ? json_decode($body, true) : $body;
     }
@@ -61,8 +60,7 @@ if (!empty($movie_api)) {
     }
 }
 
-// ========== 3. Estrazione con JMESPath ==========
-$subtitle = [];
+// 3. Estrazione dati
 if ($movie_db) {
     $titolo       = Env::search('title', $movie_db) ?? 'Titolo non disponibile';
     $titolo_orig  = Env::search('original_title', $movie_db) ?? '';
@@ -71,25 +69,19 @@ if ($movie_db) {
     $voto         = Env::search('vote_average', $movie_db);
     $durata       = Env::search('runtime', $movie_db);
     $generi       = Env::search('genres', $movie_db) ?? [];
-    $cast         = Env::search('credits.cast[:10]', $movie_db) ?? [];
+    $cast         = Env::search('credits.cast[:12]', $movie_db) ?? [];
 
-    // Anno: primi 4 caratteri di release_date
+    $trailerKey = Env::search("videos.results[?type=='Trailer' && site=='YouTube'].key | [0]", $movie_db) 
+                  ?? Env::search("videos.results[?type=='Trailer'].key | [0]", $movie_db);
+
     $release_date = Env::search('release_date', $movie_db);
     $anno = !empty($release_date) ? substr($release_date, 0, 4) : '?';
 
-    // Paese: primo paese di produzione in uppercase
     $paese_raw = Env::search('production_countries[0].name', $movie_db);
     $paese = !empty($paese_raw) ? strtoupper($paese_raw) : '?';
 
-    // Regista: filtra crew per job "Director" e concatena i nomi
     $registi = Env::search('credits.crew[?job == `Director`].name', $movie_db) ?? [];
     $regista = implode(', ', $registi);
-
-    // Sottotitolo
-    $subtitle = array_filter([
-        $regista    ? 'Diretto da: ' . htmlspecialchars($regista) : '',
-        $titolo_orig !== $titolo ? htmlspecialchars($titolo_orig) : '',
-    ]);
 }
 ?>
 <!DOCTYPE html>
@@ -101,135 +93,157 @@ if ($movie_db) {
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="/assets/css/style.css">
+    <style>
+        :root { --accent-color: #ffc107; }
+        .film-card { border-radius: 1.5rem; border: none; }
+        .overview-text { text-align: justify; line-height: 1.7; color: #333; }
+        
+        /* Voto */
+        .vote-display { font-size: 1.3rem; font-weight: 900; display: flex; align-items: center; }
+        .vote-display .bi-star-fill { color: var(--accent-color); margin-right: 8px; }
+
+        /* Avatar Cast */
+        .cast-avatar {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+        }
+
+        /* Trailer Modale */
+        .trailer-modal-content { background: transparent; border: none; }
+        .trailer-video-container { border-radius: 1.5rem; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.4); }
+        .btn-trailer { letter-spacing: 1px; font-weight: 600; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .btn-trailer:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important; }
+        .close-trailer { filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)); transform: scale(1.1); opacity: 0.85; transition: opacity 0.2s; }
+        .close-trailer:hover { opacity: 1; }
+    </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
     <?php require_once(__DIR__ . '/../../includes/header.php'); ?>
 
-    <main class="container mt-5 mb-5 flex-grow-1">
-
-        <?php if ($errore): ?>
-            <div class="alert alert-danger text-center shadow-sm rounded-3">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                <?= htmlspecialchars($errore) ?>
-            </div>
-
-        <?php elseif ($movie_db): ?>
+    <main class="container my-5 flex-grow-1">
+        <?php if ($movie_db): ?>
             <div class="row justify-content-center">
-                <div class="col-lg-9 col-md-11">
-                    <div class="card border-0 shadow-sm rounded-4">
-                        <div class="card-body p-5">
-
-                            <!-- Poster + info principali -->
-                            <div class="row g-4 mb-4">
-
-                                <div class="col-md-3 text-center">
-                                    <?php if ($poster_path): ?>
-                                        <img
-                                            src="https://image.tmdb.org/t/p/w342<?= $poster_path ?>"
-                                            alt="<?= htmlspecialchars($titolo) ?>"
-                                            class="img-fluid rounded-3 shadow-sm"
-                                        >
-                                    <?php else: ?>
-                                        <div class="ratio ratio-2x3 rounded-3 bg-secondary-subtle d-flex align-items-center justify-content-center">
-                                            <div class="text-center text-muted">
-                                                <i class="bi bi-film fs-1"></i>
-                                                <p class="small mt-2 mb-0">Poster non disponibile</p>
-                                            </div>
-                                        </div>
-                                    <?php endif; ?>
-                                </div>
-
-                                <div class="col-md-9">
-                                    <h1 class="fw-bold mb-1"><?= htmlspecialchars($titolo) ?></h1>
-
-                                    <?php if (!empty($subtitle)): ?>
-                                        <p class="text-muted fst-italic mb-3">
-                                            <?= implode(' — ', $subtitle) ?>
-                                        </p>
-                                    <?php endif; ?>
-
-                                    <?php if (!empty($generi)): ?>
-                                        <div class="d-flex flex-wrap gap-2 mb-3">
-                                            <?php foreach ($generi as $genre): ?>
-                                                <span class="badge rounded-pill badge-genre px-3 py-2">
-                                                    <?= htmlspecialchars($genre['name']) ?>
-                                                </span>
-                                            <?php endforeach; ?>
-                                        </div>
-                                    <?php endif; ?>
-
-                                    <?php if ($voto): ?>
-                                        <div class="mb-3">
-                                            <i class="bi bi-star-fill icon-star me-1"></i>
-                                            <span class="fw-semibold"><?= number_format($voto, 1) ?></span>
-                                            <span class="text-muted small">/ 10</span>
-                                        </div>
-                                    <?php endif; ?>
-
-                                    <h5 class="text-muted fw-semibold mb-2">Trama</h5>
-                                    <p class="fs-6 text-secondary lh-lg">
-                                        <?= nl2br(htmlspecialchars($overview)) ?>
-                                    </p>
-                                </div>
+                <div class="col-xl-10">
+                    <div class="card shadow-sm film-card p-4 p-md-5 bg-white">
+                        
+                        <div class="row g-5 mb-5">
+                            <div class="col-md-4">
+                                <img src="https://image.tmdb.org/t/p/w500<?= $poster_path ?>" class="img-fluid rounded-4 shadow-sm mb-3 w-100" alt="Poster">
+                                <?php if ($trailerKey): ?>
+                                    <button class="btn btn-dark btn-trailer w-100 py-3 rounded-4 shadow-sm d-flex justify-content-center align-items-center" data-bs-toggle="modal" data-bs-target="#trailerModal">
+                                        <i class="bi bi-play-circle-fill me-2 fs-5"></i> Guarda Trailer
+                                    </button>
+                                <?php endif; ?>
                             </div>
 
-                            <hr class="text-muted opacity-25 mb-4">
+                            <div class="col-md-8">
+                                <h1 class="fw-bold text-dark display-5 mb-1"><?= htmlspecialchars($titolo) ?></h1>
+                                <?php if (!empty($titolo_orig) && strcasecmp(trim($titolo_orig), trim($titolo)) !== 0): ?>
+                                    <p class="text-muted fs-5 mb-4"><?= htmlspecialchars($titolo_orig) ?></p>
+                                <?php endif; ?>
 
-                            <!-- Metadati: durata, anno, paese -->
-                            <div class="row text-center text-md-start g-4 mb-4">
-                                <div class="col-md-4">
-                                    <div class="text-uppercase text-muted small fw-bold mb-1">Durata</div>
-                                    <div class="fs-5 fw-medium">
-                                        <i class="bi bi-clock icon-accent me-2"></i>
-                                        <?= $durata ? $durata . ' min' : '?' ?>
-                                    </div>
+                                <div class="mb-4">
+                                    <small class="text-uppercase fw-bold text-muted" style="letter-spacing:1px">Regia</small>
+                                    <p class="fs-5 fw-medium"><?= htmlspecialchars($regista) ?></p>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="text-uppercase text-muted small fw-bold mb-1">Anno di uscita</div>
-                                    <div class="fs-5 fw-medium">
-                                        <i class="bi bi-calendar3 icon-accent me-2"></i>
-                                        <?= htmlspecialchars($anno) ?>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="text-uppercase text-muted small fw-bold mb-1">Paese di produzione</div>
-                                    <div class="fs-5 fw-medium">
-                                        <i class="bi bi-globe icon-accent me-2"></i>
-                                        <?= htmlspecialchars($paese) ?>
-                                    </div>
-                                </div>
-                            </div>
 
-                            <!-- Cast -->
-                            <?php if (!empty($cast)): ?>
-                                <hr class="text-muted opacity-25 mb-4">
-                                <h5 class="text-muted fw-semibold mb-3">Cast</h5>
-                                <div class="d-flex flex-wrap gap-2">
-                                    <?php foreach ($cast as $actor): ?>
-                                        <span class="badge badge-cast px-3 py-2 rounded-pill fs-6 fw-normal">
-                                            <i class="bi bi-person-circle me-1 text-muted"></i>
-                                            <?= htmlspecialchars($actor['name'] ?? 'Sconosciuto') ?>
-                                            <?php if (!empty($actor['character'])): ?>
-                                                <span class="text-muted fst-italic">
-                                                    (<?= htmlspecialchars($actor['character']) ?>)
-                                                </span>
-                                            <?php endif; ?>
-                                        </span>
+                                <div class="d-flex flex-wrap gap-2 mb-4">
+                                    <?php foreach ($generi as $genre): ?>
+                                        <span class="badge bg-white text-dark border rounded-pill px-3 py-2"><?= htmlspecialchars($genre['name']) ?></span>
                                     <?php endforeach; ?>
                                 </div>
-                            <?php endif; ?>
 
+                                <div class="border-top pt-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h4 class="fw-bold m-0">Trama</h4>
+                                        <div class="vote-display">
+                                            <i class="bi bi-star-fill"></i>
+                                            <span><?= number_format($voto, 1) ?> <small class="text-muted fw-normal" style="font-size:0.8rem">/ 10</small></span>
+                                        </div>
+                                    </div>
+                                    <p class="overview-text fs-6"><?= nl2br(htmlspecialchars($overview)) ?></p>
+                                </div>
+                            </div>
                         </div>
+
+                        <div class="row text-center py-4 bg-light rounded-4 mb-5 border mx-0">
+                            <div class="col-4 border-end">
+                                <div class="small text-muted text-uppercase fw-bold">Durata</div>
+                                <div class="fw-bold"><?= $durata ?> min</div>
+                            </div>
+                            <div class="col-4 border-end">
+                                <div class="small text-muted text-uppercase fw-bold">Anno</div>
+                                <div class="fw-bold"><?= $anno ?></div>
+                            </div>
+                            <div class="col-4">
+                                <div class="small text-muted text-uppercase fw-bold">Paese</div>
+                                <div class="fw-bold"><?= $paese ?></div>
+                            </div>
+                        </div>
+
+                        <div class="mt-2">
+                            <h4 class="fw-bold mb-4">Cast Principale</h4>
+                            <div class="row g-3">
+                                <?php foreach ($cast as $actor): 
+                                    $profile = $actor['profile_path'] 
+                                        ? "https://image.tmdb.org/t/p/w185" . $actor['profile_path'] 
+                                        : "https://ui-avatars.com/api/?name=" . urlencode($actor['name']) . "&background=random";
+                                ?>
+                                    <div class="col-12 col-sm-6 col-lg-4">
+                                        <div class="d-flex align-items-center p-2 border rounded-3 bg-light shadow-sm transition-hover">
+                                            <img src="<?= $profile ?>" 
+                                                 class="cast-avatar rounded-circle border border-2 border-white shadow-sm me-3" 
+                                                 alt="<?= htmlspecialchars($actor['name']) ?>">
+                                            <div class="overflow-hidden">
+                                                <p class="mb-0 fw-bold text-dark text-truncate" style="font-size: 0.9rem;">
+                                                    <?= htmlspecialchars($actor['name']) ?>
+                                                </p>
+                                                <p class="mb-0 text-muted text-truncate" style="font-size: 0.8rem;">
+                                                    <?= htmlspecialchars($actor['character']) ?>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
 
+            <div class="modal fade" id="trailerModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content trailer-modal-content">
+                        <div class="modal-body p-0">
+                            <div class="d-flex justify-content-start mb-3 ms-2">
+                                <button type="button" class="btn border-0 p-0 text-white close-trailer d-flex align-items-center justify-content-center" style="transform: scale(1.2);" data-bs-dismiss="modal" aria-label="Close">
+                                    <i class="bi bi-x-lg fs-5" style="text-shadow: 0 2px 4px rgba(0,0,0,0.8);"></i>
+                                </button>
+                            </div>
+                            <div class="ratio ratio-16x9 trailer-video-container">
+                                <iframe id="trailerVideo" src="https://www.youtube.com/embed/<?= $trailerKey ?>?enablejsapi=1" allowfullscreen></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php else: ?>
+            <div class="alert alert-warning shadow-sm rounded-4"><?= htmlspecialchars($errore) ?></div>
         <?php endif; ?>
     </main>
 
     <?php require_once(__DIR__ . '/../../includes/footer.php'); ?>
-
+    
     <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/assets/js/script.js"></script>
+    <script>
+        // Stop video quando chiudi il modale
+        const m = document.getElementById('trailerModal');
+        m && m.addEventListener('hidden.bs.modal', () => { 
+            const f = document.getElementById('trailerVideo'); 
+            const s = f.src; f.src = ''; f.src = s; 
+        });
+    </script>
 </body>
 </html>

@@ -16,19 +16,6 @@ $nome = $_SESSION['nome'];
     <title>Cinevobis</title>
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
-    <style>
-        /* Tipografia Homepage */
-        .headline {
-            font-size: clamp(1.8rem, 4vw, 2.8rem);
-            letter-spacing: -0.01em;
-            font-weight: 700;
-        }
-
-        .headline em {
-            font-style: italic;
-            color: var(--accent-color);
-        }
-    </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
 
