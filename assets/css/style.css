@@ -49,6 +49,18 @@ body {
     border-color: #555 !important;
 }
 
+/* Sistema il bottone outline per usare i tuoi colori --text */
+.btn-outline-dark {
+    border-color: var(--text) !important;
+    color: var(--text) !important;
+}
+
+.btn-outline-dark:hover {
+    background-color: var(--text-muted) !important;
+    border-color: var(--text) !important;
+    color: #ffffff !important;
+}
+
 /* =====================
    Navbar
 ===================== */

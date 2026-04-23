@@ -22,6 +22,7 @@ if (isset($_POST['login'])) {
                 $_SESSION['id_utente'] = $utente['id_utente'];
                 $_SESSION['username']  = $utente['username'];
                 $_SESSION['id_profilo'] = $utente['id_profilo'];
+                $_SESSION['nome'] = $utente['nome'];
 
                 $user->createDataLogin(date('Y-m-d H:i:s'), session_id(), $utente['id_utente']);
 

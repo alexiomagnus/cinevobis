@@ -38,7 +38,7 @@ $sessioni = $user->readAccess($righe);
             <form method="GET" class="d-flex align-items-center gap-2">
                 <label class="small text-muted mb-0">Righe:</label>
                 <input type="number" name="righe" class="form-control form-control-sm" style="width: 70px;" min="1" value="<?= htmlspecialchars($righe) ?>">
-                <button type="submit" class="btn btn-sm btn-brand">Aggiorna</button>
+                <button type="submit" class="btn btn-sm btn-dark">Aggiorna</button>
             </form>
         </div>
 

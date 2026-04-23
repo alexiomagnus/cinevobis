@@ -38,20 +38,6 @@ if (!$username || $id_profilo != 1) {
         <div class="row g-4 justify-content-center">
 
             <div class="col-12 col-md-6 col-lg-4">
-                <a href="add_film.php" class="text-decoration-none h-100 d-block">
-                    <div class="card border-0 shadow-sm text-center p-4 h-100 card-hover">
-                        <div class="card-body d-flex flex-column justify-content-center">
-                            <div class="display-4 mb-3 text-primary">
-                                <i class="bi bi-film"></i>
-                            </div>
-                            <h2 class="h4 fw-bold mb-3 text-dark">Aggiungi film</h2>
-                            <p class="text-muted mb-0">Carica un nuovo film nel sistema</p>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-            <div class="col-12 col-md-6 col-lg-4">
                 <a href="users.php" class="text-decoration-none h-100 d-block">
                     <div class="card border-0 shadow-sm text-center p-4 h-100 card-hover">
                         <div class="card-body d-flex flex-column justify-content-center">

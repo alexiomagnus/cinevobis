@@ -23,6 +23,7 @@ $utenti = $user->readAll();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestione utenti - Cinevobis</title>
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body class="d-flex flex-column min-vh-100">
@@ -42,7 +43,7 @@ $utenti = $user->readAll();
                             <th>Email</th>
                             <th>Profilo</th>
                             <th class="text-center">Attivo</th>
-                            <th class="text-end pe-3">Azioni</th>
+                            <th class="text-end pe-3">Azione</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -63,10 +64,11 @@ $utenti = $user->readAll();
                                 </td>
                                 <td class="text-end pe-3">
                                     <form method="GET" action="edit_user.php">
-                                        <input type="hidden" name="username" value="<?= htmlspecialchars($utente['username']) ?>">
-                                        <button type="submit" class="btn btn-sm btn-brand">
-                                            <i class="bi bi-pencil"></i> Modifica
-                                        </button>
+                                        <a href="edit_user.php?username=<?= htmlspecialchars($utente['username']) ?>" 
+                                            class="text-dark text-decoration-none d-inline-flex align-items-center">
+                                            <i class="bi bi-pencil-square me-1"></i>
+                                            Modifica
+                                        </a>
                                     </form>
                                 </td>
                             </tr>

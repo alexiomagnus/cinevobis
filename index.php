@@ -4,6 +4,8 @@ session_start();
 require_once(__DIR__ . '/config/config.php');
 require_once(__DIR__ . '/config/connection.php');
 require_once(__DIR__ . '/includes/header_logic.php');
+
+$nome = $_SESSION['nome'];
 ?>
 <!DOCTYPE html>
 <html lang="it">
@@ -28,14 +30,13 @@ require_once(__DIR__ . '/includes/header_logic.php');
         }
     </style>
 </head>
-
 <body class="d-flex flex-column min-vh-100">
 
     <?php include("includes/header.php"); ?>
 
     <main class="container mt-4 mb-5 flex-grow-1">
         <div class="container">
-            <h1 class="fw-bold mb-4">Ciao <?= htmlspecialchars($_SESSION['username']) ?></h1>
+            <h1 class="fw-bold mb-4">Ciao <?= htmlspecialchars($nome) ?></h1>
         </div>
     </main>
 
@@ -43,6 +44,6 @@ require_once(__DIR__ . '/includes/header_logic.php');
 
     <!-- Per Tom Select -->
     <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-</body>
 
+</body>
 </html>
