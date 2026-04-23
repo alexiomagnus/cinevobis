@@ -16,7 +16,7 @@ $dotenv->load();
 $tmdb = Tmdb::client($_ENV['API_KEY']);
 
 $errore = "";
-$results = [];
+$moviesList = [];
 $searched = isset($_GET['search']) ? trim($_GET['search']) : '';
 
 if ($searched !== '') {
@@ -29,6 +29,16 @@ if ($searched !== '') {
 
     if (empty($results)) {
         $errore = "Nessun risultato trovato per: " . htmlspecialchars($searched);
+    } else {
+        // PREPARAZIONE DATI: Mappiamo i risultati grezzi in un formato pulito per la vista
+        foreach ($results as $movie) {
+            $moviesList[] = [
+                'id'     => $movie['id'],
+                'titolo' => $movie['title'] ?? 'Titolo non disponibile',
+                'anno'   => !empty($movie['release_date']) ? substr($movie['release_date'], 0, 4) : null,
+                'poster' => !empty($movie['poster_path']) ? 'https://image.tmdb.org/t/p/w92' . $movie['poster_path'] : null
+            ];
+        }
     }
 }
 ?>
@@ -56,27 +66,18 @@ if ($searched !== '') {
                 </div>
             <?php endif; ?>
 
-            <?php if (!empty($results)): ?>
+            <?php if (!empty($moviesList)): ?>
                 <h5 class="text-muted mb-3 fw-normal">Risultati della ricerca</h5>
                 <div class="d-flex flex-column gap-3">
-                    <?php foreach ($results as $movie): ?>
-                        <?php
-                            $id     = $movie['id'];
-                            $titolo = $movie['title'] ?? 'Titolo non disponibile';
-                            $anno   = isset($movie['release_date']) && $movie['release_date'] !== ''
-                                        ? substr($movie['release_date'], 0, 4)
-                                        : null;
-                            $poster = isset($movie['poster_path']) && $movie['poster_path']
-                                        ? 'https://image.tmdb.org/t/p/w92' . $movie['poster_path']
-                                        : null;
-                        ?>
-                        <a href="film.php?tmdb_id=<?= urlencode($id) ?>" class="text-decoration-none">
+                    
+                    <?php foreach ($moviesList as $movie): ?>
+                        <a href="film.php?tmdb_id=<?= urlencode($movie['id']) ?>" class="text-decoration-none">
                             <div class="card border-0 shadow-sm rounded-3 card-hover bg-white search-result-card">
                                 <div class="card-body px-4 py-3 d-flex align-items-center gap-3">
 
-                                    <?php if ($poster): ?>
-                                        <img src="<?= htmlspecialchars($poster) ?>"
-                                             alt="Poster <?= htmlspecialchars($titolo) ?>"
+                                    <?php if ($movie['poster']): ?>
+                                        <img src="<?= htmlspecialchars($movie['poster']) ?>"
+                                             alt="Poster <?= htmlspecialchars($movie['titolo']) ?>"
                                              class="rounded-2 flex-shrink-0"
                                              style="width: 48px; height: 72px; object-fit: cover;">
                                     <?php else: ?>
@@ -88,10 +89,10 @@ if ($searched !== '') {
 
                                     <div class="flex-grow-1 overflow-hidden">
                                         <span class="fs-6 text-dark fw-medium d-block text-truncate">
-                                            <?= htmlspecialchars($titolo) ?>
+                                            <?= htmlspecialchars($movie['titolo']) ?>
                                         </span>
-                                        <?php if ($anno): ?>
-                                            <small class="text-muted"><?= htmlspecialchars($anno) ?></small>
+                                        <?php if ($movie['anno']): ?>
+                                            <small class="text-muted"><?= htmlspecialchars($movie['anno']) ?></small>
                                         <?php endif; ?>
                                     </div>
 
@@ -100,6 +101,7 @@ if ($searched !== '') {
                             </div>
                         </a>
                     <?php endforeach; ?>
+
                 </div>
             <?php endif; ?>
 

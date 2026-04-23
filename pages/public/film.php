@@ -9,63 +9,87 @@ require_once(__DIR__ . '/../../vendor/autoload.php');
 
 use Dotenv\Dotenv;
 use Kiwilan\Tmdb\Tmdb;
+use MongoDB\Client as MongoClient;
+use JmesPath\Env;
 
 $dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
 $dotenv->load();
 
 $tmdb  = Tmdb::client($_ENV['API_KEY']);
-$movie = null;
+
+// Connessione a MongoDB
+$mongoClient = new MongoClient("mongodb://localhost:27017"); 
+$db = $mongoClient->selectDatabase('cinevobis'); 
+$collection = $db->selectCollection('films'); 
+
+$movie_api = null;
+$movie_db = null;
 $errore = "";
 
 $movie_id = $_GET['tmdb_id'] ?? null;
 
+// 1. Recupero film da TMDB
 if (!empty($movie_id)) {
     $results = $tmdb->raw()->url("/movie/{$movie_id}", [
-        'language'          => 'it-IT',
+        'language' => 'it-IT',
         'append_to_response' => 'credits'
     ]);
 
-    $movie = $results?->getBody();
+    $body = $results?->getBody();
 
-    if (!$movie) {
+    if ($body) {
+        $movie_api = is_string($body) ? json_decode($body, true) : $body;
+    }
+
+    if (empty($movie_api)) {
         $errore = "Film non trovato su TMDB";
     }
 } else {
     $errore = "Nessun film selezionato";
 }
 
-// Variabili estratte dall'array
-if ($movie) {
-    $titolo = $movie['title'] ?? 'Titolo non disponibile';
-    $titolo_orig = $movie['original_title'] ?? '';
-    $overview = !empty($movie['overview']) ? $movie['overview'] : 'Nessuna trama disponibile.';
-    $poster_path = $movie['poster_path'] ?? null;
-    $voto = $movie['vote_average'] ?? null;
-    $durata = $movie['runtime'] ?? null;
-    $generi = $movie['genres']  ?? [];
-    $cast = array_slice($movie['credits']['cast'] ?? [], 0, 10);
+// 2. Controllo/inserimento in MongoDB
+if (!empty($movie_api)) {
+    $movie_db = $collection->findOne(
+        ['id' => (int)$movie_id],
+        ['typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']]
+    );
 
-    // Anno: prendi solo i primi 4 caratteri della data di uscita
-    $anno = !empty($movie['release_date'])
-        ? substr($movie['release_date'], 0, 4)
-        : '?';
+    if ($movie_db === null) {
+        $collection->insertOne($movie_api);
+        $movie_db = $movie_api; 
+    }
+}
 
-    // Paese: primo paese di produzione
-    $paesi = $movie['production_countries'] ?? [];
-    $paese = !empty($paesi) ? strtoupper($paesi[0]['name'] ?? '?') : '?';
+// ========== 3. Estrazione con JMESPath ==========
+$subtitle = [];
+if ($movie_db) {
+    $titolo       = Env::search('title', $movie_db) ?? 'Titolo non disponibile';
+    $titolo_orig  = Env::search('original_title', $movie_db) ?? '';
+    $overview     = Env::search('overview', $movie_db) ?: 'Nessuna trama disponibile.';
+    $poster_path  = Env::search('poster_path', $movie_db);
+    $voto         = Env::search('vote_average', $movie_db);
+    $durata       = Env::search('runtime', $movie_db);
+    $generi       = Env::search('genres', $movie_db) ?? [];
+    $cast         = Env::search('credits.cast[:10]', $movie_db) ?? [];
 
-    // Regista: filtra i membri del crew con job === 'Director'
-    $regista = implode(', ', array_column(
-        array_filter($movie['credits']['crew'] ?? [], fn($m) => ($m['job'] ?? '') === 'Director'),
-        'name'
-    ));
+    // Anno: primi 4 caratteri di release_date
+    $release_date = Env::search('release_date', $movie_db);
+    $anno = !empty($release_date) ? substr($release_date, 0, 4) : '?';
 
-    // Sottotitolo: regista + titolo originale (se diverso)
+    // Paese: primo paese di produzione in uppercase
+    $paese_raw = Env::search('production_countries[0].name', $movie_db);
+    $paese = !empty($paese_raw) ? strtoupper($paese_raw) : '?';
+
+    // Regista: filtra crew per job "Director" e concatena i nomi
+    $registi = Env::search('credits.crew[?job == `Director`].name', $movie_db) ?? [];
+    $regista = implode(', ', $registi);
+
+    // Sottotitolo
     $subtitle = array_filter([
         $regista    ? 'Diretto da: ' . htmlspecialchars($regista) : '',
         $titolo_orig !== $titolo ? htmlspecialchars($titolo_orig) : '',
     ]);
-
 }
 ?>
 <!DOCTYPE html>
@@ -73,7 +97,7 @@ if ($movie) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $movie ? htmlspecialchars($titolo) : 'Film' ?> - Cinevobis</title>
+    <title><?= $movie_db ? htmlspecialchars($titolo) : 'Film' ?> - Cinevobis</title>
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="/assets/css/style.css">
@@ -89,7 +113,7 @@ if ($movie) {
                 <?= htmlspecialchars($errore) ?>
             </div>
 
-        <?php elseif ($movie): ?>
+        <?php elseif ($movie_db): ?>
             <div class="row justify-content-center">
                 <div class="col-lg-9 col-md-11">
                     <div class="card border-0 shadow-sm rounded-4">

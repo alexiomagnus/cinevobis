@@ -87,7 +87,7 @@ if ($userData && $userData['data_registrazione']) {
             </div>
 
             <div class="col-lg-6 d-none d-lg-block bg-secondary" 
-                 style="background-image: url('/assets/img/_.jpeg'); background-size: cover; background-position: center;">
+                 style="background-image: url('/assets/img/ocean.jpeg'); background-size: cover; background-position: center;">
             </div>
         </div>
     </div>
