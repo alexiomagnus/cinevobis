@@ -1,2 +1,1 @@
-- admins: vobis
-- users: film
+- password: film
