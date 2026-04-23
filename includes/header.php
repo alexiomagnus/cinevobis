@@ -50,7 +50,7 @@ $isAdminPage = in_array($currentPage, $adminPages);
                             <li><a class="dropdown-item py-2 small" href="/pages/user/profile.php">Profilo</a></li>
                         <?php endif; ?>
 
-                        <?php if (isset($_SESSION['id_profilo']) && $_SESSION['id_profilo'] == '1' && !$isAdminPage): ?>
+                        <?php if ($_SESSION['id_profilo'] == '1' && !$isAdminPage): ?>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>

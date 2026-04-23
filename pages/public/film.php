@@ -217,7 +217,7 @@ if ($movie_db) {
                 <div class="modal-dialog modal-lg modal-dialog-centered">
                     <div class="modal-content trailer-modal-content">
                         <div class="modal-body p-0">
-                            <div class="d-flex justify-content-start mb-3 ms-2">
+                            <div class="d-flex justify-content-end mb-3 me-2">
                                 <button type="button" class="btn border-0 p-0 text-white close-trailer d-flex align-items-center justify-content-center" style="transform: scale(1.2);" data-bs-dismiss="modal" aria-label="Close">
                                     <i class="bi bi-x-lg fs-5" style="text-shadow: 0 2px 4px rgba(0,0,0,0.8);"></i>
                                 </button>
@@ -237,6 +237,7 @@ if ($movie_db) {
     <?php require_once(__DIR__ . '/../../includes/footer.php'); ?>
     
     <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    
     <script>
         // Stop video quando chiudi il modale
         const m = document.getElementById('trailerModal');

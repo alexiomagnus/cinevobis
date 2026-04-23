@@ -57,15 +57,13 @@ if (isset($_POST['cambia_password'])) {
 
     <div class="container-fluid">
 
-        <a href="javascript:void(0)" 
-            onclick="closeAndRedirect()" 
-            class="btn-close position-absolute top-0 start-0 m-4" 
-            aria-label="Close">
-        </a>
-
         <div class="row vh-100 justify-content-center align-items-center">
             <div class="col-12 col-sm-8 col-md-6 col-lg-4 px-4">
-                
+
+                <a href="/"
+                    class="btn-close position-absolute top-0 start-0 m-4"
+                    aria-label="Chiudi"></a>
+
                 <div class="text-center mb-5">
                     <h1 class="display-6 fw-bolder mb-2">Sicurezza</h1>
                     <p class="text-secondary">Aggiorna la password</p>

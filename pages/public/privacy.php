@@ -1,3 +1,10 @@
+<?php
+session_start();
+
+require_once(__DIR__ . '/../../config/config.php');
+require_once(__DIR__ . '/../../config/connection.php');
+require_once(__DIR__ . '/../../includes/user_obj.php');
+?>
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -42,5 +49,7 @@
     <?php require_once(__DIR__ . '/../../includes/footer.php'); ?>
     
     <script src="/assets/js/script.js"></script>
+
+    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
