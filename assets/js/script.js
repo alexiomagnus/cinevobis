@@ -1,58 +1,46 @@
-// --- Logica di tracciamento Referer ---
-document.addEventListener("DOMContentLoaded", function() {
-    const currentPage = window.location.pathname;
-    const blacklist = ['login.php', 'signup.php'];
+document.addEventListener("DOMContentLoaded", () => {
     
-    // Controlla se l'utente è atterrato su una pagina di accesso
-    const isAuthPage = blacklist.some(p => currentPage.includes(p));
-
-    if (isAuthPage) {
-        // Prendiamo l'URL da cui proviene l'utente
-        const referrer = document.referrer;
-        
-        console.log('Current Page:', currentPage);
-        console.log('Referrer:', referrer);
-
-        if (referrer && !sessionStorage.getItem('origin_url')) {
-            sessionStorage.setItem('origin_url', referrer);
-            console.log('Origin URL set to:', referrer);
-        }
+    // 1. LOGICA DI TRACCIAMENTO REFERER
+    const path = window.location.pathname;
+    const ref = document.referrer;
+    if (/(login|signup)\.php$/.test(path) && ref && !sessionStorage.getItem('origin_url') && !ref.includes(path)) {
+        sessionStorage.setItem('origin_url', ref);
     }
-});
 
-// --- Funzione per il tasto "X" ---
-function closeAndRedirect() {
-    const destination = sessionStorage.getItem('origin_url');
-    
-    console.log('Destination from session storage:', destination);
-
-    if (destination) {
-        window.location.href = destination;
-        sessionStorage.removeItem('origin_url');
-    } else {
-        window.location.href = '/index.php';
-    }
-}
-
-// --- Funzione per vedere la password ---
-document.addEventListener("DOMContentLoaded", function() {
-    // Seleziona tutte le icone con classe toggle-icon
-    const toggleIcons = document.querySelectorAll('.toggle-icon');
-
-    toggleIcons.forEach(icon => {
-        icon.addEventListener('click', function() {
-            // Trova l'input collegato tramite l'ID o il target data
-            const targetId = this.getAttribute('data-target') || 'password';
-            const passwordInput = document.getElementById(targetId);
-
-            if (passwordInput) {
-                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordInput.setAttribute('type', type);
-                
-                // Cambia l'icona
-                this.classList.toggle('bi-eye');
-                this.classList.toggle('bi-eye-slash');
+    // 3. VISIBILITÀ PASSWORD
+    document.querySelectorAll('.toggle-icon').forEach(icon => {
+        icon.addEventListener('click', (e) => {
+            const input = document.getElementById(e.currentTarget.dataset.target || 'password');
+            if (input) {
+                input.type = input.type === 'password' ? 'text' : 'password';
+                e.currentTarget.classList.toggle('bi-eye');
+                e.currentTarget.classList.toggle('bi-eye-slash');
             }
         });
     });
+
+    // 4. GESTIONE TRAILER MODAL
+    const modal = document.getElementById('trailerModal');
+    const container = modal?.querySelector('.ratio');
+    const iframe = container?.querySelector('iframe');
+    
+    if (iframe) {
+        const url = iframe.dataset.src;
+        const cls = iframe.className;
+        container.innerHTML = ''; // Svuota il contenitore iniziale
+        
+        modal.addEventListener('show.bs.modal', () => {
+            container.innerHTML = `<iframe src="${url}" class="${cls}" allowfullscreen></iframe>`;
+        });
+        
+        modal.addEventListener('hidden.bs.modal', () => container.innerHTML = '');
+    }
 });
+
+// 2. FUNZIONE PER IL TASTO CHIUDI (X)
+// Esposta su window per garantire che funzioni con gli attributi onclick="" nell'HTML
+window.closeAndRedirect = () => {
+    const dest = sessionStorage.getItem('origin_url');
+    if (dest) sessionStorage.removeItem('origin_url');
+    window.location.href = dest || '/index.php';
+};

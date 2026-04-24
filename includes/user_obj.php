@@ -155,4 +155,3 @@ class userObj {
         return $stmt->fetchAll();
     }
 }
-?>

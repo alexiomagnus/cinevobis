@@ -4,6 +4,7 @@ session_start();
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');
+require_once(__DIR__ . '/../../includes/movie_obj.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');
 require_once(__DIR__ . '/../../vendor/autoload.php');
 
@@ -27,23 +28,15 @@ if ($searched !== '') {
 
     $results = $raw?->getBody()['results'] ?? [];
 
-    if (empty($results)) {
+    if (empty($results)) 
         $errore = "Nessun risultato trovato per: " . htmlspecialchars($searched);
-    } else {
-        // PREPARAZIONE DATI: Mappiamo i risultati grezzi in un formato pulito per la vista
-        foreach ($results as $movie) {
-            $moviesList[] = [
-                'id'     => $movie['id'],
-                'titolo' => $movie['title'] ?? 'Titolo non disponibile',
-                'anno'   => !empty($movie['release_date']) ? substr($movie['release_date'], 0, 4) : null,
-                'poster' => !empty($movie['poster_path']) ? 'https://image.tmdb.org/t/p/w92' . $movie['poster_path'] : null
-            ];
-        }
-    }
+    else 
+        $moviesList = movieObj::search($results);
 }
 ?>
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -52,6 +45,7 @@ if ($searched !== '') {
     <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="/assets/css/style.css">
 </head>
+
 <body class="d-flex flex-column min-vh-100">
 
     <?php require_once(__DIR__ . '/../../includes/header.php'); ?>
@@ -69,7 +63,7 @@ if ($searched !== '') {
             <?php if (!empty($moviesList)): ?>
                 <h5 class="text-muted mb-3 fw-normal">Risultati della ricerca</h5>
                 <div class="d-flex flex-column gap-3">
-                    
+
                     <?php foreach ($moviesList as $movie): ?>
                         <a href="film.php?tmdb_id=<?= urlencode($movie['id']) ?>" class="text-decoration-none">
                             <div class="card border-0 shadow-sm rounded-3 card-hover bg-white search-result-card">
@@ -77,12 +71,12 @@ if ($searched !== '') {
 
                                     <?php if ($movie['poster']): ?>
                                         <img src="<?= htmlspecialchars($movie['poster']) ?>"
-                                             alt="Poster <?= htmlspecialchars($movie['titolo']) ?>"
-                                             class="rounded-2 flex-shrink-0"
-                                             style="width: 48px; height: 72px; object-fit: cover;">
+                                            alt="Poster <?= htmlspecialchars($movie['titolo']) ?>"
+                                            class="rounded-2 flex-shrink-0"
+                                            style="width: 48px; height: 72px; object-fit: cover;">
                                     <?php else: ?>
                                         <div class="rounded-2 flex-shrink-0 bg-secondary d-flex align-items-center justify-content-center"
-                                             style="width: 48px; height: 72px;">
+                                            style="width: 48px; height: 72px;">
                                             <i class="bi bi-film text-white fs-5"></i>
                                         </div>
                                     <?php endif; ?>
@@ -113,4 +107,5 @@ if ($searched !== '') {
     <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/assets/js/script.js"></script>
 </body>
+
 </html>
