@@ -12,7 +12,7 @@ class movieObj
     private $generi;
     private $cast;
     private $trailer_key;
-    private $paesi, $paese;
+    private $paesi, $nomi_paesi, $paese;
     private $registi;
 
 
@@ -32,7 +32,7 @@ class movieObj
         $this->generi = $data['genres'] ?? [];
 
         $this->paesi = $data['production_countries'] ?? [];
-        $nomi_paesi = array_column($this->paesi, 'name');
+        $this->nomi_paesi = array_column($this->paesi, 'name');
         $this->paese = $nomi_paesi[0] ?? 'N/D';
 
         $this->cast = array_slice($data['credits']['cast'] ?? [], 0, 10);
