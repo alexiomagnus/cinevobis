@@ -64,7 +64,7 @@ if (isset($_POST['delete_account']) && $username) {
             <div class="col-lg-6 d-flex flex-column justify-content-center align-items-center position-relative px-4">
                 
                 <a href="javascript:void(0)" 
-                    onclick="window.history.back();" 
+                    onclick="closeAndRedirect()" 
                     class="btn-close position-absolute top-0 start-0 m-4" 
                     aria-label="Close">
                 </a>
@@ -151,6 +151,6 @@ if (isset($_POST['delete_account']) && $username) {
         </div>
     </div>
 
-    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/script.js"></script>
 </body>
 </html>

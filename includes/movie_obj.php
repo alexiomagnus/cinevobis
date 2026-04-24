@@ -24,22 +24,18 @@ class movieObj
 
         $this->trama = $data['overview'] ?? 'Nessuna trama disponibile.';
         $this->poster_path = !empty($data['poster_path']) ? $data['poster_path'] : null;
+
         $this->voto = $data['vote_average'] ?? 0;
+        $this->trailer_key = $data['videos']['results'][0]['key'] ?? null;
 
         $this->durata = $data['runtime'] ?? '?';
         $this->anno = !empty($data['release_date']) ? substr($data['release_date'], 0, 4) : 'N/D';
 
         $this->generi = $data['genres'] ?? [];
-
-        $this->paesi = $data['production_countries'] ?? [];
-        $this->nomi_paesi = array_column($this->paesi, 'name');
-        $this->paese = $nomi_paesi[0] ?? 'N/D';
+        $this->paese = $data['production_countries'][0]['name'] ?? 'Nessun paese';
 
         $this->cast = array_slice($data['credits']['cast'] ?? [], 0, 10);
-
         $this->registi = $this->searchRegisti($data);
-
-        $this->trailer_key = $data['videos']['results'][0]['key'] ?? null;
     }
 
     private function searchRegisti($data)

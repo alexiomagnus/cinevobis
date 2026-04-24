@@ -70,7 +70,9 @@ if ($movie_db) {
 
     $trama = $data['trama'];
     $poster_path = $data['poster_path'];
+
     $voto = $data['voto'];
+    $trailerKey = $data['trailer_key'];
 
     $durata = $data['durata'];
     $anno = $data['anno'];
@@ -80,8 +82,6 @@ if ($movie_db) {
 
     $cast = $data['cast'];
     $registi = $data['registi'];
-
-    $trailerKey = $data['trailer_key'];
 }
 ?>
 <!DOCTYPE html>
@@ -160,12 +160,7 @@ if ($movie_db) {
                                 <div class="mb-4">
                                     <small class="text-uppercase fw-bold text-muted d-block mb-1" style="letter-spacing:1px">Regia</small>
                                     <p class="fs-5 fw-medium mb-0">
-                                        <?php 
-                                            $nomi_registi = array_map(function($regista) {
-                                                return htmlspecialchars($regista['name']);
-                                            }, $registi);
-                                            echo implode(', ', $nomi_registi);
-                                        ?>
+                                        <?= htmlspecialchars(implode(', ', array_column($registi, 'name'))) ?>
                                     </p>
                                 </div>
 
@@ -184,6 +179,7 @@ if ($movie_db) {
                                             <span><?= number_format($voto, 1) ?> <small class="text-muted fw-normal fs-6">/ 10</small></span>
                                         </div>
                                     </div>
+                                    <!--- Mandare a capo <br> --->
                                     <p class="text-justify lh-lg text-dark fs-6"><?= nl2br(htmlspecialchars($trama)) ?></p>
                                 </div>
                             </div>
@@ -238,7 +234,7 @@ if ($movie_db) {
             <div class="modal fade" id="trailerModal" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-xl modal-dialog-centered">
                     <div class="modal-content bg-transparent border-0">
-                        <div class="d-flex justify-content-end mb-2">
+                        <div class="d-flex justify-content-end mb-4">
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
 

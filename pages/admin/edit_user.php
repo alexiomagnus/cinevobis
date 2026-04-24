@@ -86,8 +86,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div style="max-width: 450px; width: 100%;">
 
             <a href="users.php"
-            class="btn-close position-absolute top-0 start-0 m-4"
-            aria-label="Chiudi"></a>
+                class="btn-close position-absolute top-0 start-0 m-4"
+                aria-label="Chiudi">
+            </a>
 
             <h1 class="display-6 fw-bolder mb-2 text-center">Modifica utente</h1>
             <p class="text-secondary mb-5 text-center">Aggiorna i dati dell'account</p>

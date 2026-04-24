@@ -1,46 +1,71 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", function() {
     
-    // 1. LOGICA DI TRACCIAMENTO REFERER
-    const path = window.location.pathname;
-    const ref = document.referrer;
-    if (/(login|signup)\.php$/.test(path) && ref && !sessionStorage.getItem('origin_url') && !ref.includes(path)) {
-        sessionStorage.setItem('origin_url', ref);
+    // --- 1. SALVATAGGIO PROVENIENZA (Login/Signup) ---
+    const paginaAttuale = window.location.pathname;
+    const provenienza = document.referrer;
+
+    if (paginaAttuale.includes('login.php') || paginaAttuale.includes('signup.php') || 
+        paginaAttuale.includes('change_password.php') || paginaAttuale.includes('profile.php')) {
+            
+        if (provenienza !== "" && !sessionStorage.getItem('origin_url')) {
+            sessionStorage.setItem('origin_url', provenienza);
+        }
     }
 
-    // 3. VISIBILITÀ PASSWORD
-    document.querySelectorAll('.toggle-icon').forEach(icon => {
-        icon.addEventListener('click', (e) => {
-            const input = document.getElementById(e.currentTarget.dataset.target || 'password');
-            if (input) {
-                input.type = input.type === 'password' ? 'text' : 'password';
-                e.currentTarget.classList.toggle('bi-eye');
-                e.currentTarget.classList.toggle('bi-eye-slash');
+    // --- 2. MOSTRA/NASCONDI PASSWORD ---
+    const iconePassword = document.querySelectorAll('.toggle-icon');
+    
+    iconePassword.forEach(function(icona) {
+        icona.addEventListener('click', function() {
+
+            const inputId = this.getAttribute('data-target');
+            const inputField = document.getElementById(inputId);
+
+            if (inputField.type === 'password') {
+                inputField.type = 'text';
+                this.classList.replace('bi-eye', 'bi-eye-slash');
+            } else {
+                inputField.type = 'password';
+                this.classList.replace('bi-eye-slash', 'bi-eye');
             }
         });
     });
 
-    // 4. GESTIONE TRAILER MODAL
-    const modal = document.getElementById('trailerModal');
-    const container = modal?.querySelector('.ratio');
-    const iframe = container?.querySelector('iframe');
-    
-    if (iframe) {
-        const url = iframe.dataset.src;
-        const cls = iframe.className;
-        container.innerHTML = ''; // Svuota il contenitore iniziale
-        
-        modal.addEventListener('show.bs.modal', () => {
-            container.innerHTML = `<iframe src="${url}" class="${cls}" allowfullscreen></iframe>`;
+    // --- 3. GESTIONE TRAILER (MODAL) ---
+    const trailerModal = document.getElementById('trailerModal');
+    const container = document.querySelector('#trailerModal .ratio'); 
+
+    if (trailerModal && container) {
+        const iframeOriginale = container.querySelector('iframe');
+        const videoUrlBase = iframeOriginale.getAttribute('data-src');
+        const classiIframe = iframeOriginale.className;
+
+        // Creiamo la struttura dell'iframe una volta sola, SENZA autoplay
+        const iframeHTML = `<iframe src="${videoUrlBase}" class="${classiIframe}" allowfullscreen></iframe>`;
+
+        // Svuotiamo il contenitore all'inizio
+        container.innerHTML = '';
+
+        // Quando la modale si apre: inseriamo l'iframe pulito
+        trailerModal.addEventListener('show.bs.modal', function() {
+            container.innerHTML = iframeHTML;
         });
-        
-        modal.addEventListener('hidden.bs.modal', () => container.innerHTML = '');
+
+        // Quando la modale si chiude: distruggiamo l'iframe per fermare l'audio/video
+        trailerModal.addEventListener('hidden.bs.modal', function() {
+            container.innerHTML = '';
+        });
     }
 });
 
-// 2. FUNZIONE PER IL TASTO CHIUDI (X)
-// Esposta su window per garantire che funzioni con gli attributi onclick="" nell'HTML
-window.closeAndRedirect = () => {
-    const dest = sessionStorage.getItem('origin_url');
-    if (dest) sessionStorage.removeItem('origin_url');
-    window.location.href = dest || '/index.php';
-};
+// --- 4. FUNZIONE PER TORNARE INDIETRO ---
+function closeAndRedirect() {
+    const destinazione = sessionStorage.getItem('origin_url');
+    
+    if (destinazione) {
+        sessionStorage.removeItem('origin_url');
+        window.location.href = destinazione;
+    } else {
+        window.location.href = '/index.php';
+    }
+}

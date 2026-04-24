@@ -21,7 +21,7 @@ $nome = $_SESSION['nome'];
 
     <?php include("includes/header.php"); ?>
 
-    <main class="container mt-4 mb-5 flex-grow-1">
+    <main class="container mt-5 mb-5 flex-grow-1">
         <div class="container">
             <h1 class="fw-bold mb-4">Ciao <?= htmlspecialchars($nome) ?></h1>
         </div>

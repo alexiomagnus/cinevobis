@@ -24,20 +24,6 @@ body {
 /* =====================
    Bottoni
 ===================== */
-.btn-brand {
-    background-color: var(--accent);
-    color: var(--text);
-    border: 1.5px solid var(--accent);
-    font-weight: 500;
-    transition: background-color 0.2s, border-color 0.2s;
-}
-
-.btn-brand:hover {
-    background-color: var(--accent-hover);
-    border-color: var(--accent-hover);
-    color: var(--text);
-}
-
 .btn-dark {
     background-color: var(--text) !important;
     border-color: var(--text) !important;
@@ -49,17 +35,6 @@ body {
     border-color: #555 !important;
 }
 
-/* Sistema il bottone outline per usare i tuoi colori --text */
-.btn-outline-dark {
-    border-color: var(--text) !important;
-    color: var(--text) !important;
-}
-
-.btn-outline-dark:hover {
-    background-color: var(--text-muted) !important;
-    border-color: var(--text) !important;
-    color: #ffffff !important;
-}
 
 /* =====================
    Navbar
@@ -72,6 +47,22 @@ body {
 .navbar-brand {
     text-decoration: none;
     color: var(--text) !important;
+    position: relative;
+}
+
+.navbar-brand::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: var(--text);
+    transition: width 0.3s ease-in-out;
+}
+
+.navbar-brand:hover::after {
+    width: 100%;
 }
 
 .nav-link {
@@ -200,9 +191,23 @@ footer {
 /* =====================
    Alert
 ===================== */
-.alert-danger  { background-color: #FAE8E8 !important; color: #9B4545 !important; border-color: #F2CECE !important; }
-.alert-success { background-color: #E8F4EC !important; color: #3D7A52 !important; border-color: #C4E2CE !important; }
-.alert-warning { background-color: #FDF4E3 !important; color: #8A6A2E !important; border-color: #F5E0B0 !important; }
+.alert-danger  { 
+    background-color: #FAE8E8 !important; 
+    color: #9B4545 !important; 
+    border-color: #F2CECE !important; 
+}
+
+.alert-success { 
+    background-color: #E8F4EC !important; 
+    color: #3D7A52 !important; 
+    border-color: #C4E2CE !important; 
+}
+
+.alert-warning { 
+    background-color: #FDF4E3 !important; 
+    color: #8A6A2E !important; 
+    border-color: #F5E0B0 !important; 
+}
 
 /* =====================
    Password
