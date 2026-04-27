@@ -50,20 +50,23 @@ if (!empty($movie_id)) {
 
 // 2. Controllo/inserimento o aggiornamento in MongoDB
 if (!empty($movie_api)) {
+
+    $now = time();
+    $aMonthInSeconds = 30 * 24 * 60 * 60; // 30 giorni
+
+    
     // Cercare il film nel DB
     $movie_db = $collection->findOne(
         ['id' => (int)$movie_id],
         ['typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']]
     );
 
-    $aMonthInSeconds = 30 * 24 * 60 * 60; // 30 giorni
-    
+
     // Se non esiste lo si inserisci
     if ($movie_db === null) {
         $movie_api['last_updated'] = new \MongoDB\BSON\UTCDateTime();  // Timestamp attuale in secondi
         $collection->insertOne($movie_api);
         $movie_db = $movie_api;
-
     } else {
         // Se esiste si recupera il timestamp 
         $lastUpdateSeconds = isset($movie_db['last_updated'])
@@ -79,7 +82,7 @@ if (!empty($movie_api)) {
                 ['$set' => $movie_api]
             );
 
-            $movie_db = $movie_api;
+            $movie_db = $movie_api;  // Usare i dati fresci per la visualizzazione
         }
     }
 }
