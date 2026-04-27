@@ -1,5 +1,4 @@
 <?php
-
 class movieObj
 {
     private $titolo;
@@ -12,7 +11,7 @@ class movieObj
     private $generi;
     private $cast;
     private $trailer_key;
-    private $paesi, $nomi_paesi, $paese;
+    private $paese;
     private $registi;
 
 
@@ -34,11 +33,11 @@ class movieObj
         $this->generi = $data['genres'] ?? [];
         $this->paese = $data['production_countries'][0]['name'] ?? 'Nessun paese';
 
-        $this->cast = array_slice($data['credits']['cast'] ?? [], 0, 10);
-        $this->registi = $this->searchRegisti($data);
+        $this->cast = array_slice($data['credits']['cast'] ?? [], 0, 12);
+        $this->registi = $this->searchDirectors($data);
     }
 
-    private function searchRegisti($data)
+    private function searchDirectors($data)
     {
         return array_filter(
             $data['credits']['crew'],

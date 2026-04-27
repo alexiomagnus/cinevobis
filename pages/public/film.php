@@ -10,15 +10,15 @@ require_once(__DIR__ . '/../../vendor/autoload.php');
 
 use Dotenv\Dotenv;
 use Kiwilan\Tmdb\Tmdb;
-use MongoDB\Client as MongoClient;
+use MongoDB\Client;
 
 $dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
 $dotenv->load();
 
-$tmdb  = Tmdb::client($_ENV['API_KEY']);
+$tmdb = Tmdb::client($_ENV['API_KEY']);
 
 // Connessione a MongoDB
-$mongoClient = new MongoClient("mongodb://localhost:27017");
+$mongoClient = new Client("mongodb://localhost:27017");
 $db = $mongoClient->selectDatabase('cinevobis');
 $collection = $db->selectCollection('films');
 
@@ -47,18 +47,43 @@ if (!empty($movie_id)) {
     $errore = "Nessun film selezionato";
 }
 
-// 2. Controllo/inserimento in MongoDB
+
+// 2. Controllo/inserimento o aggiornamento in MongoDB
 if (!empty($movie_api)) {
+    // Cercare il film nel DB
     $movie_db = $collection->findOne(
         ['id' => (int)$movie_id],
         ['typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']]
     );
 
+    $aMonthInSeconds = 30 * 24 * 60 * 60; // 30 giorni
+    
+    // Se non esiste lo si inserisci
     if ($movie_db === null) {
+        $movie_api['last_updated'] = new \MongoDB\BSON\UTCDateTime();  // Timestamp attuale in secondi
         $collection->insertOne($movie_api);
         $movie_db = $movie_api;
+
+    } else {
+        // Se esiste si recupera il timestamp 
+        $lastUpdateSeconds = isset($movie_db['last_updated'])
+            ? $movie_db['last_updated']->toDateTime()->getTimestamp()
+            : 0;
+
+        // Se è passato un mese si aggiorna il film
+        if (($now - $lastUpdateSeconds) > $aMonthInSeconds) {
+            $movie_api['last_updated'] = new \MongoDB\BSON\UTCDateTime();
+
+            $collection->updateOne(
+                ['id' => $movie_id],
+                ['$set' => $movie_api]
+            );
+
+            $movie_db = $movie_api;
+        }
     }
 }
+
 
 // 3. Estrazione dati
 if ($movie_db) {
@@ -86,7 +111,6 @@ if ($movie_db) {
 ?>
 <!DOCTYPE html>
 <html lang="it">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -124,7 +148,6 @@ if ($movie_db) {
         }
     </style>
 </head>
-
 <body class="d-flex flex-column min-vh-100">
     <?php require_once(__DIR__ . '/../../includes/header.php'); ?>
 
@@ -261,5 +284,4 @@ if ($movie_db) {
     <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/assets/js/script.js"></script>
 </body>
-
 </html>

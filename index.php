@@ -5,7 +5,7 @@ require_once(__DIR__ . '/config/config.php');
 require_once(__DIR__ . '/config/connection.php');
 require_once(__DIR__ . '/includes/header_logic.php');
 
-$nome = $_SESSION['nome'];
+$nome = $_SESSION['nome'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="it">
