@@ -37,6 +37,7 @@ class movieObj
         $this->registi = $this->searchDirectors($data);
     }
 
+
     private function searchDirectors($data)
     {
         return array_filter(
@@ -47,6 +48,7 @@ class movieObj
             }
         );
     }
+
 
     public static function search($movies)
     {
@@ -61,6 +63,7 @@ class movieObj
 
         return $moviesList;
     }
+    
 
     public function toArray()
     {

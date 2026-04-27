@@ -81,7 +81,7 @@ if (isset($_POST['login'])) {
                         <div class="mb-5 position-relative password-wrapper">
                             <input type="password" name="password" id="password" class="form-control bg-light border-light py-3" 
                                 placeholder="Password" required>
-                            <i class="bi bi-eye toggle-icon" id="togglePassword"></i>
+                            <i class="bi bi-eye toggle-icon" data-target="password"></i>
                         </div>
 
                         <button type="submit" name="login" class="btn btn-dark btn-lg w-100 py-3 fw-bold mb-4">Accedi</button>

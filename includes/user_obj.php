@@ -9,6 +9,7 @@ class userObj {
     private $attivo;
     private $db;
 
+
     public function __construct($db, $username, $password = null, $nome = null, $cognome = null,
                             $email = null, $attivo = null, $id_profilo = null) {
         $this->db           = $db;
@@ -21,12 +22,14 @@ class userObj {
         $this->id_profilo   = $id_profilo;
     }
 
+
     public function get($property) {
         if (property_exists($this, $property) && $property !== 'db') {
             return $this->$property;
         }
         return null;
     }
+
 
     public function set($property, $value) {
         // Impedisce la modifica diretta di db e username tramite questo metodo
@@ -41,6 +44,7 @@ class userObj {
         }
         return false;
     }
+
 
     public function create() {
         $sql = "INSERT INTO utenti 
@@ -60,6 +64,7 @@ class userObj {
         ]);
     }
 
+
     public function findByUsername() {
         $sql = "SELECT id_utente, username, password, nome, cognome, email,
                        attivo, id_profilo, data_registrazione
@@ -69,6 +74,7 @@ class userObj {
         $stmt->execute();
         return $stmt->fetch();
     }
+
 
     public function readAll() {
         $sql = "SELECT u.id_utente, u.username, u.nome, u.cognome, u.email,
@@ -80,6 +86,7 @@ class userObj {
         $stmt->execute();
         return $stmt->fetchAll();
     }
+
 
     public function update($usernameOriginale) {
         $sql = "UPDATE utenti SET
@@ -100,6 +107,7 @@ class userObj {
         ]);
     }
 
+
     public function changePassword($passwordAttuale, $nuovaPassword) {
         $utente = $this->findByUsername();
 
@@ -119,11 +127,13 @@ class userObj {
         return ['ok' => true];
     }
 
+
     public function delete() {
         $sql  = "DELETE FROM utenti WHERE username = :username";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([':username' => $this->username]);
     }
+
 
     public function createDataLogin($value, $id_sessione, $id_utente) {
         $sql = "INSERT INTO sessioni (id_sessione, id_utente, data_login)
@@ -136,12 +146,14 @@ class userObj {
         ]);
     }
 
+
     public function setDataLogout($value, $id_sessione) {
         $sql = "UPDATE sessioni SET data_logout = :value WHERE id_sessione = :id_s";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([':value' => $value, ':id_s'  => $id_sessione]);
     }
 
+    
     public function readAccess($num) {
         $sql = "SELECT u.username, s.data_login, s.data_logout
                 FROM sessioni s
