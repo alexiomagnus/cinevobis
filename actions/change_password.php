@@ -8,7 +8,7 @@ require_once(__DIR__ . '/../includes/user_obj.php');
 $username = $_SESSION['username'] ?? '';
 
 if (!$username) {
-    header("Location: /pages/login.php");
+    header("Location: /index.php");
     exit();
 }
 
@@ -67,8 +67,8 @@ if (isset($_POST['cambia_password'])) {
                 </a>
 
                 <div class="text-center mb-5">
-                    <h1 class="display-6 fw-bolder mb-2">Sicurezza</h1>
-                    <p class="text-secondary">Aggiorna la password</p>
+                    <h1 class="display-6 fw-bolder mb-2">Cambia password</h1>
+                    <p class="text-secondary">Modifica la tua password</p>
                 </div>
 
                 <?php if ($errore): ?>

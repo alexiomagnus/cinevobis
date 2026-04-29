@@ -1,17 +1,17 @@
 <?php
 class userObj {
-    private $username;
-    private $password;
-    private $nome;
-    private $cognome;
-    private $email;
-    private $id_profilo;
-    private $attivo;
-    private $db;
+    private string $username;
+    private ?string $password;
+    private ?string $nome;
+    private ?string $cognome;
+    private ?string $email;
+    private ?int $id_profilo;
+    private ?int $attivo;
+    private PDO $db;
 
 
-    public function __construct($db, $username, $password = null, $nome = null, $cognome = null,
-                            $email = null, $attivo = null, $id_profilo = null) {
+    public function __construct(PDO $db, string $username, ?string $password = null, ?string $nome = null, ?string $cognome = null,
+                            ?string $email = null, ?int $attivo = null, ?int $id_profilo = null) {
         $this->db           = $db;
         $this->username     = $username;
         $this->password     = $password ? password_hash($password, PASSWORD_DEFAULT) : null;
@@ -20,29 +20,6 @@ class userObj {
         $this->email        = $email;
         $this->attivo       = $attivo;
         $this->id_profilo   = $id_profilo;
-    }
-
-
-    public function get($property) {
-        if (property_exists($this, $property) && $property !== 'db') {
-            return $this->$property;
-        }
-        return null;
-    }
-
-
-    public function set($property, $value) {
-        // Impedisce la modifica diretta di db e username tramite questo metodo
-        if (property_exists($this, $property) && $property !== 'db' && $property !== 'username') {
-            if ($property === 'password') {
-                $value = password_hash($value, PASSWORD_DEFAULT);
-            }
-            $this->$property = $value;
-            $sql  = "UPDATE utenti SET $property = :value WHERE username = :username";
-            $stmt = $this->db->prepare($sql);
-            return $stmt->execute([':value' => $value, ':username' => $this->username]);
-        }
-        return false;
     }
 
 
@@ -88,7 +65,7 @@ class userObj {
     }
 
 
-    public function update($usernameOriginale) {
+    public function update(string $usernameOriginale) {
         $sql = "UPDATE utenti SET
                     nome       = :nome,
                     cognome    = :cognome,
@@ -108,7 +85,7 @@ class userObj {
     }
 
 
-    public function changePassword($passwordAttuale, $nuovaPassword) {
+    public function changePassword(string $passwordAttuale, string $nuovaPassword) {
         $utente = $this->findByUsername();
 
         if (!$utente) {
@@ -135,7 +112,7 @@ class userObj {
     }
 
 
-    public function createDataLogin($value, $id_sessione, $id_utente) {
+    public function createDataLogin(string $value, string $id_sessione, int $id_utente) {
         $sql = "INSERT INTO sessioni (id_sessione, id_utente, data_login)
                 VALUES (:id_s, :id_u, :data_login)";
         $stmt = $this->db->prepare($sql);
@@ -147,14 +124,17 @@ class userObj {
     }
 
 
-    public function setDataLogout($value, $id_sessione) {
+    public function setDataLogout(string $value, string $id_sessione) {
         $sql = "UPDATE sessioni SET data_logout = :value WHERE id_sessione = :id_s";
         $stmt = $this->db->prepare($sql);
-        return $stmt->execute([':value' => $value, ':id_s'  => $id_sessione]);
+        return $stmt->execute([
+            ':value' => $value, 
+            ':id_s'  => $id_sessione
+        ]);
     }
 
     
-    public function readAccess($num) {
+    public function readAccess(int $num) {
         $sql = "SELECT u.username, s.data_login, s.data_logout
                 FROM sessioni s
                 JOIN utenti u ON u.id_utente = s.id_utente

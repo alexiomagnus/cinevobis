@@ -6,43 +6,39 @@ require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');
 
 $username = $_SESSION['username'] ?? '';
-$isDeletedMessage = isset($_GET['msg']) && $_GET['msg'] === 'eliminato';
 
-// Se non c'è l'utente in sessione e NON stiamo mostrando il messaggio di eliminazione, vai alla home
-if (!$username && !$isDeletedMessage) {
+// Se non c'è l'utente in sessione
+if (!$username) {
     header("Location: /index.php");
     exit();
 }
 
 $userData = null;
 $dataRegistrazione = "N/D";
+$user = new userObj($conn, $username);
 
-// Recuperiamo i dati utente solo se c'è un utente loggato (evita errori se l'account è appena stato eliminato)
-if ($username) {
-    $user = new userObj($conn, $username);
-    $userData = $user->findByUsername();
-
-    if ($userData && $userData['data_registrazione']) {
-        $date = new DateTime($userData['data_registrazione']);
-        $dataRegistrazione = $date->format('Y');
-    }
+// Recuperiamo i dati utente
+$userData = $user->findByUsername();
+if ($userData && $userData['data_registrazione']) {
+    $date = new DateTime($userData['data_registrazione']);
+    $dataRegistrazione = $date->format('Y');
 }
 
+// Gestione Cambia Password
 if (isset($_POST['change_password'])) {
     header("Location: /actions/change_password.php");
     exit();
 }
 
-if (isset($_POST['delete_account']) && $username) {
+// Gestione Eliminazione Account (Porta subito alla Home)
+if (isset($_POST['delete_user']) && $username) {
     try {
-        $user->delete();
-
-        // Svuota e distruggi la sessione correttamente PRIMA del redirect
-        session_unset();
-        session_destroy();
-
-        header("Location: profile.php?msg=eliminato");
-        exit();
+        if ($user->delete()) {
+            // Distruggiamo la sessione per sicurezza prima del redirect
+            session_destroy();
+            header("Location: /index.php");
+            exit();
+        }
     } catch (PDOException $e) {
         $errore = "Errore durante l'eliminazione: " . $e->getMessage();
     }
@@ -63,24 +59,11 @@ if (isset($_POST['delete_account']) && $username) {
         <div class="row g-0 vh-100">
             <div class="col-lg-6 d-flex flex-column justify-content-center align-items-center position-relative px-4">
                 
-                <a href="javascript:void(0)" 
-                    onclick="closeAndRedirect()" 
-                    class="btn-close position-absolute top-0 start-0 m-4" 
-                    aria-label="Close">
-                </a>
+                <a href="/index.php" class="btn-close position-absolute top-0 start-0 m-4" aria-label="Close"></a>
 
                 <div style="max-width: 500px; width: 100%;">
                     <h1 class="display-6 fw-bolder mb-2">Profilo</h1>
                     <p class="text-secondary mb-4">Informazioni del tuo account Cinevobis</p>
-
-                    <?php if ($isDeletedMessage): ?>
-                        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
-                            Il tuo account è stato eliminato con successo.
-                        </div>
-                        <div class="d-grid gap-3">
-                            <a href="/index.php" class="btn btn-dark py-3 fw-bold">Torna alla Home</a>
-                        </div>
-                    <?php endif; ?>
 
                     <?php if (isset($errore)): ?>
                         <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
@@ -89,8 +72,7 @@ if (isset($_POST['delete_account']) && $username) {
                         </div>
                     <?php endif; ?>
 
-                    <?php if ($userData && !$isDeletedMessage): ?>
-                        <!-- RIGA USERNAME / EMAIL -->
+                    <?php if ($userData): ?>
                         <div class="row mb-3 pb-2 border-bottom">
                             <div class="col-md-6">
                                 <label class="small text-uppercase text-muted fw-bold">Username</label>
@@ -102,7 +84,6 @@ if (isset($_POST['delete_account']) && $username) {
                             </div>
                         </div>
 
-                        <!-- RIGA NOME / COGNOME -->
                         <div class="row mb-3 pb-2 border-bottom">
                             <div class="col-md-6">
                                 <label class="small text-uppercase text-muted fw-bold">Nome</label>
@@ -114,7 +95,6 @@ if (isset($_POST['delete_account']) && $username) {
                             </div>
                         </div>
 
-                        <!-- RIGA MEMBRO DAL (larghezza piena, senza linea sotto) -->
                         <div class="row mb-5">
                             <div class="col-12">
                                 <label class="small text-uppercase text-muted fw-bold">Membro dal</label>
@@ -122,25 +102,22 @@ if (isset($_POST['delete_account']) && $username) {
                             </div>
                         </div>
                         
-                        
-                            <form method="POST" class="d-flex gap-3 mt-4">
-                                <button type="submit"
-                                    name="change_password"
-                                    class="btn btn-dark btn-lg flex-fill py-3 fw-bold">
-                                    Cambia password
-                                </button>
+                        <form method="POST" class="d-flex gap-3 mt-4">
+                            <button type="submit" name="change_password" class="btn btn-dark btn-lg flex-fill py-3 fw-bold">
+                                Cambia password
+                            </button>
 
-                                <button type="submit"
-                                        name="delete_user"
-                                        class="btn btn-outline-danger btn-lg flex-fill py-3 fw-bold"
-                                        onclick="return confirm('Sei sicuro?');">
-                                    Elimina account
-                                </button>
-                            </form>
+                            <button type="submit" name="delete_user" class="btn btn-outline-danger btn-lg flex-fill py-3 fw-bold"
+                                    onclick="return confirm('Sei sicuro? Questa azione è irreversibile.');">
+                                Elimina account
+                            </button>
+                        </form>
                             
-                            
-                    <?php elseif (!$isDeletedMessage): ?>
+                    <?php else: ?>
                         <div class="alert alert-warning text-center">Utente non trovato.</div>
+                        <div class="d-grid">
+                            <a href="/index.php" class="btn btn-dark">Torna alla Home</a>
+                        </div>
                     <?php endif; ?>
                 </div>
             </div>

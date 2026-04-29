@@ -89,6 +89,11 @@ if (!empty($movie_api)) {
 
 
 // 3. Estrazione dati
+$titolo = $trama = $poster_path = $trailerKey = $paese = '';
+$voto = 0;
+$durata = $anno = '';
+$generi = $cast = $registi = [];
+
 if ($movie_db) {
     $movieObj = new movieObj($movie_db);
     $data = $movieObj->toArray();

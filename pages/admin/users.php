@@ -15,6 +15,12 @@ if (!$username) {
 
 $user = new userObj($conn, $username);
 $utenti = $user->readAll();
+
+$sql = "SELECT COUNT(*) FROM utenti";
+$stmt = $conn->prepare($sql);
+$stmt->execute();
+
+$result = $stmt->fetchColumn();
 ?>
 <!DOCTYPE html>
 <html lang="it">
@@ -31,7 +37,7 @@ $utenti = $user->readAll();
     <?php require_once(__DIR__ . '/../../includes/header.php'); ?>
 
     <div class="container mt-4 mb-5 pb-5 flex-grow-1">
-        <h1 class="fs-4 fw-bold mb-4">Gestione utenti</h1>
+        <h1 class="fs-4 fw-bold mb-4"><?php echo htmlspecialchars($result); ?> Utenti</h1>
         
         <div class="card shadow-sm border-0">
             <div class="table-responsive">

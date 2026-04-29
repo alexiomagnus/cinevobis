@@ -32,8 +32,8 @@ $isAdminPage = in_array($currentPage, $adminPages);
 
             <?php if (!$isLogged): ?>
                 <div class="d-flex gap-2 align-items-center">
-                    <a href="/pages/public/login.php" class="btn btn-outline-secondary px-4">Accedi</a>
-                    <a href="/pages/public/signup.php" class="btn btn-dark px-4">Registrati</a>
+                    <a href="/pages/public/login.php" class="btn btn-outline-secondary btn-sm px-4">Accedi</a>
+                    <a href="/pages/public/signup.php" class="btn btn-dark btn-sm px-4">Registrati</a>
                 </div>
             <?php else: ?>
                 <div class="dropdown">

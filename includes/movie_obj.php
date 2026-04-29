@@ -1,22 +1,21 @@
 <?php
 class movieObj
 {
-    private $titolo;
-    private $titolo_orig;
-    private $trama;
-    private $poster_path;
-    private $voto;
+    private string $titolo;
+    private string $titolo_orig;
+    private string $trama;
+    private ?string $poster_path;
+    private float $voto;
     private $durata;
     private $anno;
-    private $generi;
-    private $cast;
-    private $trailer_key;
-    private $paese;
-    private $registi;
+    private array $generi;
+    private array $cast;
+    private ?string $trailer_key;
+    private string $paese;
+    private array $registi;
 
-
-    // titolo, titolo_orig, trama, poster_path, voto, durata, generi, cast, trailer_key, realease_date, paese, registi
-    public function __construct($data)
+    
+    public function __construct(array $data)
     {
         $this->titolo = $data['title'] ?? 'Titolo non disponibile';
         $this->titolo_orig = $data['original_title'] ?? '';
@@ -24,34 +23,35 @@ class movieObj
         $this->trama = $data['overview'] ?? 'Nessuna trama disponibile.';
         $this->poster_path = !empty($data['poster_path']) ? $data['poster_path'] : null;
 
-        $this->voto = $data['vote_average'] ?? 0;
+        $this->voto = (float)($data['vote_average'] ?? 0);
         $this->trailer_key = $data['videos']['results'][0]['key'] ?? null;
 
-        $this->durata = $data['runtime'] ?? '?';
-        $this->anno = !empty($data['release_date']) ? substr($data['release_date'], 0, 4) : 'N/D';
+        $this->durata = $data['runtime'] ?? 'N/A';
+        $this->anno = !empty($data['release_date']) ? substr($data['release_date'], 0, 4) : 'N/A';
 
         $this->generi = $data['genres'] ?? [];
         $this->paese = $data['production_countries'][0]['name'] ?? 'Nessun paese';
-
+        
         $this->cast = array_slice($data['credits']['cast'] ?? [], 0, 12);
         $this->registi = $this->searchDirectors($data);
     }
 
 
-    private function searchDirectors($data)
+    private function searchDirectors(array $data): array
     {
-        return array_filter(
-            $data['credits']['crew'],
+        $crew = $data['credits']['crew'] ?? [];
 
-            function ($persona) {
-                return $persona['job'] === 'Director';
-            }
-        );
+        $directors = array_filter($crew, function ($persona) {
+            return ($persona['job'] ?? '') === 'Director';
+        });
+
+        return array_values($directors);
     }
 
 
-    public static function search($movies)
+    public static function search(array $movies): array
     {
+        $moviesList = [];
         foreach ($movies as $movie) {
             $moviesList[] = [
                 'id' => $movie['id'],
@@ -60,12 +60,11 @@ class movieObj
                 'poster' => !empty($movie['poster_path']) ? 'https://image.tmdb.org/t/p/w92' . $movie['poster_path'] : null
             ];
         }
-
         return $moviesList;
     }
-    
 
-    public function toArray()
+
+    public function toArray(): array
     {
         return [
             'titolo' => $this->titolo,
