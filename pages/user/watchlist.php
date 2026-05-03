@@ -5,7 +5,6 @@ require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');
 ?>
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -16,6 +15,7 @@ require_once(__DIR__ . '/../../includes/header_logic.php');
     <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body class="d-flex flex-column min-vh-100">
+    
     <?php require_once(__DIR__ . '/../../includes/header.php'); ?>
 
     <main class="container mt-5 mb-5 flex-grow-1">

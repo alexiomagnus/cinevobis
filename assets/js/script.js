@@ -5,7 +5,8 @@ document.addEventListener("DOMContentLoaded", function() {
     const provenienza = document.referrer;
 
     if (paginaAttuale.includes('login.php') || paginaAttuale.includes('signup.php') || 
-        paginaAttuale.includes('change_password.php') || paginaAttuale.includes('profile.php')) {
+        paginaAttuale.includes('change_password.php') || paginaAttuale.includes('profile.php')
+        || paginaAttuale.includes('contact.php')) {
             
         if (provenienza !== "" && !sessionStorage.getItem('origin_url')) {
             sessionStorage.setItem('origin_url', provenienza);
