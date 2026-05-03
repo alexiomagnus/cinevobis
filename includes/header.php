@@ -4,7 +4,7 @@ $isLogged = isset($_SESSION['username']);
 $currentPage = basename($_SERVER['SCRIPT_NAME']);
 
 $publicPages = ['login.php', 'signup.php'];
-$adminPages = ['add_film.php', 'admin_area.php', 'sessions.php', 'users.php', 'edit_user.php'];
+$adminPages = ['add_film.php', 'dashboard.php', 'sessions.php', 'users.php', 'edit_user.php'];
 
 $isPublicPage = in_array($currentPage, $publicPages);
 $isAdminPage = in_array($currentPage, $adminPages);
@@ -14,7 +14,7 @@ $isAdminPage = in_array($currentPage, $adminPages);
     <div class="container-fluid">
 
         <?php if ($isAdminPage): ?>
-            <a href="/pages/admin/admin_area.php" class="navbar-brand fw-bold text-dark" style="font-size: 20px; z-index: 2;">
+            <a href="/pages/admin/dashboard.php" class="navbar-brand fw-bold text-dark" style="font-size: 20px; z-index: 2;">
                 Cinevobis
             </a>
         <?php else: ?>
@@ -54,11 +54,11 @@ $isAdminPage = in_array($currentPage, $adminPages);
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            <li><a class="dropdown-item py-2 small fw-bold text" href="/pages/admin/admin_area.php">Area admin</a></li>
+                            <li><a class="dropdown-item py-2 small fw-bold text" href="/pages/admin/dashboard.php">Dashboard</a></li>
                         <?php endif; ?>
 
                         <?php if ($isAdminPage): ?>
-                            <li><a class="dropdown-item py-2 small fw-bold text" href="/">Torna alla home</a></li>
+                            <li><a class="dropdown-item py-2 small fw-bold text" href="/">Home</a></li>
                         <?php endif; ?>
 
                         <li>
