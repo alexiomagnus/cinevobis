@@ -240,19 +240,23 @@ if ($movie_db) {
                                         : "https://ui-avatars.com/api/?name=" . urlencode($actor['name']) . "&background=random";
                                 ?>
                                     <div class="col-12 col-sm-6 col-lg-4">
-                                        <div class="d-flex align-items-center p-2 border rounded-3 bg-light shadow-sm transition-hover">
-                                            <img src="<?= $profile ?>"
-                                                class="cast-avatar rounded-circle border border-2 border-white shadow-sm me-3"
-                                                alt="<?= htmlspecialchars($actor['name']) ?>">
-                                            <div class="overflow-hidden">
-                                                <p class="mb-0 fw-bold text-dark text-truncate" style="font-size: 0.9rem;">
-                                                    <?= htmlspecialchars($actor['name']) ?>
-                                                </p>
-                                                <p class="mb-0 text-muted text-truncate" style="font-size: 0.8rem;">
-                                                    <?= htmlspecialchars($actor['character']) ?>
-                                                </p>
+                                        <!-- Link all'intera card -->
+                                        <a href="https://www.themoviedb.org/person/<?= $actor['id'] ?>" 
+                                        class="text-decoration-none d-block">
+                                            <div class="d-flex align-items-center p-2 border rounded-3 bg-light shadow-sm transition-hover">
+                                                <img src="<?= $profile ?>"
+                                                    class="cast-avatar rounded-circle border border-2 border-white shadow-sm me-3"
+                                                    alt="<?= htmlspecialchars($actor['name']) ?>">
+                                                <div class="overflow-hidden">
+                                                    <p class="mb-0 fw-bold text-dark text-truncate" style="font-size: 0.9rem;">
+                                                        <?= htmlspecialchars($actor['name']) ?>
+                                                    </p>
+                                                    <p class="mb-0 text-muted text-truncate" style="font-size: 0.8rem;">
+                                                        <?= htmlspecialchars($actor['character']) ?>
+                                                    </p>
+                                                </div>
                                             </div>
-                                        </div>
+                                        </a>
                                     </div>
                                 <?php endforeach; ?>
                             </div>

@@ -3,28 +3,16 @@ session_start();
 
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
-require_once(__DIR__ . '/../../includes/user_obj.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');
 
-$username = $_SESSION["username"] ?? '';
-
-if (!$username) {
-    header("Location: /index.php");
-    exit();
-}
-
-$user = new userObj($conn, $username);
-$utenti = $user->readAll();
-
 $righe = $_GET['righe'] ?? 15;
-$sessioni = $user->readAccess($righe);
 ?>
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Area sessioni - Cinevobis</title>
+    <title>Notifiche - Cinevobis</title>
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/css/style.css">
 </head>
@@ -34,7 +22,7 @@ $sessioni = $user->readAccess($righe);
 
     <div class="container mt-4 mb-5 pb-5 flex-grow-1">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="fs-4 fw-bold mb-0">Sessioni</h1>
+            <h1 class="fs-4 fw-bold mb-0">Notifiche</h1>
             
             <form method="GET" class="d-flex align-items-center gap-2">
                 <label class="small text-muted mb-0">Righe:</label>
@@ -49,8 +37,9 @@ $sessioni = $user->readAccess($righe);
                     <thead class="table-dark">
                         <tr>
                             <th class="border-0 ps-3">Username</th>
-                            <th class="border-0">Data Login</th>
-                            <th class="border-0">Data Logout</th>
+                            <th class="border-0">Titolo</th>
+                            <th class="border-0">Descrizione</th>
+                            <th class="border-0">Data Invio</th>
                         </tr>
                     </thead>
                     <tbody>

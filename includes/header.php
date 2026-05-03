@@ -4,7 +4,7 @@ $isLogged = isset($_SESSION['username']);
 $currentPage = basename($_SERVER['SCRIPT_NAME']);
 
 $publicPages = ['login.php', 'signup.php'];
-$adminPages = ['add_film.php', 'dashboard.php', 'sessions.php', 'users.php', 'edit_user.php'];
+$adminPages = ['add_film.php', 'dashboard.php', 'sessions.php', 'users.php', 'edit_user.php', 'notifications.php', 'films.php'];
 
 $isPublicPage = in_array($currentPage, $publicPages);
 $isAdminPage = in_array($currentPage, $adminPages);

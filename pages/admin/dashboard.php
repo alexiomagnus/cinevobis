@@ -36,6 +36,13 @@ $stmt = $conn->prepare($sql);
 $stmt->execute();
 
 $totaleSessioni = $stmt->fetchColumn();
+
+// Conteggio notifiche
+$sql = "SELECT COUNT(*) FROM notifiche";
+$stmt = $conn->prepare($sql);
+$stmt->execute();
+
+$totaleNotifiche = $stmt->fetchColumn();
 ?>
 <!DOCTYPE html>
 <html lang="it">
@@ -58,6 +65,7 @@ $totaleSessioni = $stmt->fetchColumn();
         .stat-card.accent-gold  { border-color: #FCA311; }
         .stat-card.accent-green { border-color: #198754; }
         .stat-card.accent-blue  { border-color: #0d6efd; }
+        .stat-card.accent-red   { border-color: #dc3545; }
 
         .card-hover {
             transition: transform .15s ease, box-shadow .15s ease;
@@ -82,62 +90,59 @@ $totaleSessioni = $stmt->fetchColumn();
 
         <!-- Statistiche -->
         <div class="row g-3 mb-5">
-            <div class="col-12 col-sm-6 col-lg-4">
-                <div class="card border-0 shadow-sm stat-card accent-gold h-100">
-                    <div class="card-body d-flex align-items-center gap-3 p-4">
-                        <div class="fs-1 text-warning">
-                            <i class="bi bi-film"></i>
-                        </div>
-                        <div>
-                            <div class="fs-2 fw-bold lh-1"><?= $totaleFilm ?></div>
-                            <div class="text-muted small">Film nel catalogo</div>
-                        </div>
-                    </div>
+            <div class="col-6 col-lg-3">
+                <div class="p-3 rounded-2 bg-body-secondary">
+                    <div class="text-muted small mb-1">Film nel catalogo</div>
+                    <div class="fs-3 fw-medium"><?= $totaleFilm ?></div>
                 </div>
             </div>
-
-            <div class="col-12 col-sm-6 col-lg-4">
-                <div class="card border-0 shadow-sm stat-card accent-gold h-100">
-                    <div class="card-body d-flex align-items-center gap-3 p-4">
-                        <div class="fs-1 text-warning">
-                            <i class="bi bi-film"></i>
-                        </div>
-                        <div>
-                            <div class="fs-2 fw-bold lh-1"><?= $totaleUtenti ?></div>
-                            <div class="text-muted small">Utenti registrati</div>
-                        </div>
-                    </div>
+            <div class="col-6 col-lg-3">
+                <div class="p-3 rounded-2 bg-body-secondary">
+                    <div class="text-muted small mb-1">Utenti registrati</div>
+                    <div class="fs-3 fw-medium"><?= $totaleUtenti ?></div>
                 </div>
             </div>
-
-            <div class="col-12 col-sm-6 col-lg-4">
-                <div class="card border-0 shadow-sm stat-card accent-gold h-100">
-                    <div class="card-body d-flex align-items-center gap-3 p-4">
-                        <div class="fs-1 text-warning">
-                            <i class="bi bi-film"></i>
-                        </div>
-                        <div>
-                            <div class="fs-2 fw-bold lh-1"><?= $totaleSessioni ?></div>
-                            <div class="text-muted small">Sessioni registrate</div>
-                        </div>
-                    </div>
+            <div class="col-6 col-lg-3">
+                <div class="p-3 rounded-2 bg-body-secondary">
+                    <div class="text-muted small mb-1">Sessioni registrate</div>
+                    <div class="fs-3 fw-medium"><?= $totaleSessioni ?></div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="p-3 rounded-2 bg-body-secondary">
+                    <div class="text-muted small mb-1">Notifiche registrate</div>
+                    <div class="fs-3 fw-medium"><?= $totaleNotifiche ?></div>
                 </div>
             </div>
         </div>
 
-
         <!-- Sezioni di gestione -->
         <div class="row mb-4">
             <div class="col-12">
-                <h2 class="h5 fw-semibold text-uppercase text-muted ls-1 mb-3">
+                <h2 class="h5 fw-semibold text-uppercase text-muted mb-3">
                     Gestione
                 </h2>
             </div>
         </div>
 
         <div class="row g-4">
+            <!-- Gestione film -->
+            <div class="col-12 col-md-6 col-lg-3">
+                <a href="films.php" class="text-decoration-none h-100 d-block">
+                    <div class="card border-0 shadow-sm text-center p-4 h-100 card-hover">
+                        <div class="card-body d-flex flex-column justify-content-center">
+                            <div class="display-4 mb-3 text-warning">
+                                <i class="bi bi-film"></i>
+                            </div>
+                            <h2 class="h4 fw-bold mb-2 text-dark">Gestione film</h2>
+                            <p class="text-muted mb-0 small">Visualizza tutti i film registrati</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
             <!-- Gestione utenti -->
-            <div class="col-12 col-md-6 col-lg-4">
+            <div class="col-12 col-md-6 col-lg-3">
                 <a href="users.php" class="text-decoration-none h-100 d-block">
                     <div class="card border-0 shadow-sm text-center p-4 h-100 card-hover">
                         <div class="card-body d-flex flex-column justify-content-center">
@@ -152,11 +157,11 @@ $totaleSessioni = $stmt->fetchColumn();
             </div>
 
             <!-- Gestione sessioni -->
-            <div class="col-12 col-md-6 col-lg-4">
+            <div class="col-12 col-md-6 col-lg-3">
                 <a href="sessions.php" class="text-decoration-none h-100 d-block">
                     <div class="card border-0 shadow-sm text-center p-4 h-100 card-hover">
                         <div class="card-body d-flex flex-column justify-content-center">
-                            <div class="display-4 mb-3 text-warning">
+                            <div class="display-4 mb-3 text-primary">
                                 <i class="bi bi-calendar-event"></i>
                             </div>
                             <h2 class="h4 fw-bold mb-2 text-dark">Gestione sessioni</h2>
@@ -165,6 +170,22 @@ $totaleSessioni = $stmt->fetchColumn();
                     </div>
                 </a>
             </div>
+
+            <!-- Gestione notifiche -->
+            <div class="col-12 col-md-6 col-lg-3">
+                <a href="notifications.php" class="text-decoration-none h-100 d-block">
+                    <div class="card border-0 shadow-sm text-center p-4 h-100 card-hover">
+                        <div class="card-body d-flex flex-column justify-content-center">
+                            <div class="display-4 mb-3 text-danger">
+                                <i class="bi bi-bell-fill"></i>
+                            </div>
+                            <h2 class="h4 fw-bold mb-2 text-dark">Gestione notifiche</h2>
+                            <p class="text-muted mb-0 small">Visualizza i report inviati dagli utenti</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
 
     </main>
 
