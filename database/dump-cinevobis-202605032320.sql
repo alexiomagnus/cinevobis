@@ -1,9 +1,9 @@
 /*M!999999\- enable the sandbox mode */ 
--- MariaDB dump 10.19-12.2.2-MariaDB, for Linux (x86_64)
+-- MariaDB dump 10.19-11.8.6-MariaDB, for Linux (x86_64)
 --
 -- Host: localhost    Database: cinevobis
 -- ------------------------------------------------------
--- Server version	12.2.2-MariaDB
+-- Server version	11.8.6-MariaDB
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -15,6 +15,38 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*M!100616 SET @OLD_NOTE_VERBOSITY=@@NOTE_VERBOSITY, NOTE_VERBOSITY=0 */;
+
+--
+-- Table structure for table `notifiche`
+--
+
+DROP TABLE IF EXISTS `notifiche`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `notifiche` (
+  `id_notifica` int(11) NOT NULL AUTO_INCREMENT,
+  `titolo` varchar(255) DEFAULT NULL,
+  `descrizione` text NOT NULL,
+  `data_invio` timestamp NULL DEFAULT NULL,
+  `id_utente` int(11) NOT NULL,
+  `letta` tinyint(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id_notifica`),
+  KEY `id_utente` (`id_utente`),
+  CONSTRAINT `notifiche_ibfk_1` FOREIGN KEY (`id_utente`) REFERENCES `utenti` (`id_utente`)
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `notifiche`
+--
+
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
+LOCK TABLES `notifiche` WRITE;
+/*!40000 ALTER TABLE `notifiche` DISABLE KEYS */;
+/*!40000 ALTER TABLE `notifiche` ENABLE KEYS */;
+UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `profili`
@@ -86,12 +118,14 @@ INSERT INTO `sessioni` VALUES
 ('34b8ff74380d40b083f6ec8a00e00cff',1,'2026-04-24 21:10:53','2026-04-24 21:12:42'),
 ('36f340ec363a7da263d2d10964323caa',1,'2026-04-22 13:12:12','2026-04-22 13:18:41'),
 ('387579df4d1d3e5315096c25b84889f0',1,'2026-04-23 23:00:42','2026-04-24 00:45:12'),
+('397fb05fc96fc54448a4fdce56f62af6',1,'2026-05-03 19:36:55',NULL),
 ('410426c9d749dc165bd4aecc351a4c85',14,'2026-04-23 22:17:28','2026-04-23 22:17:45'),
 ('45c5fdd9888848e3bdb440d69f4f2bc2',6,'2026-03-30 18:28:01','2026-03-30 18:28:06'),
 ('4d5c2bdb6094d1e47e0e870d02d4e74e',1,'2026-04-24 01:04:45','2026-04-24 01:05:31'),
 ('4f88bd5ab14f8313947555aee89cf201',1,'2026-04-23 22:02:47','2026-04-23 22:17:03'),
 ('53c8547f1870e95af9513eeb5a10c91c',1,'2026-04-23 22:28:43','2026-04-23 22:39:06'),
 ('54c289a73c0da47c8a720a5a8bbe60d7',1,'2026-04-24 22:01:45',NULL),
+('60ec08a365332c873bfe19ec467bda1a',1,'2026-05-03 15:34:15',NULL),
 ('623fcc0f613dc86bc8f7e5598d753b04',1,'2026-04-24 00:47:10','2026-04-24 01:04:36'),
 ('683f403372ea1da627cbbd560c07c66d',1,'2026-04-19 18:02:17',NULL),
 ('6bd87857ac81c9d4b9a9114dc1cbd010',1,'2026-04-22 18:31:48','2026-04-22 18:34:28'),
@@ -220,4 +254,4 @@ SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2026-04-29 17:21:44
+-- Dump completed on 2026-05-03 23:20:09

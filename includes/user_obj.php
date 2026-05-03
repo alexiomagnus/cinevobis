@@ -139,10 +139,10 @@ class userObj {
                 FROM sessioni s
                 JOIN utenti u ON u.id_utente = s.id_utente
                 ORDER BY s.data_login DESC
-                LIMIT :numero";
+                LIMIT :num";
         $stmt = $this->db->prepare($sql);
         $num  = (int)$num;
-        $stmt->bindParam(':numero', $num, PDO::PARAM_INT);
+        $stmt->bindParam(':num', $num, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll();
     }

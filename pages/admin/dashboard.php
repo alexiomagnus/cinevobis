@@ -38,7 +38,7 @@ $stmt->execute();
 $totaleSessioni = $stmt->fetchColumn();
 
 // Conteggio notifiche
-$sql = "SELECT COUNT(*) FROM notifiche";
+$sql = "SELECT COUNT(*) FROM notifiche WHERE letta = 0";
 $stmt = $conn->prepare($sql);
 $stmt->execute();
 
@@ -98,19 +98,19 @@ $totaleNotifiche = $stmt->fetchColumn();
             </div>
             <div class="col-6 col-lg-3">
                 <div class="p-3 rounded-2 bg-body-secondary">
-                    <div class="text-muted small mb-1">Utenti registrati</div>
+                    <div class="text-muted small mb-1">Utenti</div>
                     <div class="fs-3 fw-medium"><?= $totaleUtenti ?></div>
                 </div>
             </div>
             <div class="col-6 col-lg-3">
                 <div class="p-3 rounded-2 bg-body-secondary">
-                    <div class="text-muted small mb-1">Sessioni registrate</div>
+                    <div class="text-muted small mb-1">Sessioni</div>
                     <div class="fs-3 fw-medium"><?= $totaleSessioni ?></div>
                 </div>
             </div>
             <div class="col-6 col-lg-3">
                 <div class="p-3 rounded-2 bg-body-secondary">
-                    <div class="text-muted small mb-1">Notifiche registrate</div>
+                    <div class="text-muted small mb-1">Notifiche da leggere</div>
                     <div class="fs-3 fw-medium"><?= $totaleNotifiche ?></div>
                 </div>
             </div>
@@ -135,7 +135,7 @@ $totaleNotifiche = $stmt->fetchColumn();
                                 <i class="bi bi-film"></i>
                             </div>
                             <h2 class="h4 fw-bold mb-2 text-dark">Gestione film</h2>
-                            <p class="text-muted mb-0 small">Visualizza tutti i film registrati</p>
+                            <p class="text-muted mb-0 small">Visualizza i film presenti nel database</p>
                         </div>
                     </div>
                 </a>
@@ -150,7 +150,7 @@ $totaleNotifiche = $stmt->fetchColumn();
                                 <i class="bi bi-people-fill"></i>
                             </div>
                             <h2 class="h4 fw-bold mb-2 text-dark">Gestione utenti</h2>
-                            <p class="text-muted mb-0 small">Visualizza e gestisci gli utenti registrati</p>
+                            <p class="text-muted mb-0 small">Visualizza e gestisci gli utenti</p>
                         </div>
                     </div>
                 </a>
@@ -165,7 +165,7 @@ $totaleNotifiche = $stmt->fetchColumn();
                                 <i class="bi bi-calendar-event"></i>
                             </div>
                             <h2 class="h4 fw-bold mb-2 text-dark">Gestione sessioni</h2>
-                            <p class="text-muted mb-0 small">Visualizza le sessioni registrate</p>
+                            <p class="text-muted mb-0 small">Visualizza le sessioni</p>
                         </div>
                     </div>
                 </a>

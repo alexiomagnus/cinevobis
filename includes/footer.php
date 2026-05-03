@@ -12,12 +12,12 @@ $isAdminPage = in_array($currentPage, $adminPages);
             © <?= date("Y"); ?> <span class="fw-bold text-dark">Cinevobis</span>
         </span>
     </div>
-    <div class="d-flex justify-content-center gap-3">
-        <a href="/pages/public/terms.php" class="text-secondary small text-decoration-none">Termini di servizio</a>
-        <a href="/pages/public/privacy.php" class="text-secondary small text-decoration-none">Informativa sulla privacy</a>
-
-        <?php if(!$isAdminPage): ?>
+    
+    <?php if(!$isAdminPage): ?>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="/pages/public/terms.php" class="text-secondary small text-decoration-none">Termini di servizio</a>
+            <a href="/pages/public/privacy.php" class="text-secondary small text-decoration-none">Informativa sulla privacy</a>
             <a href="/actions/contact.php" class="text-secondary small text-decoration-none">Contattaci</a>
-        <?php endif; ?>
-    </div>
+        </div>
+    <?php endif; ?>
 </footer>

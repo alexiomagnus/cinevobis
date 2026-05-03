@@ -19,7 +19,9 @@ require_once(__DIR__ . '/../../includes/header_logic.php');
     <?php require_once(__DIR__ . '/../../includes/header.php'); ?>
 
     <main class="container mt-5 mb-5 flex-grow-1">
-        <h1 class="fw-bold mb-4">Film</h1>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="fs-4 fw-bold mb-0">Film</h1>
+        </div>
 
     </main>
 
