@@ -2,7 +2,7 @@
 // Session_start() deve essere chiamato all'inizio di ogni files
 $currentPage = basename($_SERVER['SCRIPT_NAME']);
 
-$adminPages = ['add_film.php', 'dashboard.php', 'sessions.php', 'users.php', 'edit_user.php', 'notifications.php', 'films.php'];
+$adminPages = ['add_film.php', 'dashboard.php', 'sessions.php', 'users.php', 'edit_user.php', 'notifications.php', 'films.php', 'film_db.php'];
 
 $isAdminPage = in_array($currentPage, $adminPages);
 ?>

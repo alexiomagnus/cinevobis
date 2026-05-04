@@ -27,10 +27,10 @@ if (!$utente) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['save'])) {
-        $nome    = trim($_POST['nome'] ?? '');
+        $nome = trim($_POST['nome'] ?? '');
         $cognome = trim($_POST['cognome'] ?? '');
-        $email   = trim($_POST['email'] ?? '');
-        $attivo  = isset($_POST['attivo']) ? (int) $_POST['attivo'] : 0;
+        $email = trim($_POST['email'] ?? '');
+        $attivo = isset($_POST['attivo']) ? (int) $_POST['attivo'] : 0;
 
         if (!$nome || !$cognome || !$email) {
             $errore = "Nome, cognome ed email sono obbligatori";

@@ -8,95 +8,37 @@ require_once(__DIR__ . '/../../includes/movie_obj.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');
 require_once(__DIR__ . '/../../vendor/autoload.php');
 
-use Dotenv\Dotenv;
-use Kiwilan\Tmdb\Tmdb;
 use MongoDB\Client;
 
-$dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
-$dotenv->load();
-
-$tmdb = Tmdb::client($_ENV['API_KEY']);
-
-
 // Dichiarazione variabili
-$movie_api = null;
 $movie_db = null;
 $errore = "";
-$collection = [];
 
 $movie_id = $_GET['tmdb_id'] ?? null;
 
-
-// Connessione a MongoDB
-try {
-    $mongoClient = new Client("mongodb://localhost:27017");
-    $db = $mongoClient->selectDatabase('cinevobis');
-    $collection = $db->selectCollection('films');
-    
-} catch(PDOException $e) {
-    error_log("Errore: " . $e);
-}
-
-
-// 1. Recupero film da TMDB
-if (!empty($movie_id)) {
-    $results = $tmdb->raw()->url("/movie/{$movie_id}", [
-        'language' => 'it-IT',
-        'append_to_response' => 'credits,videos'
-    ]);
-
-    $body = $results?->getBody();
-    if ($body) {
-        $movie_api = is_string($body) ? json_decode($body, true) : $body;
-    }
-
-    if (empty($movie_api)) {
-        $errore = "Film non trovato su TMDB";
-    }
-} else {
+if (empty($movie_id)) {
     $errore = "Nessun film selezionato";
-}
+} else {
+    // Connessione a MongoDB e recupero diretto
+    try {
+        $mongoClient = new Client("mongodb://localhost:27017");
+        $db          = $mongoClient->selectDatabase('cinevobis');
+        $collection  = $db->selectCollection('films');
 
+        $movie_db = $collection->findOne(
+            ['id' => (int)$movie_id],
+            ['typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']]
+        );
 
-// 2. Controllo/inserimento o aggiornamento in MongoDB
-if (!empty($movie_api)) {
-
-    $now = time();
-    $aMonthInSeconds = 30 * 24 * 60 * 60; // 30 giorni
-
-    
-    // Cercare il film nel DB
-    $movie_db = $collection->findOne(
-        ['id' => (int)$movie_id],
-        ['typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']]
-    );
-
-
-    // Se non esiste lo si inserisci
-    if ($movie_db === null) {
-        $movie_api['last_updated'] = new \MongoDB\BSON\UTCDateTime();  // Timestamp attuale in secondi
-        $collection->insertOne($movie_api);
-        $movie_db = $movie_api;
-    } else {
-        // Se esiste si recupera il timestamp 
-        $lastUpdateSeconds = isset($movie_db['last_updated'])
-            ? $movie_db['last_updated']->toDateTime()->getTimestamp()
-            : 0;
-
-        // Se è passato un mese si aggiorna il film
-        if (($now - $lastUpdateSeconds) > $aMonthInSeconds) {
-            $movie_api['last_updated'] = new \MongoDB\BSON\UTCDateTime();
-
-            $collection->updateOne(
-                ['id' => $movie_id],
-                ['$set' => $movie_api]
-            );
-
-            $movie_db = $movie_api;  // Usare i dati fresci per la visualizzazione
+        if ($movie_db === null) {
+            $errore = "Film non trovato nel database";
         }
+
+    } catch (Exception $e) {
+        error_log("Errore MongoDB: " . $e->getMessage());
+        $errore = "Errore di connessione al database";
     }
 }
-
 
 // 3. Estrazione dati
 $titolo = $trama = $poster_path = $trailerKey = $paese = '';

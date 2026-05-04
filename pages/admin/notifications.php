@@ -5,9 +5,11 @@ require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');
 
-$username = $_SESSION["username"] ?? '';
+// Controllo autenticazione
+$username   = $_SESSION['username']   ?? '';
+$id_profilo = $_SESSION['id_profilo'] ?? 0;
 
-if (!$username) {
+if (!$username || $id_profilo != 1) {
     header("Location: /index.php");
     exit();
 }
@@ -94,7 +96,7 @@ if (isset($_POST['delete'])) {
 
         <?php if (empty($notifiche)): ?>
             <div class="text-center text-muted py-5">
-                <p class="mb-0">Nessuna notifica disponibile.</p>
+                <p class="mb-0">Nessuna notifica disponibile</p>
             </div>
         <?php else: ?>
 

@@ -17,6 +17,7 @@ if (isset($_POST['login'])) {
 
         if ($utente && password_verify($password, $utente['password'])) {
             if ($utente['attivo'] != 0) {
+                // Previene la Session Fixation rigenerando l'ID al cambio di privilegi (login)
                 session_regenerate_id(true);
 
                 $_SESSION['id_utente'] = $utente['id_utente'];

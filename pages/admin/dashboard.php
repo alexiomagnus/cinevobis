@@ -5,44 +5,73 @@ require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');
 require_once(__DIR__ . '/../../vendor/autoload.php');
 
-// Controllo autenticazione PRIMA di qualsiasi output
+use MongoDB\Client;
+
+
+// Controllo autenticazione
 $username   = $_SESSION['username']   ?? '';
 $id_profilo = $_SESSION['id_profilo'] ?? 0;
+
 if (!$username || $id_profilo != 1) {
     header("Location: /index.php");
     exit();
 }
 
-use MongoDB\Client;
+
+// Dichiarazione
+$totaleFilm = 0;
+$totaleUtenti = 0;
+$totaleSessioni = 0;
+$totaleNotifiche = 0;
+
 
 // Connessione a MongoDB
-$mongoClient = new Client("mongodb://localhost:27017");
-$db = $mongoClient->selectDatabase('cinevobis');
-$collection = $db->selectCollection('films');
+try {
+    $mongoClient = new Client("mongodb://localhost:27017");
+    $db = $mongoClient->selectDatabase('cinevobis');
+    $collection = $db->selectCollection('films');
 
-// Conteggio documenti
-$totaleFilm = $collection->countDocuments([]);
+    // Conteggio documenti
+    $totaleFilm = $collection->countDocuments([]);
+} catch (PDOException $e) {
+    error_log("Errore: " . $e);
+}
+
 
 // Conteggio utenti
-$sql = "SELECT COUNT(*) FROM utenti";
-$stmt = $conn->prepare($sql);
-$stmt->execute();
+try {
+    $sql = "SELECT COUNT(*) FROM utenti";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
 
-$totaleUtenti = $stmt->fetchColumn();
+    $totaleUtenti = $stmt->fetchColumn();
+} catch (PDOException $e) {
+    error_log("Errore: " . $e);
+}
+
 
 // Conteggio sessioni
-$sql = "SELECT COUNT(*) FROM sessioni";
-$stmt = $conn->prepare($sql);
-$stmt->execute();
+try {
+    $sql = "SELECT COUNT(*) FROM sessioni";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
 
-$totaleSessioni = $stmt->fetchColumn();
+    $totaleSessioni = $stmt->fetchColumn();
+} catch (PDOException $e) {
+    error_log("Errore: " . $e);
+}
+
 
 // Conteggio notifiche
-$sql = "SELECT COUNT(*) FROM notifiche WHERE letta = 0";
-$stmt = $conn->prepare($sql);
-$stmt->execute();
+try {
+    $sql = "SELECT COUNT(*) FROM notifiche WHERE letta = 0";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
 
-$totaleNotifiche = $stmt->fetchColumn();
+    $totaleNotifiche = $stmt->fetchColumn();
+} catch (PDOException $e) {
+    error_log("Errore: " . $e);
+}
 ?>
 <!DOCTYPE html>
 <html lang="it">
@@ -53,28 +82,6 @@ $totaleNotifiche = $stmt->fetchColumn();
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="/assets/css/style.css">
-    <style>
-        .stat-card {
-            border-left: 4px solid;
-            transition: transform .15s ease, box-shadow .15s ease;
-        }
-        .stat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 .5rem 1.5rem rgba(0,0,0,.12) !important;
-        }
-        .stat-card.accent-gold  { border-color: #FCA311; }
-        .stat-card.accent-green { border-color: #198754; }
-        .stat-card.accent-blue  { border-color: #0d6efd; }
-        .stat-card.accent-red   { border-color: #dc3545; }
-
-        .card-hover {
-            transition: transform .15s ease, box-shadow .15s ease;
-        }
-        .card-hover:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 .75rem 2rem rgba(0,0,0,.12) !important;
-        }
-    </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
     <?php require_once(__DIR__ . '/../../includes/header.php'); ?>

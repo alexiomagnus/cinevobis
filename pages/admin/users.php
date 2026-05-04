@@ -6,9 +6,11 @@ require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');
 
-$username = $_SESSION["username"] ?? '';
+// Controllo autenticazione
+$username   = $_SESSION['username']   ?? '';
+$id_profilo = $_SESSION['id_profilo'] ?? 0;
 
-if (!$username) {
+if (!$username || $id_profilo != 1) {
     header("Location: /index.php");
     exit();
 }
