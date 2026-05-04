@@ -21,8 +21,8 @@ $tmdb = Tmdb::client($_ENV['API_KEY']);
 // Dichiarazione variabili
 $movie_api = null;
 $movie_db = null;
-$errore = "";
 $collection = [];
+$errore = "";
 
 $movie_id = $_GET['tmdb_id'] ?? null;
 
@@ -33,8 +33,8 @@ try {
     $db = $mongoClient->selectDatabase('cinevobis');
     $collection = $db->selectCollection('films');
     
-} catch(PDOException $e) {
-    error_log("Errore: " . $e);
+} catch(Exception $e) {
+    error_log("Errore: " . $e->getMessage());
 }
 
 

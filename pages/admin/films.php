@@ -17,21 +17,50 @@ if (!$username || $id_profilo != 1) {
     exit();
 }
 
-$cursor = [];
 
+$mongoClient = null;
+$db = null;
+$collection = [];
+
+// Connessione a MongoDB
 try {
-    // Connessione a MongoDB
     $mongoClient = new Client("mongodb://localhost:27017");
     $db = $mongoClient->selectDatabase('cinevobis');
     $collection = $db->selectCollection('films');
 
-    // Recuperiamo i film (ordinati per data di aggiunta)
+} catch (PDOException $e) {
+    error_log("Errore MongoDB: " . $e->getMessage());
+}
+
+
+$cursor = [];
+
+// Recuperiamo i film (ordinati per data di aggiunta)
+try {
     $cursor = $collection->find([], [
         'sort' => ['last_updated' => -1],
         'typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']
         ]); 
+
 } catch (Exception $e) {
     error_log("Errore MongoDB: " . $e->getMessage());
+}
+
+
+// Eliminazione film
+if (isset($_POST['delete'])) {
+    $id = $_POST['_id'] ?? '';
+
+    try {
+        $objectId = new MongoDB\BSON\ObjectId($id);
+        $collection->deleteOne(['_id' => $objectId]);
+
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit();
+
+    } catch (Exception $e) {
+        error_log("Errore MongoDB: " . $e->getMessage());
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -53,7 +82,6 @@ try {
         <div class="w-100" style="max-width: 650px;">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1 class="fs-4 fw-bold mb-0">Archivio Film</h1>
-                <span class="badge bg-dark rounded-pill">MongoDB</span>
             </div>
 
             <div class="d-flex flex-column gap-3">
@@ -84,7 +112,15 @@ try {
                                         </small>
                                     </div>
 
+                                    <form method="POST">
+                                        <input type="hidden" name="_id" value="<?= (string)$movie['_id'] ?>">
+                                        <button type="submit" name="delete" class="btn btn-outline-danger btn-sm px-3 d-flex align-items-center gap-2">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </form>
+
                                     </div>
+
                             </div>
                         </a>
                     <?php endforeach; ?>

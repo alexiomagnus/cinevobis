@@ -18,7 +18,7 @@ if (!$username || $id_profilo != 1) {
 }
 
 
-// Dichiarazione
+// Dichiarazione variabili
 $totaleFilm = 0;
 $totaleUtenti = 0;
 $totaleSessioni = 0;
@@ -33,8 +33,8 @@ try {
 
     // Conteggio documenti
     $totaleFilm = $collection->countDocuments([]);
-} catch (PDOException $e) {
-    error_log("Errore: " . $e);
+} catch (Exception $e) {
+    error_log("Errore MongoDB: " . $e->getMessage());
 }
 
 
@@ -46,7 +46,7 @@ try {
 
     $totaleUtenti = $stmt->fetchColumn();
 } catch (PDOException $e) {
-    error_log("Errore: " . $e);
+    error_log("Errore DB: " . $e->getMessage());
 }
 
 
@@ -58,7 +58,7 @@ try {
 
     $totaleSessioni = $stmt->fetchColumn();
 } catch (PDOException $e) {
-    error_log("Errore: " . $e);
+    error_log("Errore DB: " . $e->getMessage());
 }
 
 
@@ -70,7 +70,7 @@ try {
 
     $totaleNotifiche = $stmt->fetchColumn();
 } catch (PDOException $e) {
-    error_log("Errore: " . $e);
+    error_log("Errore DB: " . $e->getMessage());
 }
 ?>
 <!DOCTYPE html>
