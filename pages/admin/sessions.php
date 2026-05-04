@@ -36,7 +36,7 @@ $sessioni = $user->readAccess($righe);
 
     <div class="container mt-4 mb-5 pb-5 flex-grow-1">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="fs-4 fw-bold mb-0">Sessioni</h1>
+            <h1 class="fs-4 fw-bold mb-0">Gestione Sessioni</h1>
             
             <form method="GET" class="d-flex align-items-center gap-2">
                 <label class="small text-muted mb-0">Righe:</label>

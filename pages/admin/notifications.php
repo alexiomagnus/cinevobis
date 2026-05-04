@@ -79,7 +79,7 @@ if (isset($_POST['delete'])) {
 
     <div class="container mt-4 mb-5 pb-5 flex-grow-1">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="fs-4 fw-bold mb-0">Notifiche</h1>
+            <h1 class="fs-4 fw-bold mb-0">Gestione Notifiche</h1>
         </div>
 
         <?php

@@ -141,7 +141,7 @@ try {
                             <div class="display-4 mb-3 text-warning">
                                 <i class="bi bi-film"></i>
                             </div>
-                            <h2 class="h4 fw-bold mb-2 text-dark">Gestione film</h2>
+                            <h2 class="h4 fw-bold mb-2 text-dark">Archivio Film</h2>
                             <p class="text-muted mb-0 small">Visualizza i film presenti nel database</p>
                         </div>
                     </div>
@@ -156,7 +156,7 @@ try {
                             <div class="display-4 mb-3 text-success">
                                 <i class="bi bi-people-fill"></i>
                             </div>
-                            <h2 class="h4 fw-bold mb-2 text-dark">Gestione utenti</h2>
+                            <h2 class="h4 fw-bold mb-2 text-dark">Gestione Utenti</h2>
                             <p class="text-muted mb-0 small">Visualizza e gestisci gli utenti</p>
                         </div>
                     </div>
@@ -171,7 +171,7 @@ try {
                             <div class="display-4 mb-3 text-primary">
                                 <i class="bi bi-calendar-event"></i>
                             </div>
-                            <h2 class="h4 fw-bold mb-2 text-dark">Gestione sessioni</h2>
+                            <h2 class="h4 fw-bold mb-2 text-dark">Gestione Sessioni</h2>
                             <p class="text-muted mb-0 small">Visualizza le sessioni</p>
                         </div>
                     </div>
@@ -186,7 +186,7 @@ try {
                             <div class="display-4 mb-3 text-danger">
                                 <i class="bi bi-bell-fill"></i>
                             </div>
-                            <h2 class="h4 fw-bold mb-2 text-dark">Gestione notifiche</h2>
+                            <h2 class="h4 fw-bold mb-2 text-dark">Gestione Notifiche</h2>
                             <p class="text-muted mb-0 small">Visualizza i report inviati dagli utenti</p>
                         </div>
                     </div>
