@@ -71,12 +71,15 @@ if (isset($_POST['write_review'])) {
                 ':id_utente' => $id_utente,
                 ':data_aggiunto' => date('Y-m-d H:i:s'),
                 ':descrizione' => $commento,
-                ':voto' => (float)$voto,
+                ':voto' => (float)$voto
             ]);
 
             $messaggio = $recensione_esistente
                 ? "Recensione aggiornata con successo"
                 : "Recensione pubblicata con successo";
+
+            // Inizializza per pulire la pagina dopo l'invio della recensione
+            $recensione_esistente = [];
 
         } catch (PDOException $e) {
             error_log("Errore nel DB: " . $e->getMessage());
@@ -165,6 +168,7 @@ if (isset($_POST['delete_review'])) {
                             <input
                                 type="number"
                                 name="rating"
+                                step="0.1"
                                 id="rating"
                                 class="form-control bg-light border-light py-3"
                                 min="1"
