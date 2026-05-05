@@ -7,7 +7,7 @@ require_once(__DIR__ . '/../../includes/user_obj.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');
 
 // Controllo autenticazione
-$username   = $_SESSION['username']   ?? '';
+$username   = $_SESSION['username'] ?? '';
 $id_profilo = $_SESSION['id_profilo'] ?? 0;
 
 if (!$username || $id_profilo != 1) {

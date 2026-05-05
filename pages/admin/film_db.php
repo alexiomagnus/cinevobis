@@ -22,8 +22,8 @@ if (empty($movie_id)) {
     // Connessione a MongoDB e recupero diretto
     try {
         $mongoClient = new Client("mongodb://localhost:27017");
-        $db          = $mongoClient->selectDatabase('cinevobis');
-        $collection  = $db->selectCollection('films');
+        $db = $mongoClient->selectDatabase('cinevobis');
+        $collection = $db->selectCollection('films');
 
         $movie_db = $collection->findOne(
             ['id' => (int)$movie_id],
@@ -120,17 +120,19 @@ if ($movie_db) {
 
                             <!-- Info principali -->
                             <div class="col-md-8">
-                                <h1 class="fw-bold text-dark display-5 mb-1"><?= htmlspecialchars($titolo) ?></h1>
+                                <h1 class="fw-bold text-dark display-5 mb-3"><?= htmlspecialchars($titolo) ?></h1>
 
                                 <?php if (!empty($titolo_orig) && strcasecmp(trim($titolo_orig), trim($titolo)) !== 0): ?>
                                     <p class="text-muted fs-5 mb-4"><?= htmlspecialchars($titolo_orig) ?></p>
                                 <?php endif; ?>
 
                                 <div class="mb-4">
-                                    <small class="text-uppercase fw-bold text-muted d-block mb-1" style="letter-spacing:1px">Regia</small>
-                                    <p class="fs-5 fw-medium mb-0">
-                                        <?= htmlspecialchars(implode(', ', array_column($registi, 'name'))) ?>
-                                    </p>
+                                    <small class="text-uppercase fw-bold text-muted d-block mb-2" style="letter-spacing:1px">Regia</small>
+                                    <a href="https://www.themoviedb.org/person/<?= implode(', ', array_column($registi, 'id')) ?>" class="text-decoration-none link-dark">
+                                        <p class="fs-5 fw-medium mb-0">
+                                            <?= htmlspecialchars(implode(', ', array_column($registi, 'name'))) ?>
+                                        </p>
+                                    </a>
                                 </div>
 
                                 <div class="d-flex flex-wrap gap-2 mb-4">

@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     if (paginaAttuale.includes('login.php') || paginaAttuale.includes('signup.php') || 
         paginaAttuale.includes('change_password.php') || paginaAttuale.includes('profile.php')
-        || paginaAttuale.includes('contact.php')) {
+        || paginaAttuale.includes('contact.php') || paginaAttuale.includes('review.php')) {
             
         if (provenienza !== "" && !sessionStorage.getItem('origin_url')) {
             sessionStorage.setItem('origin_url', provenienza);

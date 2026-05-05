@@ -126,6 +126,214 @@ if ($movie_db) {
     $cast = $data['cast'];
     $registi = $data['registi'];
 }
+
+
+// Dichiarazione variabili
+$tmdb_id = $movie_db['id'];
+$id_utente = $_SESSION['id_utente'];
+
+$is_favorite = false;
+$is_review = false;
+$is_watchlist = false;
+$is_watched = false;
+
+
+// Verifica condizioni per preferiti
+if ($tmdb_id != null && $id_utente != null) {
+
+    // Aggiungere il film alla lista preferiti
+    if (isset($_POST['favorite'])) {
+        try {
+            $sql = "INSERT INTO preferiti (tmdb_id, id_utente, data_aggiunto) VALUES
+                    (:tmdb_id, :id_utente, :data_aggiunto)";
+
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([
+                'tmdb_id' => $tmdb_id,
+                'id_utente' => $id_utente,
+                'data_aggiunto' => date('Y-m-d H:i:s')
+            ]);
+
+        } catch (PDOException $e) {
+            error_log("Errore nel DB: " . $e->getMessage());
+            $errore = "Errore nell'aggiunta alla lista preferiti";
+        }
+    }
+
+    // Elimina dalla lista preferiti
+    if (isset($_POST['delete_favorite'])) {
+        try {
+            $sql = "DELETE FROM preferiti WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
+
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([
+                ':id_utente' => $id_utente,
+                ':tmdb_id' => $tmdb_id
+            ]);
+
+        } catch (PDOException $e) {
+            error_log("Errore nel DB: " . $e->getMessage());
+            $errore = "Errore nella rimozione dalla lista preferiti";
+        }
+    }
+
+    // Controllo se l'utente ha aggiunto il film ai preferiti (DOPO aver gestito il POST)
+    try {
+        $sql = "SELECT * FROM preferiti WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([
+            ':id_utente' => $id_utente,
+            ':tmdb_id' => $tmdb_id
+        ]);
+
+        $results = $stmt->fetchColumn();
+        
+        if (!empty($results)) 
+            $is_favorite = true;
+
+    } catch (PDOException $e) {
+        error_log("Errore nel DB: " . $e->getMessage());
+    }
+}
+
+
+// Verifica condizioni per watchlist
+if ($tmdb_id != null && $id_utente != null) {
+
+    // Aggiungere il film alla lista watchlist
+    if (isset($_POST['watchlist'])) {
+        try {
+            $sql = "INSERT INTO watchlist (tmdb_id, id_utente, data_aggiunto) VALUES
+                    (:tmdb_id, :id_utente, :data_aggiunto)";
+
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([
+                'tmdb_id' => $tmdb_id,
+                'id_utente' => $id_utente,
+                'data_aggiunto' => date('Y-m-d H:i:s')
+            ]);
+
+        } catch (PDOException $e) {
+            error_log("Errore nel DB: " . $e->getMessage());
+            $errore = "Errore nell'aggiunta alla lista watchlist";
+        }
+    }
+
+    // Elimina dalla lista watchlist
+    if (isset($_POST['delete_watchlist'])) {
+        try {
+            $sql = "DELETE FROM watchlist WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
+
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([
+                ':id_utente' => $id_utente,
+                ':tmdb_id' => $tmdb_id
+            ]);
+
+        } catch (PDOException $e) {
+            error_log("Errore nel DB: " . $e->getMessage());
+            $errore = "Errore nella rimozione dalla lista watchlist";
+        }
+    }
+
+    // Controllo se l'utente ha aggiunto il film ai watchlist (DOPO aver gestito il POST)
+    try {
+        $sql = "SELECT * FROM watchlist WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([
+            ':id_utente' => $id_utente,
+            ':tmdb_id' => $tmdb_id
+        ]);
+
+        $results = $stmt->fetchColumn();
+
+        if (!empty($results)) 
+            $is_watchlist = true;
+
+    } catch (PDOException $e) {
+        error_log("Errore nel DB: " . $e->getMessage());
+    }
+}
+
+
+// Verifica condizioni per watched
+if ($tmdb_id != null && $id_utente != null) {
+
+    // Aggiungere il film alla lista watched
+    if (isset($_POST['watched'])) {
+        try {
+            $sql = "INSERT INTO watched (tmdb_id, id_utente, data_aggiunto) VALUES
+                    (:tmdb_id, :id_utente, :data_aggiunto)";
+
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([
+                'tmdb_id' => $tmdb_id,
+                'id_utente' => $id_utente,
+                'data_aggiunto' => date('Y-m-d H:i:s')
+            ]);
+
+        } catch (PDOException $e) {
+            error_log("Errore nel DB: " . $e->getMessage());
+            $errore = "Errore nell'aggiunta alla lista watched";
+        }
+    }
+
+    // Elimina dalla lista watched
+    if (isset($_POST['delete_watched'])) {
+        try {
+            $sql = "DELETE FROM watched WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
+
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([
+                ':id_utente' => $id_utente,
+                ':tmdb_id' => $tmdb_id
+            ]);
+
+        } catch (PDOException $e) {
+            error_log("Errore nel DB: " . $e->getMessage());
+            $errore = "Errore nella rimozione dalla lista watched";
+        }
+    }
+
+    // Controllo se l'utente ha aggiunto il film ai watched (DOPO aver gestito il POST)
+    try {
+        $sql = "SELECT * FROM watched WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([
+            ':id_utente' => $id_utente,
+            ':tmdb_id' => $tmdb_id
+        ]);
+
+        $results = $stmt->fetchColumn();
+
+        if (!empty($results)) 
+            $is_watched = true;
+
+    } catch (PDOException $e) {
+        error_log("Errore nel DB: " . $e->getMessage());
+    }
+}
+
+
+// Controlla se l'utente ha già recensito il film
+if ($tmdb_id != null && $id_utente != null) {
+    try {
+        $sql = "SELECT 1 FROM recensioni WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([
+            ':id_utente' => $id_utente, 
+            ':tmdb_id' => $tmdb_id
+        ]);
+        
+        $is_review = (bool)$stmt->fetchColumn();
+    } catch (PDOException $e) {
+        error_log("Errore nel DB: " . $e->getMessage());
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="it">
@@ -157,6 +365,7 @@ if ($movie_db) {
                 <div class="col-xl-10">
                     <div class="card shadow-sm border-0 rounded-4 p-4 p-md-5 bg-white">
 
+
                         <div class="row g-5 mb-5">
                             <!-- Poster + Trailer -->
                             <div class="col-md-4">
@@ -176,21 +385,26 @@ if ($movie_db) {
                                 <?php endif; ?>
                             </div>
 
+
                             <!-- Info principali -->
                             <div class="col-md-8">
-                                <h1 class="fw-bold text-dark display-5 mb-1"><?= htmlspecialchars($titolo) ?></h1>
+                                <h1 class="fw-bold text-dark display-5 mb-3"><?= htmlspecialchars($titolo) ?></h1>
 
                                 <?php if (!empty($titolo_orig) && strcasecmp(trim($titolo_orig), trim($titolo)) !== 0): ?>
                                     <p class="text-muted fs-5 mb-4"><?= htmlspecialchars($titolo_orig) ?></p>
                                 <?php endif; ?>
 
                                 <div class="mb-4">
-                                    <small class="text-uppercase fw-bold text-muted d-block mb-1" style="letter-spacing:1px">Regia</small>
-                                    <p class="fs-5 fw-medium mb-0">
-                                        <?= htmlspecialchars(implode(', ', array_column($registi, 'name'))) ?>
-                                    </p>
+                                    <small class="text-uppercase fw-bold text-muted d-block mb-2" style="letter-spacing:1px">Regia</small>
+                                    <a href="https://www.themoviedb.org/person/<?= implode(', ', array_column($registi, 'id')) ?>" class="text-decoration-none link-dark">
+                                        <p class="fs-5 fw-medium mb-0">
+                                            <?= htmlspecialchars(implode(', ', array_column($registi, 'name'))) ?>
+                                        </p>
+                                    </a>
                                 </div>
 
+
+                                <!-- Dopo i badge dei generi, prima del border-top con la trama -->
                                 <div class="d-flex flex-wrap gap-2 mb-4">
                                     <?php foreach ($generi as $genre): ?>
                                         <span class="badge bg-white text-dark border rounded-pill px-3 py-2">
@@ -199,6 +413,51 @@ if ($movie_db) {
                                     <?php endforeach; ?>
                                 </div>
 
+
+                                <!-- Azioni utente -->
+                                <form method="POST" class="d-flex gap-2 mb-4">
+                                    
+                                    <?php if ($is_favorite): ?>
+                                        <button class="btn btn-outline-danger btn-sm rounded-pill px-3" name="delete_favorite">
+                                            <i class="bi bi-heart-fill me-1"></i> Rimuovi
+                                        </button>
+                                    <?php else: ?>
+                                        <button class="btn btn-outline-danger btn-sm rounded-pill px-3" name="favorite">
+                                            <i class="bi bi-heart-fill me-1"></i> Preferiti
+                                        </button>
+                                    <?php endif; ?>
+
+
+                                    <?php if ($is_watchlist): ?>
+                                        <button class="btn btn-outline-primary btn-sm rounded-pill px-3" name="delete_watchlist">
+                                            <i class="bi bi-bookmark-fill me-1"></i> Rimuovi
+                                        </button>
+                                    <?php else: ?>
+                                        <button class="btn btn-outline-primary btn-sm rounded-pill px-3" name="watchlist">
+                                            <i class="bi bi-bookmark-fill me-1"></i> Watchlist
+                                        </button>
+                                    <?php endif; ?>
+
+
+                                    <?php if ($is_watched): ?>
+                                        <button class="btn btn-outline-success btn-sm rounded-pill px-3" name="delete_watched">
+                                            <i class="bi bi-eye-fill me-1"></i> Rimuovi
+                                        </button>
+                                    <?php else: ?>
+                                        <button class="btn btn-outline-success btn-sm rounded-pill px-3" name="watched">
+                                            <i class="bi bi-eye-fill me-1"></i> Watched
+                                        </button>
+                                    <?php endif; ?>
+
+
+                                    <a href="/pages/user/review.php?tmdb_id=<?= urlencode($tmdb_id) ?>" class="btn btn-outline-dark btn-sm rounded-pill px-3">
+                                        <i class="bi bi-pencil-fill me-1"></i>
+                                        <?= $is_review ? "Modifica recensione" : "Scrivi recensione" ?>
+                                    </a>
+                                </form>
+
+
+                                <!-- --- Trama --- -->
                                 <div class="border-top pt-4">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                         <h4 class="fw-bold m-0">Trama</h4>
@@ -214,6 +473,7 @@ if ($movie_db) {
                                 </div>
                             </div>
                         </div>
+
 
                         <!-- Durata / Anno / Paese -->
                         <div class="row text-center py-4 bg-light rounded-4 mb-5 border mx-0">
@@ -231,6 +491,7 @@ if ($movie_db) {
                             </div>
                         </div>
 
+
                         <!-- Cast -->
                         <div class="mt-2">
                             <h4 class="fw-bold mb-4">Cast Principale</h4>
@@ -241,8 +502,7 @@ if ($movie_db) {
                                         : "https://ui-avatars.com/api/?name=" . urlencode($actor['name']) . "&background=random";
                                 ?>
                                     <div class="col-12 col-sm-6 col-lg-4">
-                                        <a href="https://www.themoviedb.org/person/<?= $actor['id'] ?>"
-                                           class="text-decoration-none d-block">
+                                        <a href="https://www.themoviedb.org/person/<?= $actor['id'] ?>" class="text-decoration-none d-block">
                                             <div class="d-flex align-items-center p-2 border rounded-3 bg-light shadow-sm transition-hover">
                                                 <img src="<?= $profile ?>"
                                                      class="cast-avatar rounded-circle border border-2 border-white shadow-sm me-3"
@@ -265,6 +525,7 @@ if ($movie_db) {
                     </div>
                 </div>
             </div>
+
 
             <!-- Modal Trailer -->
             <?php if ($trailerKey): ?>

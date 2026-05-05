@@ -55,7 +55,7 @@ if (isset($_POST['delete'])) {
         $objectId = new MongoDB\BSON\ObjectId($id);
         $collection->deleteOne(['_id' => $objectId]);
 
-        header("Location: " . $_SERVER['PHP_SELF']);
+        header("Location: films.php");
         exit();
 
     } catch (Exception $e) {
@@ -108,7 +108,7 @@ if (isset($_POST['delete'])) {
                                             <?= htmlspecialchars($movie['title'] ?? 'Senza titolo') ?>
                                         </span>
                                         <small class="text-primary font-monospace" style="font-size: 0.75rem;">
-                                            ID: <?= (string)$movie['_id'] ?>
+                                            TMDB ID: <?= (string)$movie['id'] ?>
                                         </small>
                                     </div>
 

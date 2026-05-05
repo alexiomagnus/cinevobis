@@ -1,0 +1,219 @@
+<?php
+session_start();
+
+require_once(__DIR__ . '/../../config/config.php');
+require_once(__DIR__ . '/../../config/connection.php');
+
+$id_utente = $_SESSION['id_utente'] ?? null;
+$username  = $_SESSION['username']  ?? null;
+
+// Autenticazione
+if (!$id_utente) {
+    header("Location: /index.php");
+    exit();
+}
+
+$tmdb_id = $_GET['tmdb_id'] ?? null;
+
+if (!$tmdb_id) {
+    header("Location: /index.php");
+    exit();
+}
+
+$errore = '';
+$messaggio = '';
+$recensione_esistente = null;
+
+
+// Recupera la recensione esistente (se c'è)
+try {
+    $sql = "SELECT * FROM recensioni WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([
+        ':id_utente' => $id_utente, 
+        ':tmdb_id' => $tmdb_id
+    ]);
+
+    $recensione_esistente = $stmt->fetch();
+} catch (PDOException $e) {
+    error_log("Errore nel DB: " . $e->getMessage());
+}
+
+
+// Gestione POST
+if (isset($_POST['write_review'])) {
+    $voto = $_POST['rating'] ?? null;
+    $commento = $_POST['commento'] ?? null;
+
+    if (!$voto || !$commento) {
+        $errore = "Compila tutti i campi";
+    } elseif ($voto < 1 || $voto > 10) {
+        $errore = "Il voto deve essere compreso tra 1 e 10";
+    } else {
+        try {
+            if ($recensione_esistente) {
+                // Aggiorna recensione esistente
+                $sql = "UPDATE recensioni SET voto = :voto, descrizione = :descrizione, data_aggiunto = :data_aggiunto
+                        WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
+            } else {
+                // Inserisce nuova recensione
+                $sql = "INSERT INTO recensioni (tmdb_id, id_utente, data_aggiunto, descrizione, voto)
+                        VALUES (:tmdb_id, :id_utente, :data_aggiunto, :descrizione, :voto)";
+            }
+
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([
+                ':tmdb_id' => $tmdb_id,
+                ':id_utente' => $id_utente,
+                ':data_aggiunto' => date('Y-m-d H:i:s'),
+                ':descrizione' => $commento,
+                ':voto' => (int)$voto,
+            ]);
+
+            $messaggio = $recensione_esistente
+                ? "Recensione aggiornata con successo"
+                : "Recensione pubblicata con successo";
+
+            // Rilegge la recensione aggiornata
+            $stmt = $conn->prepare("SELECT * FROM recensioni WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id");
+            $stmt->execute([
+                ':id_utente' => $id_utente, 
+                ':tmdb_id' => $tmdb_id
+            ]);
+
+            $recensione_esistente = $stmt->fetch();
+
+        } catch (PDOException $e) {
+            error_log("Errore nel DB: " . $e->getMessage());
+            $errore = "Errore nel salvataggio della recensione";
+        }
+    }
+}
+
+if (isset($_POST['delete_review'])) {
+    try {
+        $sql = "DELETE FROM recensioni WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([
+            ':id_utente' => $id_utente, 
+            ':tmdb_id' => $tmdb_id
+        ]);
+
+        header("Location: /pages/public/film.php?tmdb_id=" . urlencode($tmdb_id));
+        exit();
+
+    } catch (PDOException $e) {
+        error_log("Errore nel DB: " . $e->getMessage());
+        $errore = "Errore nella cancellazione della recensione";
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= $recensione_esistente ? 'Modifica recensione' : 'Scrivi recensione' ?> - Cinevobis</title>
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+
+    <div class="container-fluid">
+        <div class="row vh-100 justify-content-center align-items-center">
+            <div class="col-12 col-sm-8 col-md-6 col-lg-5 px-4">
+
+                <!-- Bottone chiudi -->
+                <a href="javascript:void(0)" 
+                    onclick="closeAndRedirect()" 
+                    class="btn-close position-absolute top-0 start-0 m-4" 
+                    aria-label="Close">
+                </a>
+
+                <!-- Intestazione -->
+                <div class="text-center mb-5">
+                    <h1 class="display-6 fw-bolder mb-2">
+                        <?= $recensione_esistente ? 'Modifica recensione' : 'Scrivi recensione' ?>
+                    </h1>
+                    <p class="text-secondary">
+                        <?= $recensione_esistente
+                            ? 'Aggiorna la tua opinione'
+                            : 'Condividi la tua opinione' ?>
+                    </p>
+                </div>
+
+                <!-- Alert errore -->
+                <?php if ($errore): ?>
+                    <div class="alert alert-danger border-0 small py-2 mb-4 text-center">
+                        <?= htmlspecialchars($errore) ?>
+                    </div>
+                <?php endif; ?>
+
+                <!-- Alert successo -->
+                <?php if ($messaggio): ?>
+                    <div class="alert alert-success border-0 small py-2 mb-4 text-center">
+                        <?= htmlspecialchars($messaggio) ?>
+                    </div>
+                <?php endif; ?>
+
+                <form method="POST">
+                    <input type="hidden" name="tmdb_id" value="<?= htmlspecialchars($tmdb_id) ?>">
+
+                    <!-- Voto -->
+                    <div class="mb-4">
+                        <label class="form-label small text-secondary">Voto</label>
+                        <div class="input-group">
+                            <input
+                                type="number"
+                                name="rating"
+                                id="rating"
+                                class="form-control bg-light border-light py-3"
+                                min="1"
+                                max="10"
+                                placeholder="Da 1 a 10"
+                                value="<?= htmlspecialchars($recensione_esistente['voto'] ?? '') ?>"
+                                required>
+                        </div>
+                    </div>
+
+                    <hr class="my-4 opacity-25">
+
+                    <!-- Descrizione -->
+                    <div class="mb-5">
+                        <label class="form-label small text-secondary">Descrizione</label>
+                        <textarea
+                            name="commento"
+                            id="commento"
+                            class="form-control bg-light border-light"
+                            rows="6"
+                            placeholder="Scrivi qui la tua recensione..."
+                            required><?= htmlspecialchars($recensione_esistente['descrizione'] ?? '') ?></textarea>
+                    </div>
+
+                    <!-- Bottone pubblica/aggiorna -->
+                    <button type="submit" name="write_review" class="btn btn-dark btn-lg w-100 py-3 fw-bold mb-3">
+                        <?= $recensione_esistente ? 'Aggiorna recensione' : 'Pubblica recensione' ?>
+                    </button>
+
+                    <!-- Bottone elimina (solo se esiste già una recensione) -->
+                    <?php if ($recensione_esistente): ?>
+                        <button
+                            type="submit"
+                            name="delete_review"
+                            class="btn btn-outline-danger btn-lg w-100 py-3 fw-bold"
+                            onclick="return confirm('Sei sicuro di voler eliminare la recensione?')">
+                            <i class="bi bi-trash-fill me-2"></i> Elimina recensione
+                        </button>
+                    <?php endif; ?>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/script.js"></script>
+</body>
+</html>
