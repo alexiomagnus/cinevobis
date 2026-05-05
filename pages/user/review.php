@@ -48,14 +48,17 @@ if (isset($_POST['write_review'])) {
 
     if (!$voto || !$commento) {
         $errore = "Compila tutti i campi";
+
     } elseif ($voto < 1 || $voto > 10) {
         $errore = "Il voto deve essere compreso tra 1 e 10";
+
     } else {
         try {
             if ($recensione_esistente) {
                 // Aggiorna recensione esistente
                 $sql = "UPDATE recensioni SET voto = :voto, descrizione = :descrizione, data_aggiunto = :data_aggiunto
                         WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
+
             } else {
                 // Inserisce nuova recensione
                 $sql = "INSERT INTO recensioni (tmdb_id, id_utente, data_aggiunto, descrizione, voto)
@@ -68,21 +71,12 @@ if (isset($_POST['write_review'])) {
                 ':id_utente' => $id_utente,
                 ':data_aggiunto' => date('Y-m-d H:i:s'),
                 ':descrizione' => $commento,
-                ':voto' => (int)$voto,
+                ':voto' => (float)$voto,
             ]);
 
             $messaggio = $recensione_esistente
                 ? "Recensione aggiornata con successo"
                 : "Recensione pubblicata con successo";
-
-            // Rilegge la recensione aggiornata
-            $stmt = $conn->prepare("SELECT * FROM recensioni WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id");
-            $stmt->execute([
-                ':id_utente' => $id_utente, 
-                ':tmdb_id' => $tmdb_id
-            ]);
-
-            $recensione_esistente = $stmt->fetch();
 
         } catch (PDOException $e) {
             error_log("Errore nel DB: " . $e->getMessage());
@@ -165,6 +159,9 @@ if (isset($_POST['delete_review'])) {
                     <div class="mb-4">
                         <label class="form-label small text-secondary">Voto</label>
                         <div class="input-group">
+                            <span class="input-group-text bg-light border-light">
+                                <i class="bi bi-star-fill text-warning"></i>
+                            </span>
                             <input
                                 type="number"
                                 name="rating"
@@ -175,6 +172,7 @@ if (isset($_POST['delete_review'])) {
                                 placeholder="Da 1 a 10"
                                 value="<?= htmlspecialchars($recensione_esistente['voto'] ?? '') ?>"
                                 required>
+                            <span class="input-group-text bg-light border-light text-secondary">/ 10</span>
                         </div>
                     </div>
 
@@ -199,12 +197,8 @@ if (isset($_POST['delete_review'])) {
 
                     <!-- Bottone elimina (solo se esiste già una recensione) -->
                     <?php if ($recensione_esistente): ?>
-                        <button
-                            type="submit"
-                            name="delete_review"
-                            class="btn btn-outline-danger btn-lg w-100 py-3 fw-bold"
-                            onclick="return confirm('Sei sicuro di voler eliminare la recensione?')">
-                            <i class="bi bi-trash-fill me-2"></i> Elimina recensione
+                        <button type="submit" name="delete_review" class="btn btn-outline-danger btn-lg w-100 py-3 fw-bold">
+                            Elimina recensione
                         </button>
                     <?php endif; ?>
 
