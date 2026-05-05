@@ -33,7 +33,7 @@ CREATE TABLE `notifiche` (
   PRIMARY KEY (`id_notifica`),
   KEY `id_utente` (`id_utente`),
   CONSTRAINT `notifiche_ibfk_1` FOREIGN KEY (`id_utente`) REFERENCES `utenti` (`id_utente`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -44,6 +44,45 @@ SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `notifiche` WRITE;
 /*!40000 ALTER TABLE `notifiche` DISABLE KEYS */;
 /*!40000 ALTER TABLE `notifiche` ENABLE KEYS */;
+UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
+
+--
+-- Table structure for table `preferiti`
+--
+
+DROP TABLE IF EXISTS `preferiti`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `preferiti` (
+  `id_preferito` int(11) NOT NULL AUTO_INCREMENT,
+  `tmdb_id` int(11) NOT NULL,
+  `id_utente` int(11) NOT NULL,
+  `data_aggiunto` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id_preferito`),
+  KEY `id_utente` (`id_utente`),
+  CONSTRAINT `preferiti_ibfk_1` FOREIGN KEY (`id_utente`) REFERENCES `utenti` (`id_utente`)
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `preferiti`
+--
+
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
+LOCK TABLES `preferiti` WRITE;
+/*!40000 ALTER TABLE `preferiti` DISABLE KEYS */;
+INSERT INTO `preferiti` VALUES
+(10,129,1,'2026-05-05 15:40:57'),
+(11,157336,1,'2026-05-05 15:41:13'),
+(12,1218925,1,'2026-05-05 15:41:32'),
+(13,424,1,'2026-05-05 15:42:05'),
+(14,8587,1,'2026-05-05 15:42:29'),
+(15,354912,1,'2026-05-05 15:42:58'),
+(16,354912,1,'2026-05-05 15:47:18'),
+(17,149870,1,'2026-05-05 15:51:43');
+/*!40000 ALTER TABLE `preferiti` ENABLE KEYS */;
 UNLOCK TABLES;
 COMMIT;
 SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
@@ -78,6 +117,41 @@ COMMIT;
 SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
+-- Table structure for table `recensioni`
+--
+
+DROP TABLE IF EXISTS `recensioni`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `recensioni` (
+  `id_recensione` int(11) NOT NULL AUTO_INCREMENT,
+  `tmdb_id` int(11) NOT NULL,
+  `id_utente` int(11) NOT NULL,
+  `data_aggiunto` timestamp NULL DEFAULT NULL,
+  `commento` text DEFAULT NULL,
+  `voto` decimal(2,1) DEFAULT NULL,
+  PRIMARY KEY (`id_recensione`),
+  KEY `id_utente` (`id_utente`),
+  CONSTRAINT `recensioni_ibfk_1` FOREIGN KEY (`id_utente`) REFERENCES `utenti` (`id_utente`)
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `recensioni`
+--
+
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
+LOCK TABLES `recensioni` WRITE;
+/*!40000 ALTER TABLE `recensioni` DISABLE KEYS */;
+INSERT INTO `recensioni` VALUES
+(7,129,1,'2026-05-05 20:51:33','Il miglior film della Studio Ghibli',9.0),
+(14,1218925,1,'2026-05-05 20:53:23','Incredibile\r\n',8.5);
+/*!40000 ALTER TABLE `recensioni` ENABLE KEYS */;
+UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
+
+--
 -- Table structure for table `sessioni`
 --
 
@@ -106,7 +180,9 @@ INSERT INTO `sessioni` VALUES
 ('012fc1cc2ed0c5c279f2feacf76ee38d',1,'2026-04-23 22:01:01','2026-04-23 22:02:42'),
 ('0ee152fe15e7e1781873bd894613572e',1,'2026-04-23 21:55:58','2026-04-23 22:00:51'),
 ('0fd4f9bf5a5185c040cb2edbd08cd7f0',1,'2026-04-22 18:34:40','2026-04-22 19:49:51'),
+('13a5535ac6b8386eb7d80758fa067cb2',1,'2026-05-05 21:13:04',NULL),
 ('1547627f3983632f5d310998a9856a29',1,'2026-03-30 18:05:10','2026-03-30 18:07:30'),
+('155b8653273553129124bf53a371e557',1,'2026-05-05 23:33:01',NULL),
 ('16571ac889b5cefc8f0bfe7a94dd9847',1,'2026-03-25 18:29:10','2026-03-25 18:39:26'),
 ('172de2978f96be95c4d6855dc95b204f',1,'2026-03-27 10:09:41','2026-03-27 10:10:11'),
 ('1fd1fc7131a2523f6739c2ec40c2a837',1,'2026-04-23 21:01:52','2026-04-23 21:52:59'),
@@ -115,10 +191,12 @@ INSERT INTO `sessioni` VALUES
 ('2ca8233ba8347cb65c6c3ed193295fa3',1,'2026-04-23 20:29:10','2026-04-23 20:29:34'),
 ('2dbdd57f893b120973f9ea65a7a8cb3b',1,'2026-04-23 22:17:51','2026-04-23 22:23:04'),
 ('309e992fc63b90ed6b071fe06f26fdaa',1,'2026-04-23 22:49:49','2026-04-23 23:00:31'),
+('30d3c15fbb854ef494aaddd7725c241b',1,'2026-05-04 12:58:37',NULL),
 ('34b8ff74380d40b083f6ec8a00e00cff',1,'2026-04-24 21:10:53','2026-04-24 21:12:42'),
 ('36f340ec363a7da263d2d10964323caa',1,'2026-04-22 13:12:12','2026-04-22 13:18:41'),
 ('387579df4d1d3e5315096c25b84889f0',1,'2026-04-23 23:00:42','2026-04-24 00:45:12'),
 ('397fb05fc96fc54448a4fdce56f62af6',1,'2026-05-03 19:36:55',NULL),
+('3fbebb040f548d49cf0670fa61c14cca',1,'2026-05-04 10:34:49',NULL),
 ('410426c9d749dc165bd4aecc351a4c85',14,'2026-04-23 22:17:28','2026-04-23 22:17:45'),
 ('45c5fdd9888848e3bdb440d69f4f2bc2',6,'2026-03-30 18:28:01','2026-03-30 18:28:06'),
 ('4d5c2bdb6094d1e47e0e870d02d4e74e',1,'2026-04-24 01:04:45','2026-04-24 01:05:31'),
@@ -131,7 +209,11 @@ INSERT INTO `sessioni` VALUES
 ('6bd87857ac81c9d4b9a9114dc1cbd010',1,'2026-04-22 18:31:48','2026-04-22 18:34:28'),
 ('6ceed541eb8e947df425b2e244a4c5ee',1,'2026-04-23 20:37:06',NULL),
 ('73b33b898c631f652d41cd2e22e68352',1,'2026-04-17 13:35:17','2026-04-17 13:36:11'),
+('75b55e05146627e9ccfc9516e2170efd',1,'2026-05-04 20:25:12',NULL),
+('7cd956bc695e9634d123917d93c2ab24',1,'2026-05-05 16:41:50',NULL),
+('85b348526adf4bbe32ca46dab7a8a8f2',1,'2026-05-05 08:20:37','2026-05-05 11:50:58'),
 ('8728ce84b027b0afd50bf431e2d7d22a',1,'2026-03-25 19:24:57','2026-03-25 19:26:40'),
+('8a63c25dd055a536dfd64cacab38ec91',1,'2026-05-05 22:44:22',NULL),
 ('8a967e7e0ab9c9770c00df37d77a30ee',1,'2026-04-29 13:20:32','2026-04-29 13:30:27'),
 ('8c09f5a44105f042d6807b1f8170e30b',1,'2026-04-24 21:22:47','2026-04-24 21:43:02'),
 ('8d9feef2c70ea2ca8401cc2044b15ff1',1,'2026-04-18 12:43:54','2026-04-18 12:44:18'),
@@ -154,8 +236,11 @@ INSERT INTO `sessioni` VALUES
 ('d7d83f3a5d9ae973bac6db319f7eed4b',1,'2026-04-19 16:37:05',NULL),
 ('da3f07ec30e02ad0d9b7d19f80b195a4',1,'2026-03-25 19:26:56',NULL),
 ('de211e890f489a173ead66ef61cf8b0d',1,'2026-04-29 16:18:55','2026-04-29 16:27:56'),
+('eb96335cb7140a9e3e282af7baf30085',1,'2026-05-05 11:51:07',NULL),
 ('f2c98e62d02ae5874cff68c3aeb49465',1,'2026-03-27 09:35:22','2026-03-27 09:35:28'),
+('f37460f6c45627f06a209bd7b2d20159',1,'2026-05-05 23:26:36',NULL),
 ('f404018aacf436676f3d15a1ea30da5e',1,'2026-03-30 18:23:39','2026-03-30 18:27:27'),
+('f75e4fb63aae159b3fab4008dab53681',1,'2026-05-05 19:00:56',NULL),
 ('fc62965b2147501d2a088dfe60bd4b1d',1,'2026-04-19 16:26:02','2026-04-19 16:37:00');
 /*!40000 ALTER TABLE `sessioni` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -242,6 +327,75 @@ COMMIT;
 SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
+-- Table structure for table `watched`
+--
+
+DROP TABLE IF EXISTS `watched`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `watched` (
+  `id_watched` int(11) NOT NULL AUTO_INCREMENT,
+  `tmdb_id` int(11) NOT NULL,
+  `id_utente` int(11) NOT NULL,
+  `data_aggiunto` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id_watched`),
+  KEY `id_utente` (`id_utente`),
+  CONSTRAINT `watched_ibfk_1` FOREIGN KEY (`id_utente`) REFERENCES `utenti` (`id_utente`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `watched`
+--
+
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
+LOCK TABLES `watched` WRITE;
+/*!40000 ALTER TABLE `watched` DISABLE KEYS */;
+INSERT INTO `watched` VALUES
+(7,129,1,'2026-05-05 21:07:37');
+/*!40000 ALTER TABLE `watched` ENABLE KEYS */;
+UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
+
+--
+-- Table structure for table `watchlist`
+--
+
+DROP TABLE IF EXISTS `watchlist`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `watchlist` (
+  `id_watchlist` int(11) NOT NULL AUTO_INCREMENT,
+  `tmdb_id` int(11) NOT NULL,
+  `id_utente` int(11) NOT NULL,
+  `data_aggiunto` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id_watchlist`),
+  KEY `id_utente` (`id_utente`),
+  CONSTRAINT `watchlist_ibfk_1` FOREIGN KEY (`id_utente`) REFERENCES `utenti` (`id_utente`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `watchlist`
+--
+
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
+LOCK TABLES `watchlist` WRITE;
+/*!40000 ALTER TABLE `watchlist` DISABLE KEYS */;
+INSERT INTO `watchlist` VALUES
+(3,858024,1,'2026-05-05 21:06:24'),
+(4,1214931,1,'2026-05-05 21:06:29'),
+(6,687163,1,'2026-05-05 21:06:36'),
+(8,1226863,1,'2026-05-05 21:06:42'),
+(9,936075,1,'2026-05-05 21:06:45'),
+(10,1084242,1,'2026-05-05 21:06:58');
+/*!40000 ALTER TABLE `watchlist` ENABLE KEYS */;
+UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
+
+--
 -- Dumping routines for database 'cinevobis'
 --
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -254,4 +408,4 @@ SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2026-05-03 23:20:09
+-- Dump completed on 2026-05-05 23:54:03
