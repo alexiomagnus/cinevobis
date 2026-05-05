@@ -59,7 +59,11 @@ if (isset($_POST['delete_user']) && $username) {
         <div class="row g-0 vh-100">
             <div class="col-lg-6 d-flex flex-column justify-content-center align-items-center position-relative px-4">
                 
-                <a href="/index.php" class="btn-close position-absolute top-0 start-0 m-4" aria-label="Close"></a>
+                <a href="javascript:void(0)"
+                   onclick="closeAndRedirect()"
+                   class="btn-close position-absolute top-0 start-0 m-4"
+                   aria-label="Close">
+                </a>
 
                 <div style="max-width: 500px; width: 100%;">
                     <h1 class="display-6 fw-bolder mb-2">Profilo</h1>
@@ -102,15 +106,19 @@ if (isset($_POST['delete_user']) && $username) {
                             </div>
                         </div>
                         
-                        <form method="POST" class="d-flex gap-3 mt-4">
-                            <button type="submit" name="change_password" class="btn btn-dark btn-lg flex-fill py-3 fw-bold">
-                                Cambia password
-                            </button>
-
-                            <button type="submit" name="delete_user" class="btn btn-outline-danger btn-lg flex-fill py-3 fw-bold"
-                                    onclick="return confirm('Sei sicuro? Questa azione è irreversibile.');">
-                                Elimina account
-                            </button>
+                        <form method="POST">
+                            <div class="d-flex gap-3 mt-4">
+                                <button type="submit" name="change_password" class="btn btn-dark btn-lg flex-fill py-3 fw-bold">
+                                    Cambia password
+                                </button>
+                            </div>
+                            
+                            <div class="d-flex gap-3 mt-4">
+                                <button type="submit" name="delete_user" class="btn btn-outline-danger btn-lg flex-fill py-3 fw-bold"
+                                        onclick="return confirm('Sei sicuro? Questa azione è irreversibile.');">
+                                    Elimina account
+                                </button>
+                            </div>
                         </form>
                             
                     <?php else: ?>

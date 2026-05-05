@@ -138,9 +138,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="mb-3">
                     <input type="text"
-                        class="form-control bg-light border-light py-3"
+                        class="form-control bg-light border-light py-3 text-muted"
                         value="<?= htmlspecialchars($utente['username'] ?? '') ?>"
-                        readonly>
+                        disabled 
+                        style="cursor: not-allowed;">
                 </div>
 
                 <div class="mb-4">
@@ -163,14 +164,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <button type="submit"
                             name="save"
                             class="btn btn-dark btn-lg flex-fill py-3 fw-bold">
-                        Salva
+                        Salva modifiche
                     </button>
+                </div>
 
+                <div class="d-flex gap-3 mt-4">
                     <button type="submit"
                             name="delete_user"
                             class="btn btn-outline-danger btn-lg flex-fill py-3 fw-bold"
                             onclick="return confirm('Sei sicuro?');">
-                        Elimina
+                        Elimina utente
                     </button>
                 </div>
             </form>

@@ -41,13 +41,14 @@ $isAdminPage = in_array($currentPage, $adminPages);
                         <span class="navbar-toggler-icon"></span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg mt-2">
+
+                    <li><a class="dropdown-item py-2 small" href="/pages/user/profile.php">Profilo</a></li>
+
                         <?php if(!$isAdminPage): ?>
-                            
                             <li><a class="dropdown-item py-2 small" href="/pages/user/favorites.php">Preferiti</a></li>
                             <li><a class="dropdown-item py-2 small" href="/pages/user/watchlist.php">Watchlist</a></li>
                             <li><a class="dropdown-item py-2 small" href="/pages/user/watched.php">Watched</a></li>
                             <li><a class="dropdown-item py-2 small" href="/pages/user/reviews.php">Recensioni</a></li>
-                            <li><a class="dropdown-item py-2 small" href="/pages/user/profile.php">Profilo</a></li>
                         <?php endif; ?>
 
                         <?php if ($_SESSION['id_profilo'] == '1' && !$isAdminPage): ?>
@@ -58,6 +59,9 @@ $isAdminPage = in_array($currentPage, $adminPages);
                         <?php endif; ?>
 
                         <?php if ($isAdminPage): ?>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
                             <li><a class="dropdown-item py-2 small fw-bold text" href="/">Home</a></li>
                         <?php endif; ?>
 

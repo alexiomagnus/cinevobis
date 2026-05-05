@@ -56,13 +56,13 @@ if (isset($_POST['write_review'])) {
         try {
             if ($recensione_esistente) {
                 // Aggiorna recensione esistente
-                $sql = "UPDATE recensioni SET voto = :voto, descrizione = :descrizione, data_aggiunto = :data_aggiunto
+                $sql = "UPDATE recensioni SET voto = :voto, commento = :commento, data_aggiunto = :data_aggiunto
                         WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
 
             } else {
                 // Inserisce nuova recensione
-                $sql = "INSERT INTO recensioni (tmdb_id, id_utente, data_aggiunto, descrizione, voto)
-                        VALUES (:tmdb_id, :id_utente, :data_aggiunto, :descrizione, :voto)";
+                $sql = "INSERT INTO recensioni (tmdb_id, id_utente, data_aggiunto, commento, voto)
+                        VALUES (:tmdb_id, :id_utente, :data_aggiunto, :commento, :voto)";
             }
 
             $stmt = $conn->prepare($sql);
@@ -70,7 +70,7 @@ if (isset($_POST['write_review'])) {
                 ':tmdb_id' => $tmdb_id,
                 ':id_utente' => $id_utente,
                 ':data_aggiunto' => date('Y-m-d H:i:s'),
-                ':descrizione' => $commento,
+                ':commento' => $commento,
                 ':voto' => (float)$voto
             ]);
 
@@ -182,16 +182,16 @@ if (isset($_POST['delete_review'])) {
 
                     <hr class="my-4 opacity-25">
 
-                    <!-- Descrizione -->
+                    <!-- Commento -->
                     <div class="mb-5">
-                        <label class="form-label small text-secondary">Descrizione</label>
+                        <label class="form-label small text-secondary">Commento</label>
                         <textarea
                             name="commento"
                             id="commento"
                             class="form-control bg-light border-light"
                             rows="6"
                             placeholder="Scrivi qui la tua recensione..."
-                            required><?= htmlspecialchars($recensione_esistente['descrizione'] ?? '') ?></textarea>
+                            required><?= htmlspecialchars($recensione_esistente['commento'] ?? '') ?></textarea>
                     </div>
 
                     <!-- Bottone pubblica/aggiorna -->

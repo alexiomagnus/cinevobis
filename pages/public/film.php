@@ -321,7 +321,7 @@ if ($tmdb_id != null && $id_utente != null) {
 // Controlla se l'utente ha già recensito il film
 if ($tmdb_id != null && $id_utente != null) {
     try {
-        $sql = "SELECT 1 FROM recensioni WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
+        $sql = "SELECT * FROM recensioni WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
 
         $stmt = $conn->prepare($sql);
         $stmt->execute([
@@ -329,7 +329,11 @@ if ($tmdb_id != null && $id_utente != null) {
             ':tmdb_id' => $tmdb_id
         ]);
         
-        $is_review = (bool)$stmt->fetchColumn();
+        $results = $stmt->fetchColumn();
+        
+        if (!empty($results))
+            $is_review = true;
+
     } catch (PDOException $e) {
         error_log("Errore nel DB: " . $e->getMessage());
     }

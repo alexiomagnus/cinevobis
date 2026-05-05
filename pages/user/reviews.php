@@ -22,17 +22,18 @@ $ids = [];
 $id_utente = $_SESSION['id_profilo'] ?? '';
 
 try {
-    $sql = "SELECT tmdb_id, voto, descrizione FROM recensioni WHERE id_utente = :id_u";
+    $sql = "SELECT tmdb_id, commento, voto FROM recensioni WHERE id_utente = :id_u";
     $stmt = $conn->prepare($sql);
     $stmt->execute([':id_u' => $id_utente]);
 
-    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $rows = $stmt->fetchAll();
 
     foreach ($rows as $row) {
         $ids[] = (int) $row['tmdb_id'];
+
         $recensioni_map[(int) $row['tmdb_id']] = [
-            'voto'        => $row['voto'],
-            'descrizione' => $row['descrizione'],
+            'voto' => $row['voto'],
+            'commento' => $row['commento'],
         ];
     }
 
@@ -84,7 +85,6 @@ if (!empty($ids)) {
             object-fit: cover;
         }
 
-        /* Poster fisso nella card recensione */
         .review-poster {
             width: 120px;
             min-width: 120px;
@@ -93,7 +93,6 @@ if (!empty($ids)) {
             border-radius: 0.5rem 0 0 0.5rem;
         }
 
-        /* Stelle rating */
         .star-rating {
             color: #ccc;
             font-size: 1.1rem;
@@ -104,7 +103,6 @@ if (!empty($ids)) {
             color: var(--accent-color);
         }
 
-        /* Badge voto numerico */
         .vote-badge {
             background-color: var(--accent-color);
             color: #1a1a1a;
@@ -138,32 +136,35 @@ if (!empty($ids)) {
                         ? "https://image.tmdb.org/t/p/w500" . $film['poster_path']
                         : "https://via.placeholder.com/500x750?text=No+Poster";
                     $rec = $recensioni_map[$id] ?? [];
-                    $voto = isset($rec['voto']) ? (int) $rec['voto'] : null;
-                    $descrizione = $rec['descrizione'] ?? '';
+                    $voto = isset($rec['voto']) ? (float) $rec['voto'] : null;
+                    $commento = $rec['commento'] ?? '';
                 ?>
                 <div class="col">
-                <a href="/pages/user/review.php?tmdb_id=<?= $id ?>" class="text-decoration-none text-dark h-100 d-block">
                     <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden transition-hover">
                         <div class="d-flex">
 
-                            <!-- Poster -->
-                            <img
-                                src="<?= htmlspecialchars($poster) ?>"
-                                alt="<?= htmlspecialchars($titolo) ?>"
-                                class="review-poster"
-                            >
+                            <!-- Poster → film.php -->
+                            <a href="/pages/public/film.php?tmdb_id=<?= $id ?>" class="flex-shrink-0">
+                                <img src="<?= htmlspecialchars($poster) ?>"
+                                     alt="<?= htmlspecialchars($titolo) ?>"
+                                     loading="lazy"
+                                     class="review-poster">
+                            </a>
 
                             <!-- Contenuto -->
                             <div class="card-body d-flex flex-column justify-content-between p-3">
 
-                                <!-- Titolo -->
                                 <div>
-                                    <h5 class="fw-bold mb-1"><?= htmlspecialchars($titolo) ?></h5>
+                                    <!-- Titolo → review.php -->
+                                    <a href="/pages/user/review.php?tmdb_id=<?= $id ?>"
+                                       class="text-decoration-none text-dark">
+                                        <h5 class="fw-bold mb-1"><?= htmlspecialchars($titolo) ?></h5>
+                                    </a>
 
-                                    <!-- Descrizione recensione -->
-                                    <?php if (!empty($descrizione)): ?>
+                                    <!-- Commento -->
+                                    <?php if (!empty($commento)): ?>
                                         <p class="text-muted small mb-2 text-justify">
-                                            <?= nl2br(htmlspecialchars($descrizione)) ?>
+                                            <?= nl2br(htmlspecialchars($commento)) ?>
                                         </p>
                                     <?php endif; ?>
                                 </div>
@@ -172,14 +173,14 @@ if (!empty($ids)) {
                                 <?php if ($voto !== null): ?>
                                     <div class="d-flex align-items-center gap-1 mt-1">
                                         <i class="bi bi-star-fill" style="color: var(--accent-color); font-size: 1rem;"></i>
-                                        <span class="fw-semibold"><?= $voto ?>/10</span>
+                                        <span class="fw-bold fs-5"><?= $voto ?></span>
+                                        <span class="text-muted small">/10</span>
                                     </div>
                                 <?php endif; ?>
 
                             </div>
                         </div>
                     </div>
-                </a>
                 </div>
                 <?php endforeach; ?>
             </div>

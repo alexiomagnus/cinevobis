@@ -94,7 +94,7 @@ if (!empty($ids)) {
                     <div class="col">
                         <a href="/pages/public/film.php?tmdb_id=<?= $id ?>" class="text-decoration-none text-dark d-block h-100">
                             <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden transition-hover">
-                                <img src="<?= $poster ?>" class="card-img-top w-100" alt="<?= htmlspecialchars($titolo) ?>" style="object-fit: cover; aspect-ratio: 2/3;">
+                                <img src="<?= $poster ?>" class="card-img-top w-100" alt="<?= htmlspecialchars($titolo) ?>" loading="lazy" style="object-fit: cover; aspect-ratio: 2/3;">
                             </div>
                         </a>
                     </div>
