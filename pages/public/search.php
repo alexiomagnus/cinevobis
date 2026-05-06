@@ -20,13 +20,47 @@ $errore = "";
 $moviesList = [];
 $searched = isset($_GET['search']) ? trim($_GET['search']) : '';
 
+
 if ($searched !== '') {
     $raw = $tmdb->raw()->url('/search/movie', [
         'query' => $searched,
         'language' => 'it-IT'
     ]);
 
-    $results = $raw?->getBody()['results'] ?? [];
+    $results = [];
+
+    if ($raw !== null) {
+        $body = $raw->getBody();
+
+        if (isset($body['results'])) {
+            $results = $body['results'];
+        }
+    }
+
+    // filtro film validi (eliminare i film che non hanno i poster e le date)
+    $filtered = [];
+
+    foreach ($results as $movie) {
+        if (!empty($movie['poster_path']) && !empty($movie['release_date'])) {
+            $filtered[] = $movie;
+        }
+    }
+
+    $results = $filtered;
+
+    $n = count($results);
+
+    // Ordinare per popolarità
+    for ($i = 0; $i < $n - 1; $i++) {
+        for ($j = $i + 1; $j < $n; $j++) {
+            if ($results[$i]['popularity'] < $results[$j]['popularity']) {
+                // scambio
+                $temp = $results[$i];
+                $results[$i] = $results[$j];
+                $results[$j] = $temp;
+            }
+        }
+    }
 
     if (empty($results)) 
         $errore = "Nessun risultato trovato per: " . htmlspecialchars($searched);

@@ -43,12 +43,13 @@ try {
 
 // Connessione a MongoDB e ricerca film
 $films = [];
+$numeroFilm = 0;
 
 if (!empty($ids)) {
 
     // Conteggio film nel DB
     try {
-        $sql = "SELECT COUNT(*) FROM watchlist WHERE id_utente = :id_u";
+        $sql = "SELECT COUNT(*) FROM recensioni WHERE id_utente = :id_u";
 
         $stmt = $conn->prepare($sql);
         $stmt->execute([':id_u' => $id_utente]);

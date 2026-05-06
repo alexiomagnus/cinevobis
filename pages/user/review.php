@@ -161,7 +161,7 @@ if (isset($_POST['delete_review'])) {
                     
                     <div class="d-inline-flex align-items-center text-muted opacity-75" style="font-size: 0.85rem;">
                         <i class="bi bi-info-circle me-2"></i>
-                        <span>Il film verrà aggiunto automaticamente ai tuoi <strong>visti</strong></span>
+                        <span>Il film verrà aggiunto automaticamente alla tua <strong>watched</strong></span>
                     </div>
                 </div>
 
@@ -210,7 +210,7 @@ if (isset($_POST['delete_review'])) {
                             name="commento"
                             id="commento"
                             class="form-control bg-light border-light"
-                            rows="4"
+                            rows="6"
                             maxlength="200"
                             placeholder="Scrivi qui la tua recensione..."
                             required><?= htmlspecialchars($recensione_esistente['commento'] ?? '') ?></textarea>

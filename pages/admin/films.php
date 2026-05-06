@@ -131,8 +131,7 @@ if (isset($_POST['delete'])) {
                                 <button type="submit" name="delete"
                                         class="btn btn-link p-0 text-danger"
                                         style="font-size: 0.8rem;"
-                                        title="Elimina"
-                                        onclick="return confirm('Sei sicuro di voler eliminare questo film?')">
+                                        title="Elimina">
                                     <i class="bi bi-trash3"></i>
                                 </button>
                             </form>
