@@ -23,6 +23,7 @@ $id_utente = $_SESSION['id_utente'] ?? '';
 
 try {
     $sql = "SELECT tmdb_id, commento, voto FROM recensioni WHERE id_utente = :id_u";
+
     $stmt = $conn->prepare($sql);
     $stmt->execute([':id_u' => $id_utente]);
 
@@ -43,18 +44,18 @@ try {
 
 // Connessione a MongoDB e ricerca film
 $films = [];
-$numeroFilm = 0;
+$numeroRecensioni = 0;
 
 if (!empty($ids)) {
 
-    // Conteggio film nel DB
+    // Conteggio recensioni
     try {
         $sql = "SELECT COUNT(*) FROM recensioni WHERE id_utente = :id_u";
 
         $stmt = $conn->prepare($sql);
         $stmt->execute([':id_u' => $id_utente]);
 
-        $numeroFilm = $stmt->fetchColumn();
+        $numeroRecensioni = $stmt->fetchColumn();
 
     } catch (PDOException $e) {
         error_log("Errore: " . $e->getMessage());
@@ -139,9 +140,9 @@ if (!empty($ids)) {
         <h1 class="fw-bold mb-4">Recensioni</h1>
 
         <?php 
-        if ($numeroFilm > 0) {
+        if ($numeroRecensioni > 0) {
             echo "<div class='mb-4'>";
-            echo "<small class='text-uppercase fw-bold text-muted d-block mb-2' style='letter-spacing:1px'>" . htmlspecialchars($numeroFilm) . " Film recensiti</small>";
+            echo "<small class='text-uppercase fw-bold text-muted d-block mb-2' style='letter-spacing:1px'>" . htmlspecialchars($numeroRecensioni) . " Film recensiti</small>";
             echo "</div>";
         }
         ?>
@@ -182,7 +183,7 @@ if (!empty($ids)) {
 
                                     <?php if (!empty($commento)): ?>
                                         <p class="text-muted small mb-2 text-justify">
-                                            <?= nl2br(htmlspecialchars($commento)) ?>
+                                            "<?= nl2br(htmlspecialchars($commento)) ?>"
                                         </p>
                                     <?php endif; ?>
                                 </div>

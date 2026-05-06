@@ -12,7 +12,7 @@ if (!$username) {
     exit();
 }
 
-$errore    = '';
+$errore = '';
 $messaggio = '';
 
 if (isset($_POST['cambia_password'])) {
@@ -104,10 +104,13 @@ if (isset($_POST['cambia_password'])) {
                         Salva modifiche
                     </button>
 
-                    <p class="text-center small text-secondary">Non ricordi la password? 
-                        <a href="contact.php" class="text-dark fw-bold text-decoration-none">
-                            Contattaci
-                        </a>
+                    <?php if($_SESSION['id_profilo'] == 2): ?>
+                        <p class="text-center small text-secondary">Non ricordi la password? 
+                            <a href="contact.php" class="text-dark fw-bold text-decoration-none">
+                                Contattaci
+                            </a>
+                        </p>
+                    <?php endif; ?>
                 </form>
             </div>
         </div>

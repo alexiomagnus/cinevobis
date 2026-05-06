@@ -340,6 +340,22 @@ if ($tmdb_id != null && $id_utente != null) {
         error_log("Errore nel DB: " . $e->getMessage());
     }
 }
+
+// Contiamo le recensioni degli altri utenti
+$recensioni_altri = 0;
+try {   
+    $sql = "SELECT COUNT(*)
+            FROM recensioni r
+            WHERE tmdb_id = :tmdb_id";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([':tmdb_id' => $movie_id]);
+
+    $recensioni_altri = $stmt->fetchColumn();
+
+} catch (PDOException $e) {
+    error_log("Errore nel DB: " . $e->getMessage());
+}
 ?>
 <!DOCTYPE html>
 <html lang="it">
@@ -371,9 +387,7 @@ if ($tmdb_id != null && $id_utente != null) {
                 <div class="col-xl-10">
                     <div class="card shadow-sm border-0 rounded-4 p-4 p-md-5 bg-white">
 
-
                         <div class="row g-5 mb-5">
-                            <!-- Poster + Trailer -->
                             <div class="col-md-4">
                                 <img src="https://image.tmdb.org/t/p/w500<?= $poster_path ?>"
                                      class="img-fluid rounded-4 shadow-sm w-100"
@@ -391,8 +405,6 @@ if ($tmdb_id != null && $id_utente != null) {
                                 <?php endif; ?>
                             </div>
 
-
-                            <!-- Info principali -->
                             <div class="col-md-8">
                                 <h1 class="fw-bold text-dark display-5 mb-3"><?= htmlspecialchars($titolo) ?></h1>
 
@@ -409,8 +421,6 @@ if ($tmdb_id != null && $id_utente != null) {
                                     </a>
                                 </div>
 
-
-                                <!-- Dopo i badge dei generi, prima del border-top con la trama -->
                                 <div class="d-flex flex-wrap gap-2 mb-4">
                                     <?php foreach ($generi as $genre): ?>
                                         <span class="badge bg-white text-dark border rounded-pill px-3 py-2">
@@ -419,53 +429,46 @@ if ($tmdb_id != null && $id_utente != null) {
                                     <?php endforeach; ?>
                                 </div>
 
-
-                                <!-- Azioni utente -->
-                                 <?php if($_SESSION['username']): ?>
-                                    <form method="POST" class="d-flex gap-2 mb-4">
+                                <?php if($_SESSION['username']): ?>
+                                    <form method="POST" class="d-flex flex-wrap gap-2 mb-4">
                                         
                                         <?php if ($is_favorite): ?>
                                             <button class="btn btn-outline-danger btn-sm rounded-pill px-3" name="delete_favorite">
-                                                <i class="bi bi-heart-fill me-1"></i> Rimuovi
+                                                <i class="bi bi-heart-fill me-1 btn-action-icon"></i> Rimuovi
                                             </button>
                                         <?php else: ?>
                                             <button class="btn btn-outline-danger btn-sm rounded-pill px-3" name="favorite">
-                                                <i class="bi bi-heart-fill me-1"></i> Preferiti
+                                                <i class="bi bi-heart-fill me-1 btn-action-icon"></i> Preferiti
                                             </button>
                                         <?php endif; ?>
-
 
                                         <?php if ($is_watchlist): ?>
                                             <button class="btn btn-outline-primary btn-sm rounded-pill px-3" name="delete_watchlist">
-                                                <i class="bi bi-bookmark-fill me-1"></i> Rimuovi
+                                                <i class="bi bi-bookmark-fill me-1 btn-action-icon"></i> Rimuovi
                                             </button>
                                         <?php else: ?>
                                             <button class="btn btn-outline-primary btn-sm rounded-pill px-3" name="watchlist">
-                                                <i class="bi bi-bookmark-fill me-1"></i> Watchlist
+                                                <i class="bi bi-bookmark-fill me-1 btn-action-icon"></i> Watchlist
                                             </button>
                                         <?php endif; ?>
-
 
                                         <?php if ($is_watched): ?>
                                             <button class="btn btn-outline-success btn-sm rounded-pill px-3" name="delete_watched">
-                                                <i class="bi bi-eye-fill me-1"></i> Rimuovi
+                                                <i class="bi bi-eye-fill me-1 btn-action-icon"></i> Rimuovi
                                             </button>
                                         <?php else: ?>
                                             <button class="btn btn-outline-success btn-sm rounded-pill px-3" name="watched">
-                                                <i class="bi bi-eye-fill me-1"></i> Watched
+                                                <i class="bi bi-eye-fill me-1 btn-action-icon"></i> Watched
                                             </button>
                                         <?php endif; ?>
 
-
                                         <a href="/pages/user/review.php?tmdb_id=<?= urlencode($tmdb_id) ?>" class="btn btn-outline-dark btn-sm rounded-pill px-3">
-                                            <i class="bi bi-pencil-fill me-1"></i>
+                                            <i class="bi bi-pencil-fill me-1 btn-action-icon"></i>
                                             <?= $is_review ? "Modifica recensione" : "Scrivi recensione" ?>
                                         </a>
                                     </form>
                                 <?php endif; ?>
 
-
-                                <!-- --- Trama --- -->
                                 <div class="border-top pt-4">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                         <h4 class="fw-bold m-0">Trama</h4>
@@ -477,13 +480,17 @@ if ($tmdb_id != null && $id_utente != null) {
                                             </span>
                                         </div>
                                     </div>
-                                    <p class="text-justify lh-lg text-dark fs-6"><?= nl2br(htmlspecialchars($trama)) ?></p>
+                                    <p class="text-justify lh-lg text-dark fs-6 mb-4"><?= nl2br(htmlspecialchars($trama)) ?></p>
+                                    
+                                    <?php if($recensioni_altri > 0): ?>
+                                        <a href="/pages/public/users_reviews.php?tmdb_id=<?= urlencode($tmdb_id) ?>" class="text-decoration-none fw-bold text-info">
+                                            <i class="bi bi-chat-left-text-fill me-1"></i> Leggi le recensioni degli utenti
+                                        </a>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
 
-
-                        <!-- Durata / Anno / Paese -->
                         <div class="row text-center py-4 bg-light rounded-4 mb-5 border mx-0">
                             <div class="col-4 border-end">
                                 <div class="small text-muted text-uppercase fw-bold">Durata</div>
@@ -499,8 +506,6 @@ if ($tmdb_id != null && $id_utente != null) {
                             </div>
                         </div>
 
-
-                        <!-- Cast -->
                         <div class="mt-2">
                             <h4 class="fw-bold mb-4">Cast Principale</h4>
                             <div class="row g-3">
@@ -535,8 +540,6 @@ if ($tmdb_id != null && $id_utente != null) {
                 </div>
             </div>
 
-
-            <!-- Modal Trailer -->
             <?php if ($trailerKey): ?>
             <div class="modal fade" id="trailerModal" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-xl modal-dialog-centered">

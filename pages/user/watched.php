@@ -37,7 +37,7 @@ try {
 
 // Connessione a MongoDB e ricerca film
 $films = [];
-$numeroFilm = 0;
+$numeroWatched = 0;
 
 if (!empty($ids)) {
 
@@ -48,7 +48,7 @@ if (!empty($ids)) {
         $stmt = $conn->prepare($sql);
         $stmt->execute([':id_u' => $id_utente]);
 
-        $numeroFilm = $stmt->fetchColumn();
+        $numeroWatched = $stmt->fetchColumn();
 
     } catch (PDOException $e) {
         error_log("Errore: " . $e->getMessage());
@@ -94,9 +94,9 @@ if (!empty($ids)) {
         <h1 class="fw-bold mb-4">Watched</h1>
 
         <?php 
-            if ($numeroFilm > 0) {
+            if ($numeroWatched > 0) {
                 echo "<div class='mb-4'>";
-                echo "<small class='text-uppercase fw-bold text-muted d-block mb-2' style='letter-spacing:1px'>" . htmlspecialchars($numeroFilm) . " Film visti</small>";
+                echo "<small class='text-uppercase fw-bold text-muted d-block mb-2' style='letter-spacing:1px'>" . htmlspecialchars($numeroWatched) . " Film visti</small>";
                 echo "</div>";
             }
         ?>
