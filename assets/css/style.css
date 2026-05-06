@@ -89,14 +89,14 @@ body {
     border: 1.5px solid var(--border);
     border-radius: 0.75rem;
     padding: 8px 10px 8px 22px;
-    box-shadow: 0 1px 6px rgba(0,0,0,.05);
+    box-shadow: 0 1px 6px rgba(0, 0, 0, .05);
     transition: all 0.25s;
     cursor: text;
 }
 
 .search-wrap:hover,
 .search-wrap:focus-within {
-    box-shadow: 0 0 0 3px rgba(168,197,218,.35);
+    box-shadow: 0 0 0 3px rgba(168, 197, 218, .35);
     border-color: var(--accent);
 }
 
@@ -147,7 +147,7 @@ body {
 
 .card-hover:hover {
     transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(0,0,0,.08) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, .08) !important;
 }
 
 .transition-hover {
@@ -156,7 +156,7 @@ body {
 
 .transition-hover:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,.1) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .1) !important;
 }
 
 
@@ -176,7 +176,7 @@ body {
 .form-control:focus {
     background-color: var(--bg-surface) !important;
     border-color: var(--accent) !important;
-    box-shadow: 0 0 0 0.2rem rgba(168,197,218,.3) !important;
+    box-shadow: 0 0 0 0.2rem rgba(168, 197, 218, .3) !important;
     color: var(--text) !important;
 }
 
@@ -191,22 +191,22 @@ footer {
 /* =====================
    Alert
 ===================== */
-.alert-danger  { 
-    background-color: #FAE8E8 !important; 
-    color: #9B4545 !important; 
-    border-color: #F2CECE !important; 
+.alert-danger {
+    background-color: #FAE8E8 !important;
+    color: #9B4545 !important;
+    border-color: #F2CECE !important;
 }
 
-.alert-success { 
-    background-color: #E8F4EC !important; 
-    color: #3D7A52 !important; 
-    border-color: #C4E2CE !important; 
+.alert-success {
+    background-color: #E8F4EC !important;
+    color: #3D7A52 !important;
+    border-color: #C4E2CE !important;
 }
 
-.alert-warning { 
-    background-color: #FDF4E3 !important; 
-    color: #8A6A2E !important; 
-    border-color: #F5E0B0 !important; 
+.alert-warning {
+    background-color: #FDF4E3 !important;
+    color: #8A6A2E !important;
+    border-color: #F5E0B0 !important;
 }
 
 /* =====================
@@ -220,7 +220,7 @@ footer {
 .toggle-icon {
     position: absolute;
     right: 15px;
-    bottom: 15px; 
+    bottom: 15px;
     cursor: pointer;
     color: var(--text-muted);
     font-size: 1.25rem;

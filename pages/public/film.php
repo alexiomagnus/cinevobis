@@ -331,8 +331,10 @@ if ($tmdb_id != null && $id_utente != null) {
         
         $results = $stmt->fetchColumn();
         
-        if (!empty($results))
+        if (!empty($results)) {
             $is_review = true;
+            $is_watched = true;
+        }
 
     } catch (PDOException $e) {
         error_log("Errore nel DB: " . $e->getMessage());

@@ -115,7 +115,7 @@ if (isset($_POST['delete'])) {
                                             <span class="text-muted small">·</span>
                                             <span class="text-muted small"><?= htmlspecialchars($notifica['username']) ?></span>
                                         </div>
-                                        <p class="mb-0 text-muted small"><?= htmlspecialchars($notifica['descrizione'] ?? '') ?></p>
+                                        <p class="mb-0 text-muted small"><?= nl2br(htmlspecialchars($notifica['descrizione'] ?? '')) ?></p>
                                     </div>
                                     <div class="d-flex align-items-center gap-2 mt-1 text-nowrap">
                                         <span class="badge bg-light text-muted fw-normal border small">
@@ -155,7 +155,7 @@ if (isset($_POST['delete'])) {
                                             <span class="text-muted small">·</span>
                                             <span class="text-muted small"><?= htmlspecialchars($notifica['username']) ?></span>
                                         </div>
-                                        <p class="mb-0 text-muted small"><?= htmlspecialchars($notifica['descrizione'] ?? '') ?></p>
+                                        <p class="mb-0 text-muted small"><?= nl2br(htmlspecialchars($notifica['descrizione'] ?? '')) ?></p>
                                     </div>
                                     <span class="badge bg-light text-muted fw-normal border small mt-1 text-nowrap">
                                         <?= htmlspecialchars($notifica['data_invio'] ?? '') ?>

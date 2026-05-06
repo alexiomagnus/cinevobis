@@ -77,6 +77,7 @@ if (isset($_POST['invia'])) {
                         <input type="text"
                                name="titolo"
                                id="titolo"
+                               maxlength="50"
                                class="form-control bg-light border-light py-3"
                                placeholder="Inserisci un titolo"
                                required>
@@ -88,8 +89,12 @@ if (isset($_POST['invia'])) {
                                   id="descrizione"
                                   class="form-control bg-light border-light py-3"
                                   rows="6"
+                                  maxlength="200"
                                   placeholder="Descrivi il tuo messaggio..."
                                   required></textarea>
+                        <div class="form-text text-end">
+                            Limite massimo: 200 caratteri
+                        </div>
                     </div>
 
                     <button type="submit" name="invia" class="btn btn-dark btn-lg w-100 py-3 fw-bold mb-4">

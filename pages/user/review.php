@@ -79,6 +79,25 @@ if (isset($_POST['write_review'])) {
                 ? "Recensione aggiornata"
                 : "Recensione pubblicata";
 
+            // Segna automaticamente come visto (watched)
+            $sql_check_watched = "SELECT 1 FROM watched WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
+            $stmt_check_watched = $conn->prepare($sql_check_watched);
+            $stmt_check_watched->execute([
+                ':id_utente' => $id_utente,
+                ':tmdb_id' => $tmdb_id
+            ]);
+
+            if (!$stmt_check_watched->fetch()) {
+                $sql_insert_watched = "INSERT INTO watched (tmdb_id, id_utente, data_aggiunto) 
+                                     VALUES (:tmdb_id, :id_utente, :data_aggiunto)";
+                $stmt_insert_watched = $conn->prepare($sql_insert_watched);
+                $stmt_insert_watched->execute([
+                    ':tmdb_id' => $tmdb_id,
+                    ':id_utente' => $id_utente,
+                    ':data_aggiunto' => date('Y-m-d H:i:s')
+                ]);
+            }
+
             // Inizializza per pulire la pagina dopo l'invio della recensione
             $recensione_esistente = [];
 
@@ -125,43 +144,43 @@ if (isset($_POST['delete_review'])) {
         <div class="row vh-100 justify-content-center align-items-center">
             <div class="col-12 col-sm-8 col-md-6 col-lg-5 px-4">
 
-                <!-- Bottone chiudi -->
                 <a href="/pages/public/film.php?tmdb_id=<?= urldecode($tmdb_id) ?>" 
                     class="btn-close position-absolute top-0 start-0 m-4" 
                     aria-label="Close">
                 </a>
 
-                <!-- Intestazione -->
-                <div class="text-center mb-5">
+                <div class="text-center mb-4">
                     <h1 class="display-6 fw-bolder mb-2">
                         <?= $recensione_esistente ? 'Modifica recensione' : 'Scrivi recensione' ?>
                     </h1>
-                    <p class="text-secondary">
+                    <p class="text-secondary mb-3">
                         <?= $recensione_esistente
                             ? 'Aggiorna la tua opinione'
                             : 'Condividi la tua opinione' ?>
                     </p>
+                    
+                    <div class="d-inline-flex align-items-center text-muted opacity-75" style="font-size: 0.85rem;">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <span>Il film verrà aggiunto automaticamente ai tuoi <strong>visti</strong></span>
+                    </div>
                 </div>
 
-                <!-- Alert errore -->
                 <?php if ($errore): ?>
                     <div class="alert alert-danger border-0 small py-2 mb-4 text-center">
                         <?= htmlspecialchars($errore) ?>
                     </div>
                 <?php endif; ?>
 
-                <!-- Alert successo -->
                 <?php if ($messaggio): ?>
                     <div class="alert alert-success border-0 small py-2 mb-4 text-center">
                         <?= htmlspecialchars($messaggio) ?>
-                        <a href="/pages/user/reviews.php">vedi</a>
+                        <a href="/pages/user/reviews.php" class="fw-bold text-decoration-none">vedi</a>
                     </div>
                 <?php endif; ?>
 
                 <form method="POST">
                     <input type="hidden" name="tmdb_id" value="<?= htmlspecialchars($tmdb_id) ?>">
 
-                    <!-- Voto -->
                     <div class="mb-4">
                         <label class="form-label small text-secondary">Voto</label>
                         <div class="input-group">
@@ -183,26 +202,27 @@ if (isset($_POST['delete_review'])) {
                         </div>
                     </div>
 
-                    <hr class="my-4 opacity-25">
+                    <hr class="my-3 opacity-25">
 
-                    <!-- Commento -->
-                    <div class="mb-5">
+                    <div class="mb-4">
                         <label class="form-label small text-secondary">Commento</label>
                         <textarea
                             name="commento"
                             id="commento"
                             class="form-control bg-light border-light"
-                            rows="6"
+                            rows="4"
+                            maxlength="200"
                             placeholder="Scrivi qui la tua recensione..."
                             required><?= htmlspecialchars($recensione_esistente['commento'] ?? '') ?></textarea>
+                            <div class="form-text text-end">
+                                Limite massimo: 200 caratteri
+                            </div>
                     </div>
 
-                    <!-- Bottone pubblica/aggiorna -->
                     <button type="submit" name="write_review" class="btn btn-dark btn-lg w-100 py-3 fw-bold mb-3">
                         <?= $recensione_esistente ? 'Aggiorna recensione' : 'Pubblica recensione' ?>
                     </button>
 
-                    <!-- Bottone elimina (solo se esiste già una recensione) -->
                     <?php if ($recensione_esistente): ?>
                         <button type="submit" onclick="closeAndRedirect()" name="delete_review" class="btn btn-outline-danger btn-lg w-100 py-3 fw-bold">
                             Elimina recensione
