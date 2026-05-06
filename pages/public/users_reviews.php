@@ -11,7 +11,7 @@ $movie_id = $_GET['tmdb_id'] ?? null;
 
 // Recuperiamo le recensioni degli altri utenti
 try {   
-    $sql = "SELECT tmdb_id, r.commento, r.voto, u.nome, u.cognome
+    $sql = "SELECT r.commento, r.voto, u.nome, u.cognome
             FROM recensioni r
             JOIN utenti u ON r.id_utente = u.id_utente 
             WHERE tmdb_id = :tmdb_id
