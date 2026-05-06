@@ -48,8 +48,7 @@ if (!empty($ids)) {
         $stmt = $conn->prepare($sql);
         $stmt->execute([':id_u' => $id_utente]);
 
-        $preferiti = $stmt->fetchColumn();
-        $numeroPreferiti = count($preferiti);
+        $numeroPreferiti = $stmt->fetchColumn();
 
     } catch (PDOException $e) {
         error_log("Errore: " . $e->getMessage());
