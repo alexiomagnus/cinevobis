@@ -142,7 +142,7 @@ if (!empty($ids)) {
         <?php 
         if ($numeroRecensioni > 0) {
             echo "<div class='mb-4'>";
-            echo "<small class='text-uppercase fw-bold text-muted d-block mb-2' style='letter-spacing:1px'>" . htmlspecialchars($numeroRecensioni) . " Film recensiti</small>";
+            echo "<small class='text-uppercase fw-bold text-muted d-block mb-2' style='letter-spacing:1px'>" . htmlspecialchars($numeroRecensioni) . " Film che hai recensito</small>";
             echo "</div>";
         }
         ?>

@@ -96,7 +96,7 @@ if (!empty($ids)) {
         <?php 
             if ($numeroWatched > 0) {
                 echo "<div class='mb-4'>";
-                echo "<small class='text-uppercase fw-bold text-muted d-block mb-2' style='letter-spacing:1px'>" . htmlspecialchars($numeroWatched) . " Film visti</small>";
+                echo "<small class='text-uppercase fw-bold text-muted d-block mb-2' style='letter-spacing:1px'>" . htmlspecialchars($numeroWatched) . " Film che hai visto</small>";
                 echo "</div>";
             }
         ?>

@@ -43,6 +43,19 @@ if (isset($_POST['delete_user']) && $username) {
         $errore = "Errore durante l'eliminazione: " . $e->getMessage();
     }
 }
+
+// Film visti nell'anno corrente
+$numeroFilmVisti = 0;
+try {
+    $sql = "SELECT COUNT(*) FROM watched WHERE id_utente = :id_utente AND YEAR(data_aggiunto) = YEAR(CURRENT_DATE)";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([':id_utente' => $_SESSION['id_utente']]);
+
+    $numeroFilmVisti = $stmt->fetchColumn();
+
+} catch (PDOException $e) {
+    error_log("Errore nel DB: " . $e->getMessage());
+}
 ?>
 <!DOCTYPE html>
 <html lang="it">
@@ -103,6 +116,13 @@ if (isset($_POST['delete_user']) && $username) {
                             <div class="col-12">
                                 <label class="small text-uppercase text-muted fw-bold">Membro dal</label>
                                 <p class="fs-6 mb-0 text-break"><?= htmlspecialchars($dataRegistrazione); ?></p>
+                            </div>
+                        </div>
+
+                        <div class="row mb-5">
+                            <div class="col-12">
+                                <label class="small text-uppercase text-muted fw-bold">Film visti nel <?php echo date('Y'); ?></label>
+                                <p class="fs-6 mb-0 text-break"><?= htmlspecialchars($numeroFilmVisti); ?></p>
                             </div>
                         </div>
                         
