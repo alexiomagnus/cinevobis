@@ -19,7 +19,7 @@ if (!$username) {
 // Estrazione tmdb_id + dati recensione
 $recensioni_map = [];
 $ids = [];
-$id_utente = $_SESSION['id_profilo'] ?? '';
+$id_utente = $_SESSION['id_utente'] ?? '';
 
 try {
     $sql = "SELECT tmdb_id, commento, voto FROM recensioni WHERE id_utente = :id_u";
@@ -45,6 +45,22 @@ try {
 $films = [];
 
 if (!empty($ids)) {
+
+    // Conteggio film nel DB
+    try {
+        $sql = "SELECT COUNT(*) FROM watchlist WHERE id_utente = :id_u";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([':id_u' => $id_utente]);
+
+        $numeroFilm = $stmt->fetchColumn();
+
+    } catch (PDOException $e) {
+        error_log("Errore: " . $e->getMessage());
+    }
+
+
+    // Connessione a MongoDB
     try {
         $mongoClient = new Client("mongodb://localhost:27017");
         $db = $mongoClient->selectDatabase("cinevobis");
@@ -121,6 +137,14 @@ if (!empty($ids)) {
     <main class="container mt-5 mb-5 flex-grow-1">
         <h1 class="fw-bold mb-4">Recensioni</h1>
 
+        <?php 
+        if ($numeroFilm > 0) {
+            echo "<div class='mb-4'>";
+            echo "<small class='text-uppercase fw-bold text-muted d-block mb-2' style='letter-spacing:1px'>" . htmlspecialchars($numeroFilm) . " Film recensiti</small>";
+            echo "</div>";
+        }
+        ?>
+
         <?php if (empty($films)): ?>
             <div class="alert alert-info shadow-sm rounded-4 border-0">
                 <i class="bi bi-info-circle me-2"></i>Non hai ancora recensito nessun film
@@ -140,28 +164,21 @@ if (!empty($ids)) {
                     $commento = $rec['commento'] ?? '';
                 ?>
                 <div class="col">
-                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden transition-hover">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden transition-hover position-relative">
                         <div class="d-flex">
 
-                            <!-- Poster → film.php -->
-                            <a href="/pages/public/film.php?tmdb_id=<?= $id ?>" class="flex-shrink-0">
-                                <img src="<?= htmlspecialchars($poster) ?>"
-                                     alt="<?= htmlspecialchars($titolo) ?>"
-                                     loading="lazy"
-                                     class="review-poster">
-                            </a>
+                            <img src="<?= htmlspecialchars($poster) ?>"
+                                alt="<?= htmlspecialchars($titolo) ?>"
+                                class="review-poster">
 
-                            <!-- Contenuto -->
                             <div class="card-body d-flex flex-column justify-content-between p-3">
-
                                 <div>
-                                    <!-- Titolo → review.php -->
-                                    <a href="/pages/user/review.php?tmdb_id=<?= $id ?>"
-                                       class="text-decoration-none text-dark">
-                                        <h5 class="fw-bold mb-1"><?= htmlspecialchars($titolo) ?></h5>
-                                    </a>
+                                    <h5 class="fw-bold mb-1">
+                                        <a href="/pages/public/film.php?tmdb_id=<?= $id ?>" class="text-decoration-none text-dark stretched-link">
+                                            <?= htmlspecialchars($titolo) ?>
+                                        </a>
+                                    </h5>
 
-                                    <!-- Commento -->
                                     <?php if (!empty($commento)): ?>
                                         <p class="text-muted small mb-2 text-justify">
                                             <?= nl2br(htmlspecialchars($commento)) ?>
@@ -169,7 +186,6 @@ if (!empty($ids)) {
                                     <?php endif; ?>
                                 </div>
 
-                                <!-- Voto -->
                                 <?php if ($voto !== null): ?>
                                     <div class="d-flex align-items-center gap-1 mt-1">
                                         <i class="bi bi-star-fill" style="color: var(--accent-color); font-size: 1rem;"></i>
@@ -177,7 +193,6 @@ if (!empty($ids)) {
                                         <span class="text-muted small">/10</span>
                                     </div>
                                 <?php endif; ?>
-
                             </div>
                         </div>
                     </div>

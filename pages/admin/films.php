@@ -72,66 +72,80 @@ if (isset($_POST['delete'])) {
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="/assets/css/style.css">
+    <style>
+        /* Bootstrap non ha row-cols-xl-10 di default, lo aggiungiamo */
+        @media (min-width: 1200px) {
+            .row-cols-xl-10 > * {
+                flex: 0 0 auto;
+                width: 10%;
+            }
+        }
+        @media (min-width: 992px) {
+            .row-cols-lg-8 > * {
+                flex: 0 0 auto;
+                width: 12.5%;
+            }
+        }
+    </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
     
     <?php require_once(__DIR__ . '/../../includes/header.php'); ?>
 
-    <main class="container mt-5 mb-5 flex-grow-1 d-flex flex-column align-items-center">
+    <main class="container mt-5 mb-5 flex-grow-1">
         
-        <div class="w-100" style="max-width: 650px;">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="fs-4 fw-bold mb-0">Archivio Film</h1>
-            </div>
-
-            <div class="d-flex flex-column gap-3">
-                <?php if (!empty($cursor)): ?>
-                    <?php foreach($cursor as $movie): ?>
-                        <a href="/pages/admin/film_db.php?tmdb_id=<?= urlencode($movie['id']) ?>" class="text-decoration-none">
-                            <div class="card border-0 shadow-sm rounded-3 card-hover bg-white search-result-card">
-                                <div class="card-body px-4 py-3 d-flex align-items-center gap-3">
-
-                                    <?php if (!empty($movie['poster_path'])): ?>
-                                        <img src="https://image.tmdb.org/t/p/w92<?= $movie['poster_path'] ?>" 
-                                            alt="Poster" 
-                                            class="rounded-2 flex-shrink-0"
-                                            loading="lazy"
-                                            style="width: 48px; height: 72px; object-fit: cover;">
-                                    <?php else: ?>
-                                        <div class="rounded-2 flex-shrink-0 bg-secondary d-flex align-items-center justify-content-center"
-                                            style="width: 48px; height: 72px;">
-                                            <i class="bi bi-film text-white fs-5"></i>
-                                        </div>
-                                    <?php endif; ?>
-
-                                    <div class="flex-grow-1 overflow-hidden">
-                                        <span class="fs-6 text-dark fw-medium d-block text-truncate">
-                                            <?= htmlspecialchars($movie['title'] ?? 'Senza titolo') ?>
-                                        </span>
-                                        <small class="text-primary font-monospace" style="font-size: 0.75rem;">
-                                            TMDB ID: <?= (string)$movie['id'] ?>
-                                        </small>
-                                    </div>
-
-                                    <form method="POST">
-                                        <input type="hidden" name="_id" value="<?= (string)$movie['_id'] ?>">
-                                        <button type="submit" name="delete" class="btn btn-outline-danger btn-sm px-3 d-flex align-items-center gap-2">
-                                            <i class="bi bi-trash3"></i>
-                                        </button>
-                                    </form>
-
-                                    </div>
-
-                            </div>
-                        </a>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <div class="alert alert-info text-center rounded-3 border-0 shadow-sm">
-                        <i class="bi bi-info-circle me-2"></i> Nessun film trovato nel database
-                    </div>
-                <?php endif; ?>
-            </div>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="fs-4 fw-bold mb-0">Archivio Film</h1>
         </div>
+
+        <?php if (!empty($cursor)): ?>
+            <div class="row row-cols-2 row-cols-sm-3 row-cols-md-5 row-cols-lg-8 row-cols-xl-10 g-2">
+                <?php foreach($cursor as $movie): 
+                    $titolo = $movie['title'] ?? 'Senza titolo';
+                    $anno = !empty($movie['release_date']) ? substr($movie['release_date'], 0, 4) : '';
+                    $poster = !empty($movie['poster_path'])
+                        ? "https://image.tmdb.org/t/p/w185" . $movie['poster_path']
+                        : null;
+                ?>
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden transition-hover">
+                        <a href="/pages/admin/film_db.php?tmdb_id=<?= urlencode($movie['id']) ?>" class="text-decoration-none text-dark d-block">
+                            <?php if ($poster): ?>
+                                <img src="<?= $poster ?>" 
+                                     alt="<?= htmlspecialchars($titolo) ?>" 
+                                     class="card-img-top w-100"
+                                     style="object-fit: cover; aspect-ratio: 2/3;">
+                            <?php else: ?>
+                                <div class="bg-secondary d-flex align-items-center justify-content-center w-100" style="aspect-ratio: 2/3;">
+                                    <i class="bi bi-film text-white fs-4"></i>
+                                </div>
+                            <?php endif; ?>
+                        </a>
+                        <div class="card-body p-1">
+                            <h6 class="card-title mb-1 text-truncate" style="font-size: 0.75rem;" title="<?= htmlspecialchars($titolo) ?>">
+                                <?= htmlspecialchars($titolo) ?>
+                            </h6>
+                            
+                            <form method="POST" class="mt-0">
+                                <input type="hidden" name="_id" value="<?= (string)$movie['_id'] ?>">
+                                <button type="submit" name="delete"
+                                        class="btn btn-link p-0 text-danger"
+                                        style="font-size: 0.8rem;"
+                                        title="Elimina"
+                                        onclick="return confirm('Sei sicuro di voler eliminare questo film?')">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        <?php else: ?>
+            <div class="alert alert-info text-center rounded-3 border-0 shadow-sm">
+                <i class="bi bi-info-circle me-2"></i> Nessun film trovato nel database
+            </div>
+        <?php endif; ?>
 
     </main>
 

@@ -73,7 +73,6 @@ if ($searched !== '') {
                                         <img src="<?= htmlspecialchars($movie['poster']) ?>"
                                             alt="Poster <?= htmlspecialchars($movie['titolo']) ?>"
                                             class="rounded-2 flex-shrink-0"
-                                            loading="lazy"
                                             style="width: 48px; height: 72px; object-fit: cover;">
                                     <?php else: ?>
                                         <div class="rounded-2 flex-shrink-0 bg-secondary d-flex align-items-center justify-content-center"

@@ -13,11 +13,9 @@ $isAdminPage = in_array($currentPage, $adminPages);
         </span>
     </div>
     
-    <?php if(!$isAdminPage): ?>
-        <div class="d-flex justify-content-center gap-3">
-            <a href="/pages/public/terms.php" class="text-secondary small text-decoration-none">Termini di servizio</a>
-            <a href="/pages/public/privacy.php" class="text-secondary small text-decoration-none">Informativa sulla privacy</a>
-            <a href="/actions/contact.php" class="text-secondary small text-decoration-none">Contattaci</a>
-        </div>
-    <?php endif; ?>
+    <div class="d-flex justify-content-center gap-3">
+        <a href="/pages/public/terms.php" class="text-secondary small text-decoration-none">Termini di servizio</a>
+        <a href="/pages/public/privacy.php" class="text-secondary small text-decoration-none">Informativa sulla privacy</a>
+        <a href="/actions/contact.php" class="text-secondary small text-decoration-none">Contattaci</a>
+    </div>
 </footer>

@@ -419,46 +419,48 @@ if ($tmdb_id != null && $id_utente != null) {
 
 
                                 <!-- Azioni utente -->
-                                <form method="POST" class="d-flex gap-2 mb-4">
-                                    
-                                    <?php if ($is_favorite): ?>
-                                        <button class="btn btn-outline-danger btn-sm rounded-pill px-3" name="delete_favorite">
-                                            <i class="bi bi-heart-fill me-1"></i> Rimuovi
-                                        </button>
-                                    <?php else: ?>
-                                        <button class="btn btn-outline-danger btn-sm rounded-pill px-3" name="favorite">
-                                            <i class="bi bi-heart-fill me-1"></i> Preferiti
-                                        </button>
-                                    <?php endif; ?>
+                                 <?php if($_SESSION['username']): ?>
+                                    <form method="POST" class="d-flex gap-2 mb-4">
+                                        
+                                        <?php if ($is_favorite): ?>
+                                            <button class="btn btn-outline-danger btn-sm rounded-pill px-3" name="delete_favorite">
+                                                <i class="bi bi-heart-fill me-1"></i> Rimuovi
+                                            </button>
+                                        <?php else: ?>
+                                            <button class="btn btn-outline-danger btn-sm rounded-pill px-3" name="favorite">
+                                                <i class="bi bi-heart-fill me-1"></i> Preferiti
+                                            </button>
+                                        <?php endif; ?>
 
 
-                                    <?php if ($is_watchlist): ?>
-                                        <button class="btn btn-outline-primary btn-sm rounded-pill px-3" name="delete_watchlist">
-                                            <i class="bi bi-bookmark-fill me-1"></i> Rimuovi
-                                        </button>
-                                    <?php else: ?>
-                                        <button class="btn btn-outline-primary btn-sm rounded-pill px-3" name="watchlist">
-                                            <i class="bi bi-bookmark-fill me-1"></i> Watchlist
-                                        </button>
-                                    <?php endif; ?>
+                                        <?php if ($is_watchlist): ?>
+                                            <button class="btn btn-outline-primary btn-sm rounded-pill px-3" name="delete_watchlist">
+                                                <i class="bi bi-bookmark-fill me-1"></i> Rimuovi
+                                            </button>
+                                        <?php else: ?>
+                                            <button class="btn btn-outline-primary btn-sm rounded-pill px-3" name="watchlist">
+                                                <i class="bi bi-bookmark-fill me-1"></i> Watchlist
+                                            </button>
+                                        <?php endif; ?>
 
 
-                                    <?php if ($is_watched): ?>
-                                        <button class="btn btn-outline-success btn-sm rounded-pill px-3" name="delete_watched">
-                                            <i class="bi bi-eye-fill me-1"></i> Rimuovi
-                                        </button>
-                                    <?php else: ?>
-                                        <button class="btn btn-outline-success btn-sm rounded-pill px-3" name="watched">
-                                            <i class="bi bi-eye-fill me-1"></i> Watched
-                                        </button>
-                                    <?php endif; ?>
+                                        <?php if ($is_watched): ?>
+                                            <button class="btn btn-outline-success btn-sm rounded-pill px-3" name="delete_watched">
+                                                <i class="bi bi-eye-fill me-1"></i> Rimuovi
+                                            </button>
+                                        <?php else: ?>
+                                            <button class="btn btn-outline-success btn-sm rounded-pill px-3" name="watched">
+                                                <i class="bi bi-eye-fill me-1"></i> Watched
+                                            </button>
+                                        <?php endif; ?>
 
 
-                                    <a href="/pages/user/review.php?tmdb_id=<?= urlencode($tmdb_id) ?>" class="btn btn-outline-dark btn-sm rounded-pill px-3">
-                                        <i class="bi bi-pencil-fill me-1"></i>
-                                        <?= $is_review ? "Modifica recensione" : "Scrivi recensione" ?>
-                                    </a>
-                                </form>
+                                        <a href="/pages/user/review.php?tmdb_id=<?= urlencode($tmdb_id) ?>" class="btn btn-outline-dark btn-sm rounded-pill px-3">
+                                            <i class="bi bi-pencil-fill me-1"></i>
+                                            <?= $is_review ? "Modifica recensione" : "Scrivi recensione" ?>
+                                        </a>
+                                    </form>
+                                <?php endif; ?>
 
 
                                 <!-- --- Trama --- -->
@@ -510,6 +512,7 @@ if ($tmdb_id != null && $id_utente != null) {
                                             <div class="d-flex align-items-center p-2 border rounded-3 bg-light shadow-sm transition-hover">
                                                 <img src="<?= $profile ?>"
                                                      class="cast-avatar rounded-circle border border-2 border-white shadow-sm me-3"
+                                                     loading="lazy"
                                                      alt="<?= htmlspecialchars($actor['name']) ?>">
                                                 <div class="overflow-hidden">
                                                     <p class="mb-0 fw-bold text-dark text-truncate" style="font-size: 0.9rem;">

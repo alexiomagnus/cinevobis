@@ -5,7 +5,7 @@ require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 
 $id_utente = $_SESSION['id_utente'] ?? null;
-$username  = $_SESSION['username']  ?? null;
+$username = $_SESSION['username']  ?? null;
 
 // Autenticazione
 if (!$id_utente) {
@@ -36,6 +36,7 @@ try {
     ]);
 
     $recensione_esistente = $stmt->fetch();
+    
 } catch (PDOException $e) {
     error_log("Errore nel DB: " . $e->getMessage());
 }
@@ -70,13 +71,13 @@ if (isset($_POST['write_review'])) {
                 ':tmdb_id' => $tmdb_id,
                 ':id_utente' => $id_utente,
                 ':data_aggiunto' => date('Y-m-d H:i:s'),
-                ':commento' => $commento,
+                ':commento' => trim($commento),
                 ':voto' => (float)$voto
             ]);
 
             $messaggio = $recensione_esistente
-                ? "Recensione aggiornata con successo"
-                : "Recensione pubblicata con successo";
+                ? "Recensione aggiornata"
+                : "Recensione pubblicata";
 
             // Inizializza per pulire la pagina dopo l'invio della recensione
             $recensione_esistente = [];
@@ -88,9 +89,11 @@ if (isset($_POST['write_review'])) {
     }
 }
 
+// Eliminare film
 if (isset($_POST['delete_review'])) {
     try {
         $sql = "DELETE FROM recensioni WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
+
         $stmt = $conn->prepare($sql);
         $stmt->execute([
             ':id_utente' => $id_utente, 
@@ -123,8 +126,7 @@ if (isset($_POST['delete_review'])) {
             <div class="col-12 col-sm-8 col-md-6 col-lg-5 px-4">
 
                 <!-- Bottone chiudi -->
-                <a href="javascript:void(0)" 
-                    onclick="closeAndRedirect()" 
+                <a href="/pages/public/film.php?tmdb_id=<?= urldecode($tmdb_id) ?>" 
                     class="btn-close position-absolute top-0 start-0 m-4" 
                     aria-label="Close">
                 </a>
@@ -152,6 +154,7 @@ if (isset($_POST['delete_review'])) {
                 <?php if ($messaggio): ?>
                     <div class="alert alert-success border-0 small py-2 mb-4 text-center">
                         <?= htmlspecialchars($messaggio) ?>
+                        <a href="/pages/user/reviews.php">vedi</a>
                     </div>
                 <?php endif; ?>
 
@@ -201,7 +204,7 @@ if (isset($_POST['delete_review'])) {
 
                     <!-- Bottone elimina (solo se esiste già una recensione) -->
                     <?php if ($recensione_esistente): ?>
-                        <button type="submit" name="delete_review" class="btn btn-outline-danger btn-lg w-100 py-3 fw-bold">
+                        <button type="submit" onclick="closeAndRedirect()" name="delete_review" class="btn btn-outline-danger btn-lg w-100 py-3 fw-bold">
                             Elimina recensione
                         </button>
                     <?php endif; ?>

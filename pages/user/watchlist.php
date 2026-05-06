@@ -19,7 +19,7 @@ if (!$username) {
 
 // Estrazione tmdb_id
 $ids = [];
-$id_utente = $_SESSION['id_profilo'] ?? '';
+$id_utente = $_SESSION['id_utente'] ?? '';
 
 try {
     $sql = "SELECT tmdb_id FROM watchlist WHERE id_utente = :id_u";
@@ -35,10 +35,27 @@ try {
 }
 
 
-// Connessione a MongoDB e ricerca film
+
 $films = [];
+$numeroFilm = 0;
 
 if (!empty($ids)) {
+
+    // Conteggio film nel DB
+    try {
+        $sql = "SELECT COUNT(*) FROM watchlist WHERE id_utente = :id_u";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([':id_u' => $id_utente]);
+
+        $numeroFilm = $stmt->fetchColumn();
+
+    } catch (PDOException $e) {
+        error_log("Errore: " . $e->getMessage());
+    }
+
+
+    // Connessione a MongoDB e ricerca film
     try {
         $mongoClient = new Client("mongodb://localhost:27017");
         $db = $mongoClient->selectDatabase("cinevobis");
@@ -74,34 +91,52 @@ if (!empty($ids)) {
     <?php require_once(__DIR__ . '/../../includes/header.php'); ?>
 
     <main class="container mt-5 mb-5 flex-grow-1">
-        <div class="container">
-            <h1 class="fw-bold mb-4">Watchlist</h1>
+        <h1 class="fw-bold mb-4">Watchlist</h1>
 
-            <?php if (empty($films)): ?>
-                <div class="alert alert-info shadow-sm rounded-4 border-0">
-                    <i class="bi bi-info-circle me-2"></i>Non hai ancora aggiunto film alla tua watchlist
-                </div>
-            <?php else: ?>
-                <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 row-cols-xl-6 g-3">
-                    <?php 
-                    /** @var array $film */
-                    foreach ($films as $film): 
-                        $id = $film['id'] ?? '';
-                        $titolo = $film['title'] ?? 'Titolo non disponibile';
-                        $poster = !empty($film['poster_path']) ? "https://image.tmdb.org/t/p/w500" . $film['poster_path'] : "https://via.placeholder.com/500x750?text=No+Poster";
-                        $anno = !empty($film['release_date']) ? substr($film['release_date'], 0, 4) : '';
-                    ?>
-                    <div class="col">
-                        <a href="/pages/public/film.php?tmdb_id=<?= $id ?>" class="text-decoration-none text-dark d-block h-100">
-                            <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden transition-hover">
-                                <img src="<?= $poster ?>" class="card-img-top w-100" alt="<?= htmlspecialchars($titolo) ?>" loading="lazy" style="object-fit: cover; aspect-ratio: 2/3;">
+        <?php 
+        if ($numeroFilm > 0) {
+            echo "<div class='mb-4'>";
+            echo "<small class='text-uppercase fw-bold text-muted d-block mb-2' style='letter-spacing:1px'>" . htmlspecialchars($numeroFilm) . " Film da vedere</small>";
+            echo "</div>";
+        }
+        ?>
+
+        <?php if (empty($films)): ?>
+            <div class="alert alert-info shadow-sm rounded-4 border-0">
+                <i class="bi bi-info-circle me-2"></i>Non hai ancora aggiunto film alla tua watchlist
+            </div>
+        <?php else: ?>
+            <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 row-cols-xl-6 g-3">
+                
+                <?php 
+                /** @var array $film */
+                foreach ($films as $film):
+                    $id = $film['id'] ?? '';
+                    $titolo = $film['title'] ?? 'Titolo non disponibile';
+                    $poster = !empty($film['poster_path']) 
+                        ? "https://image.tmdb.org/t/p/w500" . $film['poster_path'] 
+                        : "https://via.placeholder.com/500x750?text=No+Poster";
+                    $anno = !empty($film['release_date']) ? substr($film['release_date'], 0, 4) : '';
+                ?>
+
+                <div class="col">
+                    <a href="/pages/public/film.php?tmdb_id=<?= $id ?>" class="text-decoration-none text-dark d-block h-100">
+                        <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden transition-hover">
+                            <div class="position-relative">
+                                <img src="<?= $poster ?>" class="card-img-top w-100" alt="<?= htmlspecialchars($titolo) ?>" style="object-fit: cover; aspect-ratio: 2/3;">
                             </div>
-                        </a>
-                    </div>
-                    <?php endforeach; ?>
+                            <div class="card-body p-2 d-flex flex-column bg-white">
+                                <h6 class="card-title fw-bold text-truncate mb-1" style="font-size: 0.95rem;" title="<?= htmlspecialchars($titolo) ?>"><?= htmlspecialchars($titolo) ?></h6>
+                                <div class="mt-auto">
+                                    <small class="text-muted fw-medium" style="font-size: 0.85rem;"><?= htmlspecialchars($anno) ?></small>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
                 </div>
-            <?php endif; ?>
-        </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
     </main>
 
     <?php require_once(__DIR__ . '/../../includes/footer.php'); ?>

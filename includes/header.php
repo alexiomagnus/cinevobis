@@ -42,14 +42,24 @@ $isAdminPage = in_array($currentPage, $adminPages);
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg mt-2">
 
-                    <li><a class="dropdown-item py-2 small" href="/pages/user/profile.php">Profilo</a></li>
+                        <li><a class="dropdown-item py-2 small" href="/pages/user/profile.php">Profilo</a></li>
 
                         <?php if(!$isAdminPage): ?>
                             <li><a class="dropdown-item py-2 small" href="/pages/user/favorites.php">Preferiti</a></li>
                             <li><a class="dropdown-item py-2 small" href="/pages/user/watchlist.php">Watchlist</a></li>
                             <li><a class="dropdown-item py-2 small" href="/pages/user/watched.php">Watched</a></li>
                             <li><a class="dropdown-item py-2 small" href="/pages/user/reviews.php">Recensioni</a></li>
+                            <?php if ($_SESSION['id_profilo'] == 2): ?>
+                                <li><a class="dropdown-item py-2 small" href="/actions/contact.php">Contattaci</a></li>
+                            <?php endif; ?>
                         <?php endif; ?>
+
+                        <?php if($isAdminPage): ?>
+                            <li><a class="dropdown-item py-2 small" href="/pages/admin/dashboard.php">Home</a></li>
+                        <?php else: ?>
+                            <li><a class="dropdown-item py-2 small" href="/">Home</a></li>
+                        <?php endif; ?>
+                        
 
                         <?php if ($_SESSION['id_profilo'] == '1' && !$isAdminPage): ?>
                             <li>
@@ -58,11 +68,12 @@ $isAdminPage = in_array($currentPage, $adminPages);
                             <li><a class="dropdown-item py-2 small fw-bold text" href="/pages/admin/dashboard.php">Dashboard</a></li>
                         <?php endif; ?>
 
+
                         <?php if ($isAdminPage): ?>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            <li><a class="dropdown-item py-2 small fw-bold text" href="/">Home</a></li>
+                            <li><a class="dropdown-item py-2 small fw-bold text" href="/">Esci</a></li>
                         <?php endif; ?>
 
                         <li>

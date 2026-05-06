@@ -67,7 +67,7 @@ if (isset($_POST['delete_user']) && $username) {
 
                 <div style="max-width: 500px; width: 100%;">
                     <h1 class="display-6 fw-bolder mb-2">Profilo</h1>
-                    <p class="text-secondary mb-4">Informazioni del tuo account Cinevobis</p>
+                    <p class="text-secondary mb-4">Informazioni account Cinevobis</p>
 
                     <?php if (isset($errore)): ?>
                         <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">

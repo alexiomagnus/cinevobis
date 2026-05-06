@@ -190,6 +190,7 @@ if ($movie_db) {
                                             <div class="d-flex align-items-center p-2 border rounded-3 bg-light shadow-sm transition-hover">
                                                 <img src="<?= $profile ?>"
                                                      class="cast-avatar rounded-circle border border-2 border-white shadow-sm me-3"
+                                                     loading="lazy"
                                                      alt="<?= htmlspecialchars($actor['name']) ?>">
                                                 <div class="overflow-hidden">
                                                     <p class="mb-0 fw-bold text-dark text-truncate" style="font-size: 0.9rem;">
