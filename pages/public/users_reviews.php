@@ -68,12 +68,11 @@ try {
                 <div class="col">
                         <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden transition-hover">
                             <div class="d-flex h-100">
-                                <img src="<?= $poster_url ?>" alt="<?= htmlspecialchars($r['titolo']) ?>" class="review-poster">
 
                                 <div class="card-body d-flex flex-column justify-content-between p-3">
                                     <div>
                                         <h5 class="fw-bold mb-1 text-dark">
-                                            <?= htmlspecialchars($item['titolo']) ?>
+                                            <?= htmlspecialchars($r['titolo']) ?>
                                         </h5>
                                         
                                         <p class="text-dark small mb-2">

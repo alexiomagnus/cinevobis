@@ -4,14 +4,8 @@ session_start();
 require_once(__DIR__ . '/../config/config.php');
 require_once(__DIR__ . '/../config/connection.php');
 
-$username = $_SESSION['username'] ?? '';
 $erroe = "";
 $messaggio = "";
-
-if (!$username) {
-    header("Location: /index.php");
-    exit();
-}
 
 if (isset($_POST['invia'])) {
     $titolo = $_POST['titolo'];
@@ -26,7 +20,7 @@ if (isset($_POST['invia'])) {
             ':titolo' => $titolo,
             ':descrizione' => $descrizione,
             ':data_invio' => date('Y-m-d H:i:s'),
-            ':id_utente' => $_SESSION['id_utente']
+            ':id_utente' => empty($_SESSION['id_utente']) ? null : $_SESSION['id_utente']
         ]);
         
         $messaggio = "Messaggio inviato con successo";

@@ -15,6 +15,7 @@ if (!$username || $id_profilo != 1) {
 }
 
 
+// Aggiornare notifica letta
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = (int) ($_POST['id_notifica'] ?? 0);
 
@@ -36,7 +37,7 @@ $notifiche = "";
 try {
     $sql = "SELECT * 
             FROM notifiche n
-            JOIN utenti u ON n.id_utente = u.id_utente
+            LEFT JOIN utenti u ON n.id_utente = u.id_utente
             ORDER BY n.data_invio DESC";
              
     $stmt = $conn->prepare($sql);
@@ -113,7 +114,7 @@ if (isset($_POST['delete'])) {
                                         <div class="d-flex align-items-center gap-2">
                                             <span class="fw-semibold"><?= htmlspecialchars($notifica['titolo'] ?? '—') ?></span>
                                             <span class="text-muted small">·</span>
-                                            <span class="text-muted small"><?= htmlspecialchars($notifica['username']) ?></span>
+                                            <span class="text-muted small"><?= htmlspecialchars($notifica['username'] ?? 'Sconosciuto') ?></span>
                                         </div>
                                         <p class="mb-0 text-muted small"><?= nl2br(htmlspecialchars($notifica['descrizione'] ?? '')) ?></p>
                                     </div>
@@ -153,7 +154,7 @@ if (isset($_POST['delete'])) {
                                         <div class="d-flex align-items-center gap-2">
                                             <span class="fw-semibold text-muted"><?= htmlspecialchars($notifica['titolo'] ?? '—') ?></span>
                                             <span class="text-muted small">·</span>
-                                            <span class="text-muted small"><?= htmlspecialchars($notifica['username']) ?></span>
+                                            <span class="text-muted small"><?= htmlspecialchars($notifica['username'] ?? 'Sconosciuto')?></span>
                                         </div>
                                         <p class="mb-0 text-muted small"><?= nl2br(htmlspecialchars($notifica['descrizione'] ?? '')) ?></p>
                                     </div>
