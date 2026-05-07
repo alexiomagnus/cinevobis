@@ -1,6 +1,4 @@
 <?php
-session_start();
-
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');
@@ -36,17 +34,6 @@ if ($searched !== '') {
             $results = $body['results'];
         }
     }
-
-    // filtro film validi (eliminare i film che non hanno i poster e le date)
-    $filtered = [];
-
-    foreach ($results as $movie) {
-        if (!empty($movie['poster_path']) && !empty($movie['release_date'])) {
-            $filtered[] = $movie;
-        }
-    }
-
-    $results = $filtered;
 
     $n = count($results);
 

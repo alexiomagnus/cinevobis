@@ -20,7 +20,7 @@ class movieObj
         $this->titolo = $data['title'] ?? 'Titolo non disponibile';
         $this->titolo_orig = $data['original_title'] ?? '';
 
-        $this->trama = $data['overview'] ?? 'Nessuna trama disponibile.';
+        $this->trama = !empty($data['overview']) ? $data['overview'] : 'Nessuna trama disponibile';        
         $this->poster_path = !empty($data['poster_path']) ? $data['poster_path'] : null;
 
         $this->voto = (float)($data['vote_average'] ?? 0);

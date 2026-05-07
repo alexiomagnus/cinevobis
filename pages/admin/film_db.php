@@ -1,6 +1,4 @@
 <?php
-session_start();
-
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');
@@ -100,11 +98,17 @@ if ($movie_db) {
                     <div class="card shadow-sm border-0 rounded-4 p-4 p-md-5 bg-white">
 
                         <div class="row g-5 mb-5">
-                            <!-- Poster + Trailer -->
                             <div class="col-md-4">
-                                <img src="https://image.tmdb.org/t/p/w500<?= $poster_path ?>"
-                                     class="img-fluid rounded-4 shadow-sm w-100"
-                                     alt="Poster">
+                                <?php if($poster_path): ?>
+                                    <img src="https://image.tmdb.org/t/p/w500<?= $poster_path ?>" class="img-fluid rounded-4 shadow-sm w-100" alt="Poster">
+                                <?php else: ?>
+                                    <div class="bg-light d-flex align-items-center justify-content-center rounded-4 shadow-sm w-100" style="aspect-ratio: 2/3; border: 2px dashed #dee2e6;">
+                                        <div class="text-center">
+                                            <i class="bi bi-film text-muted" style="font-size: 4rem;"></i>
+                                            <p class="text-muted small mt-2">Poster non disponibile</p>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
 
                                 <?php if ($trailerKey): ?>
                                     <div class="mt-3">
@@ -118,7 +122,6 @@ if ($movie_db) {
                                 <?php endif; ?>
                             </div>
 
-                            <!-- Info principali -->
                             <div class="col-md-8">
                                 <h1 class="fw-bold text-dark display-5 mb-3"><?= htmlspecialchars($titolo) ?></h1>
 
@@ -126,14 +129,22 @@ if ($movie_db) {
                                     <p class="text-muted fs-5 mb-4"><?= htmlspecialchars($titolo_orig) ?></p>
                                 <?php endif; ?>
 
-                                <div class="mb-4">
-                                    <small class="text-uppercase fw-bold text-muted d-block mb-2" style="letter-spacing:1px">Regia</small>
-                                    <a href="https://www.themoviedb.org/person/<?= implode(', ', array_column($registi, 'id')) ?>" class="text-decoration-none link-dark">
+                                <?php if (!empty($registi)): ?>
+                                    <div class="mb-4">
+                                        <small class="text-uppercase fw-bold text-muted d-block mb-2" style="letter-spacing:1px">Regia</small>
                                         <p class="fs-5 fw-medium mb-0">
-                                            <?= htmlspecialchars(implode(', ', array_column($registi, 'name'))) ?>
+                                            <?php 
+                                            $registi_links = [];
+                                            foreach ($registi as $regista) {
+                                                $name = htmlspecialchars($regista['name']);
+                                                $id = urlencode($regista['id']);
+                                                $registi_links[] = "<a href='https://www.themoviedb.org/person/$id' class='text-decoration-none link-dark'>$name</a>";
+                                            }
+                                            echo implode(', ', $registi_links);
+                                            ?>
                                         </p>
-                                    </a>
-                                </div>
+                                    </div>
+                                <?php endif; ?>
 
                                 <div class="d-flex flex-wrap gap-2 mb-4">
                                     <?php foreach ($generi as $genre): ?>
@@ -154,12 +165,11 @@ if ($movie_db) {
                                             </span>
                                         </div>
                                     </div>
-                                    <p class="text-justify lh-lg text-dark fs-6"><?= nl2br(htmlspecialchars($trama)) ?></p>
+                                    <p class="text-justify lh-lg text-dark fs-6 mb-4"><?= nl2br(htmlspecialchars($trama)) ?></p>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Durata / Anno / Paese -->
                         <div class="row text-center py-4 bg-light rounded-4 mb-5 border mx-0">
                             <div class="col-4 border-end">
                                 <div class="small text-muted text-uppercase fw-bold">Durata</div>
@@ -175,7 +185,6 @@ if ($movie_db) {
                             </div>
                         </div>
 
-                        <!-- Cast -->
                         <div class="mt-2">
                             <h4 class="fw-bold mb-4">Cast Principale</h4>
                             <div class="row g-3">
@@ -211,7 +220,6 @@ if ($movie_db) {
                 </div>
             </div>
 
-            <!-- Modal Trailer -->
             <?php if ($trailerKey): ?>
             <div class="modal fade" id="trailerModal" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-xl modal-dialog-centered">

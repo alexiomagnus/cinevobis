@@ -1,12 +1,25 @@
 <?php
-// 1. Nascondi gli errori all'utente
-ini_set('display_errors', 0);
+// Impedisce a JS di leggere il cookie di sessione
+ini_set('session.cookie_httponly', 1);
 
-// 2. Attiva il log su file
-ini_set('log_errors', 1);
+// Avvia la sessione
+session_start();
 
-// 3. Salva il log nella stessa cartella di questo config.php
-ini_set('error_log', __DIR__ . '/php_errors.log');
+// Gestione Errori 
+ini_set('display_errors', 0);                       // Nascondi gli errori all'utente
+ini_set('log_errors', 1);                           // Attiva il log su file
+ini_set('error_log', __DIR__ . '/php_errors.log');  // Salva il log nella stessa cartella di questo config.php
+error_reporting(E_ALL);                             // Riporta tutti gli errori
 
-// 4. Riporta tutti gli errori
-error_reporting(E_ALL);
+// LOGICA DI SCADENZA
+$scadenza = 1800; // 30 minuti
+
+if (isset($_SESSION['last_update']) && (time() - $_SESSION['last_update'] > $scadenza)) {
+    session_unset();
+    session_destroy();
+    header("Location: login.php?error=timeout");
+    exit;
+}
+
+// Aggiorna il tempo dell'ultima attività
+$_SESSION['last_update'] = time();

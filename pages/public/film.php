@@ -1,6 +1,4 @@
 <?php
-session_start();
-
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');
@@ -389,9 +387,16 @@ try {
 
                         <div class="row g-5 mb-5">
                             <div class="col-md-4">
-                                <img src="https://image.tmdb.org/t/p/w500<?= $poster_path ?>"
-                                     class="img-fluid rounded-4 shadow-sm w-100"
-                                     alt="Poster">
+                                <?php if($poster_path): ?>
+                                    <img src="https://image.tmdb.org/t/p/w500<?= $poster_path ?>" class="img-fluid rounded-4 shadow-sm w-100" alt="Poster">
+                                <?php else: ?>
+                                    <div class="bg-light d-flex align-items-center justify-content-center rounded-4 shadow-sm w-100" style="aspect-ratio: 2/3; border: 2px dashed #dee2e6;">
+                                        <div class="text-center">
+                                            <i class="bi bi-film text-muted" style="font-size: 4rem;"></i>
+                                            <p class="text-muted small mt-2">Poster non disponibile</p>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
 
                                 <?php if ($trailerKey): ?>
                                     <div class="mt-3">
@@ -403,23 +408,32 @@ try {
                                         </button>
                                     </div>
                                 <?php endif; ?>
-                            </div>
 
-                            <div class="col-md-8">
+                            </div> <div class="col-md-8">
                                 <h1 class="fw-bold text-dark display-5 mb-3"><?= htmlspecialchars($titolo) ?></h1>
 
                                 <?php if (!empty($titolo_orig) && strcasecmp(trim($titolo_orig), trim($titolo)) !== 0): ?>
                                     <p class="text-muted fs-5 mb-4"><?= htmlspecialchars($titolo_orig) ?></p>
                                 <?php endif; ?>
 
-                                <div class="mb-4">
-                                    <small class="text-uppercase fw-bold text-muted d-block mb-2" style="letter-spacing:1px">Regia</small>
-                                    <a href="https://www.themoviedb.org/person/<?= implode(', ', array_column($registi, 'id')) ?>" class="text-decoration-none link-dark">
+                                <?php if (!empty($registi)): ?>
+                                    <div class="mb-4">
+                                        <small class="text-uppercase fw-bold text-muted d-block mb-2" style="letter-spacing:1px">Regia</small>
                                         <p class="fs-5 fw-medium mb-0">
-                                            <?= htmlspecialchars(implode(', ', array_column($registi, 'name'))) ?>
+                                            <?php 
+                                            $registi_links = [];
+                                            foreach ($registi as $regista) {
+                                                // Creiamo un link per ogni singolo regista
+                                                $name = htmlspecialchars($regista['name']);
+                                                $id = urlencode($regista['id']);
+                                                $registi_links[] = "<a href='https://www.themoviedb.org/person/$id' class='text-decoration-none link-dark'>$name</a>";
+                                            }
+                                            // Uniamo i link con una virgola
+                                            echo implode(', ', $registi_links);
+                                            ?>
                                         </p>
-                                    </a>
-                                </div>
+                                    </div>
+                                <?php endif; ?>
 
                                 <div class="d-flex flex-wrap gap-2 mb-4">
                                     <?php foreach ($generi as $genre): ?>

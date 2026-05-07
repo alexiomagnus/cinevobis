@@ -237,3 +237,26 @@ footer {
     background-position: center;
     background-size: 64px;
 }
+
+/* =====================
+   Barra di scorrimento
+===================== */
+::-webkit-scrollbar {
+  width: 10px;               /* Larghezza per barre verticali */
+  height: 10px;              /* Altezza per barre orizzontali */
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;       /* Un grigio chiarissimo per dare profondità */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;       /* Colore neutro visibile */
+  border-radius: 10px;
+  border: 2px solid #f1f1f1; /* Crea un piccolo margine interno (padding visivo) */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #999;          /* Si scurisce al passaggio */
+}
