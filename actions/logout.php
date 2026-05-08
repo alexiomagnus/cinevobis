@@ -27,18 +27,8 @@ try {
     error_log("Errore durante il logout: " . $e->getMessage());
 
 } finally {
-    // Esegui sempre la distruzione, indipendentemente dal successo del DB
-    destroy_session_and_redirect();
-}
-
-/**
- * Cancella completamente la sessione e
- * reindirizza l'utente alla home con il flag di logout avvenuto.
- * Viene chiamata nel blocco `finally` per garantire l'esecuzione in ogni caso.
- *
- * @return void
- */
-function destroy_session_and_redirect() {
+    // Cancella completamente la sessione e reindirizza l'utente alla home con il flag di logout avvenuto
+    // Viene chiamata nel blocco `finally` per garantire l'esecuzione in ogni caso
     session_unset();                                
     session_destroy();                              
     header("Location: /index.php?logout=success");

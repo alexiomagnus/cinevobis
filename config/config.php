@@ -1,32 +1,40 @@
 <?php
-// Impedisce a JS di leggere il cookie di sessione
-ini_set('session.cookie_httponly', 1);
-
-// Avvia la sessione
+// --- Cookie di sessione ---
+ini_set('session.cookie_httponly', 1);      // JS non può leggere il cookie
+ini_set('session.cookie_samesite', 'Lax');  // Protezione CSRF base
 session_start();
 
-// --- Logica scadenza sessioni ---
-$timeout = 3600;  // 3600 secondi = 1 ora
-
-if (isset($_SESSION['last_activity'])) {
-    // Calcola quanto tempo è passato dall'ultima azione
-    $inattivita = time() - $_SESSION['last_activity'];
-
-    if ($inattivita > $timeout) {
-        // Se è passato troppo tempo, distruggi la sessione e vai al login
-        session_unset();  // Pulisce l'array $_SESSION eliminando le variabili di sessione
-        session_destroy();
-        header("Location: login.php?error=session_expired");
-        exit();
-    }
-}
-
-// Aggiorna il timestamp dell'ultima attività a ogni caricamento di pagina
-$_SESSION['last_activity'] = time();
-
-
-// Gestione Errori 
+// --- Gestione errori ---
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 ini_set('error_log', __DIR__ . '/php_errors.log');
 error_reporting(E_ALL);
+
+// --- Scadenza sessione per inattività ---
+define('SESSION_TIMEOUT', 3600);
+
+if (isset($_SESSION['last_activity'])) {
+    if ((time() - $_SESSION['last_activity']) > SESSION_TIMEOUT) {
+        
+        // Aggiorna il DB se c'è un utente loggato
+        if (isset($_SESSION['username'])) {
+            require_once(__DIR__ . '/connection.php');
+            require_once(__DIR__ . '/../includes/user_obj.php');
+
+            try {
+                $user = new userObj($conn, $_SESSION['username']);
+                $user->setDataLogout(date('Y-m-d H:i:s'), session_id());
+
+            } catch (Exception $e) {
+                error_log("Errore logout automatico: " . $e->getMessage());
+            }
+        }
+        
+        session_unset();
+        session_destroy();
+        header("Location: /login.php?error=session_expired");
+        exit();
+    }
+}
+
+$_SESSION['last_activity'] = time();
