@@ -2,9 +2,8 @@
 /**
  * Pagina di login. Verifica le credenziali dell'utente tramite userObj::findByUsername
  * e password_verify. Se l'autenticazione va a buon fine, rigenera l'ID di sessione
- * per prevenire la Session Fixation, popola le variabili di sessione e, se richiesto,
- * imposta il cookie HMAC "remember_me" con durata 30 giorni. Registra anche
- * la data/ora di accesso tramite userObj::createDataLogin.
+ * per prevenire la Session Fixation e popola le variabili di sessione.
+ * Registra anche la data/ora di accesso tramite userObj::createDataLogin.
  * Gli utenti già autenticati vengono reindirizzati alla home.
  *
  * @note Interagisce con la tabella MariaDB: `utenti`, `sessioni` (tramite userObj).
@@ -40,20 +39,6 @@ if (isset($_POST['login'])) {
                 $_SESSION['nome'] = $utente['nome'];
 
                 $user->createDataLogin(date('Y-m-d H:i:s'), session_id(), $utente['id_utente']);
-
-                // --- INIZIO NUOVA LOGICA: COOKIE "RICORDAMI" ---
-                if (isset($_POST['remember_me'])) { 
-                    // Creiamo una firma usando l'username e la costante SECRET_KEY (che hai messo in config.php)
-                    $firma = hash_hmac('sha256', $utente['username'], SECRET_KEY);
-                    
-                    // Il valore del cookie sarà "username:firma"
-                    $valore_cookie = $utente['username'] . ':' . $firma;
-                    
-                    // Impostiamo il cookie per 30 giorni (86400 secondi * 30)
-                    // Il percorso '/' indica che il cookie vale su tutto il sito
-                    setcookie('remember_me', $valore_cookie, time() + (86400 * 30), '/'); 
-                }
-                // --- FINE NUOVA LOGICA ---
 
                 header("Location: /index.php");
                 exit();
@@ -107,15 +92,10 @@ if (isset($_POST['login'])) {
                                    placeholder="Username" required>
                         </div>
                         
-                        <div class="mb-3 position-relative password-wrapper">
+                        <div class="mb-5 position-relative password-wrapper">
                             <input type="password" name="password" id="password" class="form-control bg-light border-light py-3" 
                                 placeholder="Password" required>
                             <i class="bi bi-eye toggle-icon" data-target="password"></i>
-                        </div>
-
-                        <div class="mb-4 form-check">
-                            <input type="checkbox" name="remember_me" class="form-check-input" id="rememberMe">
-                            <label class="form-check-label text-secondary" for="rememberMe">Ricordami</label>
                         </div>
 
                         <button type="submit" name="login" class="btn btn-dark btn-lg w-100 py-3 fw-bold mb-4">Accedi</button>
