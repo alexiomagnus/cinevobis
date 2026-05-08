@@ -1,13 +1,14 @@
 <?php
 /**
- * Pagina delle recensioni personali (riservata agli utenti autenticati).
- * Recupera da MariaDB i TMDB ID e i dati (voto, commento) di tutti i film
- * recensiti dall'utente loggato, poi interroga MongoDB per ottenere poster
- * e titolo di ciascun film. I risultati vengono presentati come card con
- * il commento e il voto dell'utente.
+ * Pagina bacheca globale che mostra le ultime 20 recensioni inserite nel sistema.
+ * Recupera i dati testuali (voto, commento, autore) da MariaDB e i dettagli 
+ * tecnici del film (titolo, locandina, ecc.) da MongoDB.
+ * * Il recupero da MongoDB avviene tramite una query batch ($in) su TMDB ID,
+ * con successivo riordinamento manuale per preservare la cronologia (data_aggiunto).
  *
- * @note Interagisce con la tabella MariaDB: `recensioni`.
- * @note Interagisce con la collezione MongoDB: `films` (query con operatore $in).
+ * @note Interagisce con:
+ * - MariaDB: tabelle `recensioni` e `utenti` (per i dati sociali).
+ * - MongoDB: collezione `films` (per i metadati dei media).
  */
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
@@ -24,28 +25,34 @@ if (!$username) {
     exit();
 }
 
-// Estrazione tmdb_id + dati recensione
-$recensioni_map = [];
+// Configurazione query
+$limit = 20;
 $ids = [];
-$id_utente = $_SESSION['id_utente'] ?? '';
+$recensioni_map = [];
+$films = [];
 
 try {
-    $sql = "SELECT tmdb_id, commento, voto 
-            FROM recensioni 
-            WHERE id_utente = :id_u 
-            ORDER BY voto DESC";
-
+    // Recupero le ultime 20 recensioni globali includendo nome e cognome
+    $sql = "SELECT tmdb_id, commento, voto, nome, cognome
+            FROM recensioni r
+            JOIN utenti u ON r.id_utente = u.id_utente
+            ORDER BY data_aggiunto DESC 
+            LIMIT :limit";
+            
     $stmt = $conn->prepare($sql);
-    $stmt->execute([':id_u' => $id_utente]);
+    $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+    $stmt->execute();
 
     $rows = $stmt->fetchAll();
 
     foreach ($rows as $row) {
-        $ids[] = (int) $row['tmdb_id'];
+        $tmdb_id = (int) $row['tmdb_id'];
+        $ids[] = $tmdb_id;
 
-        $recensioni_map[(int) $row['tmdb_id']] = [
+        $recensioni_map[$tmdb_id] = [
             'voto' => $row['voto'],
             'commento' => $row['commento'],
+            'autore' => $row['nome'] . ' ' . $row['cognome'] // Mappatura nome e cognome
         ];
     }
 
@@ -53,29 +60,7 @@ try {
     error_log("Errore nel DB: " . $e->getMessage());
 }
 
-// Connessione a MongoDB e ricerca film
-$films = [];
-$numeroRecensioni = 0;
-
 if (!empty($ids)) {
-
-    // Conteggio recensioni
-    try {
-        $sql = "SELECT COUNT(*) 
-                FROM recensioni 
-                WHERE id_utente = :id_u";
-
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([':id_u' => $id_utente]);
-
-        $numeroRecensioni = $stmt->fetchColumn();
-
-    } catch (PDOException $e) {
-        error_log("Errore: " . $e->getMessage());
-    }
-
-
-    // Connessione a MongoDB
     try {
         $mongoClient = new Client("mongodb://localhost:27017");
         $db = $mongoClient->selectDatabase("cinevobis");
@@ -83,12 +68,9 @@ if (!empty($ids)) {
 
         $cursor = $collection->find(
             ['id' => ['$in' => $ids]],
-            [
-                'sort' => ['vote_average' => -1],
-                'typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array'],
-            ]
+            ['typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']]
         );
-
+        
         // Da puntatore ad array, si estraggono i dati da MongoDB come array
         $raw_films = iterator_to_array($cursor);
 
@@ -118,21 +100,13 @@ if (!empty($ids)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recensioni - Cinevobis</title>
+    <title>Bacheca Recensioni - Cinevobis</title>
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="/assets/css/style.css">
     <style>
         :root { --accent-color: #ffc107; }
-
         .text-justify { text-align: justify; }
-
-        .cast-avatar {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-        }
-
         .review-poster {
             width: 120px;
             min-width: 120px;
@@ -140,25 +114,9 @@ if (!empty($ids)) {
             object-fit: cover;
             border-radius: 0.5rem 0 0 0.5rem;
         }
-
-        .star-rating {
-            color: #ccc;
-            font-size: 1.1rem;
-            letter-spacing: 2px;
-        }
-
-        .star-rating .filled {
-            color: var(--accent-color);
-        }
-
-        .vote-badge {
-            background-color: var(--accent-color);
-            color: #1a1a1a;
-            font-weight: 700;
-            font-size: 1rem;
-            border-radius: 0.4rem;
-            padding: 2px 10px;
-            display: inline-block;
+        .transition-hover:hover {
+            transform: translateY(-5px);
+            transition: transform 0.3s ease;
         }
     </style>
 </head>
@@ -167,41 +125,38 @@ if (!empty($ids)) {
     <?php require_once(__DIR__ . '/../../includes/header.php'); ?>
 
     <main class="container mt-5 mb-5 flex-grow-1">
-        <h1 class="fw-bold mb-4">Recensioni</h1>
+        <div class="d-flex align-items-center mb-4">
+            <i class="bi bi-journal-text fs-2 me-3 text-warning"></i>
+            <h1 class="fw-bold m-0">Bacheca</h1>
+        </div>
 
-        <?php 
-        if ($numeroRecensioni > 0) {
-            echo "<div class='mb-4'>";
-            echo "<small class='text-uppercase fw-bold text-muted d-block mb-2' style='letter-spacing:1px'>Hai recensito " . htmlspecialchars($numeroRecensioni) . " Film</small>";
-            echo "</div>";
-        }
-        ?>
+        <p class="text-muted mb-4">Le ultime recensioni della community</p>
 
         <?php if (empty($films)): ?>
             <div class="alert alert-info shadow-sm rounded-4 border-0">
-                <i class="bi bi-info-circle me-2"></i>Non hai ancora recensito nessun film
+                <i class="bi bi-info-circle me-2"></i>Non ci sono ancora recensioni in bacheca
             </div>
         <?php else: ?>
             <div class="row row-cols-1 row-cols-md-2 g-3">
                 <?php
-                /** @var array $film */
                 foreach ($films as $film):
                     $id = (int) ($film['id'] ?? 0);
                     $titolo = $film['title'] ?? 'Titolo non disponibile';
                     $poster = !empty($film['poster_path'])
                         ? "https://image.tmdb.org/t/p/w500" . $film['poster_path']
                         : "https://via.placeholder.com/500x750?text=No+Poster";
+                    
                     $rec = $recensioni_map[$id] ?? [];
                     $voto = isset($rec['voto']) ? (float) $rec['voto'] : null;
                     $commento = $rec['commento'] ?? '';
+                    $autore = $rec['autore'] ?? 'Utente Anonimo';
                 ?>
                 <div class="col">
                     <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden transition-hover position-relative">
                         <div class="d-flex">
-
                             <img src="<?= htmlspecialchars($poster) ?>"
-                                alt="<?= htmlspecialchars($titolo) ?>"
-                                class="review-poster">
+                                 alt="<?= htmlspecialchars($titolo) ?>"
+                                 class="review-poster">
 
                             <div class="card-body d-flex flex-column justify-content-between p-3">
                                 <div>
@@ -210,6 +165,10 @@ if (!empty($ids)) {
                                             <?= htmlspecialchars($titolo) ?>
                                         </a>
                                     </h5>
+                                    
+                                    <div class="small text-primary mb-2">
+                                        <i class="bi bi-person-circle me-1"></i><?= htmlspecialchars($autore) ?>
+                                    </div>
 
                                     <?php if (!empty($commento)): ?>
                                         <p class="text-muted small mb-2 text-justify">

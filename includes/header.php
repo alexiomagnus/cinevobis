@@ -49,6 +49,8 @@ $isAdminPage = in_array($currentPage, $adminPages);
                             <li><a class="dropdown-item py-2 small" href="/pages/user/watchlist.php">Watchlist</a></li>
                             <li><a class="dropdown-item py-2 small" href="/pages/user/watched.php">Watched</a></li>
                             <li><a class="dropdown-item py-2 small" href="/pages/user/reviews.php">Recensioni</a></li>
+                            <li><a class="dropdown-item py-2 small" href="/pages/user/notice_board.php">Bacheca</a></li>
+                            
                             <?php if ($_SESSION['id_profilo'] == 2): ?>
                                 <li><a class="dropdown-item py-2 small" href="/actions/contact.php">Contattaci</a></li>
                             <?php endif; ?>

@@ -80,9 +80,9 @@ try {
                                             <?= htmlspecialchars($r['titolo']) ?>
                                         </h5>
                                         
-                                        <p class="text-dark small mb-2">
-                                            <i class="bi bi-person-circle"></i> Recensione di: <strong><?= htmlspecialchars($r['nome']) ?> <?= htmlspecialchars($r['cognome']) ?></strong>
-                                        </p>
+                                        <div class="small text-primary mb-2">
+                                            <i class="bi bi-person-circle me-1"></i><?= htmlspecialchars($r['nome']) . " " . htmlspecialchars($r['cognome'])?>
+                                        </div>
 
                                         <?php if (!empty($r['commento'])): ?>
                                             <p class="text-muted small mb-2 text-justify">

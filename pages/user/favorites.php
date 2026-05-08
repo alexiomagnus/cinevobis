@@ -30,7 +30,7 @@ $ids = [];
 $id_utente = $_SESSION['id_utente'] ?? '';
 
 try {
-    $sql = "SELECT tmdb_id FROM preferiti WHERE id_utente = :id_u";
+    $sql = "SELECT tmdb_id FROM preferiti WHERE id_utente = :id_u ORDER BY data_aggiunto DESC";
     $stmt = $conn->prepare($sql);
     $stmt->execute([':id_u' => $id_utente]);
 
@@ -77,7 +77,24 @@ if (!empty($ids)) {
             ]
         );
 
-        $films = iterator_to_array($cursor);
+        // Da puntatore ad array, si estraggono i dati da MongoDB come array
+        $raw_films = iterator_to_array($cursor);
+
+        // --- Riordinamento manuale ---
+        $films_map = [];
+
+        foreach ($raw_films as $f) {
+            $films_map[$f['id']] = $f;
+        }
+
+        // Ricostruiamo la lista $films seguendo l'ordine esatto di $ids
+        $films = [];
+
+        foreach ($ids as $id) {
+            if (isset($films_map[$id])) {
+                $films[] = $films_map[$id];
+            }
+        }
 
     } catch (Exception $e) {
         error_log("Errore in MongoDB: " . $e->getMessage());
@@ -104,7 +121,7 @@ if (!empty($ids)) {
         <?php 
             if ($numeroPreferiti > 0) {
                 echo "<div class='mb-4'>";
-                echo "<small class='text-uppercase fw-bold text-muted d-block mb-2' style='letter-spacing:1px'>" . htmlspecialchars($numeroPreferiti) . " Film preferiti</small>";
+                echo "<small class='text-uppercase fw-bold text-muted d-block mb-2' style='letter-spacing:1px'>Hai " . htmlspecialchars($numeroPreferiti) . " Film come preferiti</small>";
                 echo "</div>";
             }
         ?>

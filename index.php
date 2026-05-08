@@ -49,6 +49,7 @@ try {
         'sort' => ['vote_average' => -1],
         'typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']
     ]);
+    
 } catch (Exception $e) {
     error_log("Errore: " . $e->getMessage());
 }
@@ -92,17 +93,34 @@ try {
             <?php endif; ?>
 
             <?php if (!empty($topFilms)):
-                $id       = $film['id'] ?? '';
-                $titolo   = $film['title'] ?? '';
-                $anno     = !empty($film['release_date']) ? substr($film['release_date'], 0, 4) : '';
-                $rating   = isset($film['vote_average']) ? number_format((float)$film['vote_average'], 1) : null;
+                $id = $film['id'] ?? '';
+                
+                $titolo = $film['title'] ?? '';
+                $anno = !empty($film['release_date']) ? substr($film['release_date'], 0, 4) : '';  // Restituisce parte di una stringa
+                
+                $rating = isset($film['vote_average']) ? number_format((float)$film['vote_average'], 1) : null;
                 $overview = $film['overview'] ?? '';
-                $bg       = !empty($film['backdrop_path'])
-                    ? "https://image.tmdb.org/t/p/w1280" . $film['backdrop_path']
-                    : (!empty($film['poster_path']) ? "https://image.tmdb.org/t/p/w500" . $film['poster_path'] : '');
+
+                $background = '';
+
+                // Controlliamo se c'è un background
+                if (!empty($film['backdrop_path'])) {
+                    
+                    $background = "https://image.tmdb.org/t/p/w1280" . $film['backdrop_path'];
+
+                // Se non c'è controlliamo il poster
+                } elseif (!empty($film['poster_path'])) {
+                    
+                    $background = "https://image.tmdb.org/t/p/w500" . $film['poster_path'];
+
+                // Se non c'è né il background né il poster
+                } else {
+                    $background = ''; 
+                }
             ?>
+
             <div class="position-relative rounded-4 overflow-hidden mb-5"
-                 style="min-height: 420px; background: url('<?= htmlspecialchars($bg) ?>') center/cover no-repeat #1a1a1a;">
+                 style="min-height: 420px; background: url('<?= htmlspecialchars($background) ?>') center/cover no-repeat #1a1a1a;">
                 <div class="position-absolute top-0 start-0 w-100 h-100"
                      style="background: linear-gradient(to right, rgba(0,0,0,.85) 0%, rgba(0,0,0,.4) 60%, transparent 100%);"></div>
                 <div class="position-relative d-flex align-items-end h-100 p-4 p-md-5" style="min-height: 420px;">

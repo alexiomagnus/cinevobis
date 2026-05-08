@@ -1,15 +1,22 @@
 document.addEventListener("DOMContentLoaded", function() {
     
-    // --- 1. SALVATAGGIO PROVENIENZA (Login/Signup) ---
+    // --- 1. SALVATAGGIO PROVENIENZA (Login/Signup/Profile) ---
     const paginaAttuale = window.location.pathname;
     const provenienza = document.referrer;
+    
+    // Raggruppiamo le pagine che condividono questa logica
+    const pagineTracciate = ['login.php', 'signup.php', 'change_password.php', 'profile.php', 'contact.php'];
 
-    if (paginaAttuale.includes('login.php') || paginaAttuale.includes('signup.php') || 
-        paginaAttuale.includes('change_password.php') || paginaAttuale.includes('profile.php')
-        || paginaAttuale.includes('contact.php')) {
-            
-        if (provenienza !== "" && !sessionStorage.getItem('origin_url')) {
-            sessionStorage.setItem('origin_url', provenienza);
+    // Controlliamo se siamo in una di queste pagine
+    const isPaginaTracciata = pagineTracciate.some(pagina => paginaAttuale.includes(pagina));
+
+    if (isPaginaTracciata) {
+        // Controlliamo se arriviamo da una delle altre pagine tracciate
+        const arrivoDaPaginaInterna = pagineTracciate.some(pagina => provenienza.includes(pagina));
+
+        // Sovrascriviamo l'URL di origine SOLO se arriviamo da una pagina esterna a questo gruppo
+        if (!arrivoDaPaginaInterna) {
+            sessionStorage.setItem('origin_url', provenienza !== "" ? provenienza : '/index.php');
         }
     }
 
@@ -62,11 +69,6 @@ document.addEventListener("DOMContentLoaded", function() {
 // --- 4. FUNZIONE PER TORNARE INDIETRO ---
 function closeAndRedirect() {
     const destinazione = sessionStorage.getItem('origin_url');
-    
-    if (destinazione) {
-        sessionStorage.removeItem('origin_url');
-        window.location.href = destinazione;
-    } else {
-        window.location.href = '/index.php';
-    }
+    sessionStorage.removeItem('origin_url');
+    window.location.href = destinazione || '/index.php';
 }
