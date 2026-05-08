@@ -15,10 +15,10 @@ error_reporting(E_ALL);                             // Riporta tutti gli errori
 $scadenza = 1800; // 30 minuti
 
 if (isset($_SESSION['last_update']) && (time() - $_SESSION['last_update'] > $scadenza)) {
-    session_unset();
-    session_destroy();
+    session_unset();                                // Libera tutte le variabili di sessione
+    session_destroy();                              // Distruzione della sessione
     header("Location: login.php?error=timeout");
-    exit;
+    exit();
 }
 
 // Aggiorna il tempo dell'ultima attività
