@@ -17,14 +17,17 @@ use MongoDB\Client;
 $nome = $_SESSION['nome'] ?? '';
 
 
-// Connessione a MongoDB
+// DIchiarazione variabili
 $recommendedFilms = [];
 $cursor = [];
+$topFilms = [];
 
 try {
+    // Connessione a MongoDB
     $mongoClient = new Client("mongodb://localhost:27017");
     $db = $mongoClient->selectDatabase('cinevobis');
     $collection = $db->selectCollection('films');
+
 
     // I Film in evidenza
     $cursor = $collection->find([], [
@@ -35,21 +38,14 @@ try {
 
     $recommendedFilms = iterator_to_array($cursor);
 
-} catch (Exception $e) {
-    error_log("Errore MongoDB: " . $e->getMessage());
-}
-
-
-// I migliori Film
-$topFilms = [];
-
-try {
     $cursor = $collection->find([], [
         'limit' => 6,
         'sort' => ['vote_average' => -1],
         'typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']
     ]);
 
+
+    // I migliori Film
     $topFilms = iterator_to_array($cursor);
     
     // Film della settimana: cambia ogni lunedì usando il numero della settimana come seed
