@@ -437,9 +437,11 @@ try {
 
                                 <div class="d-flex flex-wrap gap-2 mb-4">
                                     <?php foreach ($generi as $genre): ?>
-                                        <span class="badge bg-white text-dark border rounded-pill px-3 py-2">
+                                        <a href="search_genre.php?id=<?= urlencode($genre['id']) ?>&name=<?= urlencode($genre['name']) ?>" 
+                                            class="badge bg-white text-decoration-none text-dark border rounded-pill px-3 py-2">
+                                            
                                             <?= htmlspecialchars($genre['name']) ?>
-                                        </span>
+                                        </a>
                                     <?php endforeach; ?>
                                 </div>
 

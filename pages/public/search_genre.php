@@ -6,72 +6,22 @@ require_once(__DIR__ . '/../../vendor/autoload.php');
 
 use MongoDB\Client;
 
-// Controllo autenticazione
-$username = $_SESSION['username'] ?? '';
+// Connessione a MongoDB e ricerca film per genere
+$id_genere = isset($_GET['id']) ? (int)$_GET['id'] : null;
+$nome_genere = isset($_GET['name']) ? $_GET['name'] : null;
+$cursor = [];
 
-if (!$username) {
-    header("Location: /index.php");
-    exit();
-}
-
-
-// Estrazione tmdb_id
-$ids = [];
-$id_utente = $_SESSION['id_utente'] ?? '';
-
-try {
-    $sql = "SELECT tmdb_id FROM watchlist WHERE id_utente = :id_u";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute([':id_u' => $id_utente]);
-
-    // Prende l'intera colonna e la mette dentro un array
-    $ids = $stmt->fetchAll(PDO::FETCH_COLUMN, 0); 
-    
-} catch (PDOException $e) {
-    error_log("Errore nel DB: " . $e->getMessage());
-    $ids = [];
-}
-
-
-
-$films = [];
-$numeroWatchlist = 0;
-
-if (!empty($ids)) {
-
-    // Conteggio film nel DB
-    try {
-        $sql = "SELECT COUNT(*) FROM watchlist WHERE id_utente = :id_u";
-
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([':id_u' => $id_utente]);
-
-        $numeroWatchlist = $stmt->fetchColumn();
-
-    } catch (PDOException $e) {
-        error_log("Errore: " . $e->getMessage());
-    }
-
-
-    // Connessione a MongoDB e ricerca film
+if (!empty($id_genere)) {
     try {
         $mongoClient = new Client("mongodb://localhost:27017");
-        $db = $mongoClient->selectDatabase("cinevobis");
-        $collection = $db->selectCollection("films");
+        $db = $mongoClient->selectDatabase('cinevobis');
+        $collection = $db->selectCollection('films');
 
-        $cursor = $collection->find(
-            // $in seleziona i documenti in cui il valore di un campo corrisponde a uno qualsiasi dei valori presenti nell'array specificato
-            ['id' => ['$in' => $ids]],
-            [
-                'sort' => ['vote_average' => -1],
-                'typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array'],
-            ]
-        );
-
-        $films = iterator_to_array($cursor);
-
-    } catch (Exception $e) {
-        error_log("Errore in MongoDB: " . $e->getMessage());
+        $cursor = $collection->find(['genres.id' => $id_genere])->toArray();
+        $count = count($cursor);
+        
+    } catch(Exception $e) {
+        error_log("Errore: " . $e->getMessage());
     }
 }
 ?>
@@ -80,7 +30,7 @@ if (!empty($ids)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Watchlist - Cinevobis</title>
+    <title>Ricerca genere - Cinevobis</title>
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="/assets/css/style.css">
@@ -90,26 +40,27 @@ if (!empty($ids)) {
     <?php require_once(__DIR__ . '/../../includes/header.php'); ?>
 
     <main class="container mt-5 mb-5 flex-grow-1">
-        <h1 class="fw-bold mb-4">Watchlist</h1>
+        <?php if(!empty($nome_genere)): ?>
+            <h1 class="fw-bold mb-4"><?= htmlspecialchars($nome_genere) ?></h1>
+            
+            <?php if($count > 0): ?>
+                <small class="text-uppercase fw-bold text-muted d-block mb-2" style="letter-spacing: 1px;">
+                    <?= htmlspecialchars($count) ?> Film presenti
+                </small>
+            <?php endif; ?>
+        <?php endif; ?>
 
-        <?php 
-        if ($numeroWatchlist > 0) {
-            echo "<div class='mb-4'>";
-            echo "<small class='text-uppercase fw-bold text-muted d-block mb-2' style='letter-spacing:1px'>" . htmlspecialchars($numeroWatchlist) . " Film da vedere</small>";
-            echo "</div>";
-        }
-        ?>
-
-        <?php if (empty($films)): ?>
+        <?php if (empty($cursor)): ?>
             <div class="alert alert-info shadow-sm rounded-4 border-0">
-                <i class="bi bi-info-circle me-2"></i>Non hai ancora aggiunto film alla tua watchlist
+                <i class="bi bi-info-circle me-2"></i>Non ci sono film di questo genere salvati nel Database 
             </div>
         <?php else: ?>
+
             <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 row-cols-xl-6 g-3">
                 
                 <?php 
                 /** @var array $film */
-                foreach ($films as $film):
+                foreach ($cursor as $film):
                     $id = $film['id'] ?? '';
                     $titolo = $film['title'] ?? 'Titolo non disponibile';
                     $poster = !empty($film['poster_path']) 
