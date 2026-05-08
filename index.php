@@ -18,9 +18,8 @@ $nome = $_SESSION['nome'] ?? '';
 
 
 // DIchiarazione variabili
-$recommendedFilms = [];
+$collection = [];
 $cursor = [];
-$topFilms = [];
 
 try {
     // Connessione a MongoDB
@@ -28,8 +27,15 @@ try {
     $db = $mongoClient->selectDatabase('cinevobis');
     $collection = $db->selectCollection('films');
 
+} catch (MongoDBException $e) {
+    error_log("Errore MongoDB: " . $e->getMessage());
+}
 
-    // I Film in evidenza
+
+// I Film in evidenza
+$recommendedFilms = [];
+
+try {
     $cursor = $collection->find([], [
         'limit' => 12,
         'sort' => ['release_date' => -1],
@@ -43,9 +49,15 @@ try {
         'sort' => ['vote_average' => -1],
         'typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']
     ]);
+} catch (Exception $e) {
+    error_log("Errore: " . $e->getMessage());
+}
 
 
-    // I migliori Film
+// I migliori Film
+$topFilms = [];
+
+try {
     $topFilms = iterator_to_array($cursor);
     
     // Film della settimana: cambia ogni lunedì usando il numero della settimana come seed
@@ -54,7 +66,7 @@ try {
     $film = $topFilms[$index] ?? null;
 
 } catch (Exception $e) {
-    error_log("Errore MongoDB: " . $e->getMessage());
+    error_log("Errore: " . $e->getMessage());
 }
 ?>
 <!DOCTYPE html>

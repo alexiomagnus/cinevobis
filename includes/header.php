@@ -55,7 +55,7 @@ $isAdminPage = in_array($currentPage, $adminPages);
                         <?php endif; ?>
 
                         <?php if($isAdminPage): ?>
-                            <li><a class="dropdown-item py-2 small" href="/pages/admin/dashboard.php">Home</a></li>
+                            <li><a class="dropdown-item py-2 small" href="/pages/admin/dashboard.php">Dashboard</a></li>
                         <?php else: ?>
                             <li><a class="dropdown-item py-2 small" href="/">Home</a></li>
                         <?php endif; ?>
