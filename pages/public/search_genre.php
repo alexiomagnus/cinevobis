@@ -44,7 +44,7 @@ if (!empty($id_genere)) {
             <h1 class="fw-bold mb-4"><?= htmlspecialchars($nome_genere) ?></h1>
             
             <?php if($count > 0): ?>
-                <small class="text-uppercase fw-bold text-muted d-block mb-2" style="letter-spacing: 1px;">
+                <small class="text-uppercase fw-bold text-muted d-block mb-4" style="letter-spacing: 1px;">
                     <?= htmlspecialchars($count) ?> Film presenti
                 </small>
             <?php endif; ?>
