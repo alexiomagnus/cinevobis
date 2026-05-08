@@ -1,4 +1,10 @@
 <?php
+/**
+ * Logica di routing lato server per le azioni inviate tramite i form dell'header
+ * (navbar). Intercetta le richieste POST e reindirizza alle pagine appropriate:
+ * logout, login, signup e profilo. Viene incluso in ogni pagina che usa l'header
+ * per garantire che i pulsanti della navbar funzionino correttamente.
+ */
 $currentPage = basename($_SERVER['SCRIPT_NAME']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

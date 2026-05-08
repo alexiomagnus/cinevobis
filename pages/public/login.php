@@ -1,4 +1,14 @@
 <?php
+/**
+ * Pagina di login. Verifica le credenziali dell'utente tramite userObj::findByUsername
+ * e password_verify. Se l'autenticazione va a buon fine, rigenera l'ID di sessione
+ * per prevenire la Session Fixation, popola le variabili di sessione e, se richiesto,
+ * imposta il cookie HMAC "remember_me" con durata 30 giorni. Registra anche
+ * la data/ora di accesso tramite userObj::createDataLogin.
+ * Gli utenti già autenticati vengono reindirizzati alla home.
+ *
+ * @note Interagisce con la tabella MariaDB: `utenti`, `sessioni` (tramite userObj).
+ */
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');

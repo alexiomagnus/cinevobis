@@ -1,4 +1,12 @@
 <?php
+/**
+ * Pagina di dettaglio film per l'area admin. A differenza della versione pubblica,
+ * recupera i dati esclusivamente da MongoDB (senza interrogare l'API TMDB)
+ * e li visualizza in sola lettura con poster, trama, cast, registi e trailer.
+ * Riceve il TMDB ID tramite GET (?tmdb_id=...).
+ *
+ * @note Interagisce con la collezione MongoDB: `films` (findOne).
+ */
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');

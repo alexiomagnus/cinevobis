@@ -1,4 +1,13 @@
 <?php
+/**
+ * Pagina di dettaglio film (pubblica). Recupera i dati del film dall'API TMDB,
+ * li salva in MongoDB alla prima visita e li aggiorna se sono più vecchi di 30 giorni.
+ * Per gli utenti autenticati gestisce le azioni POST per aggiungere/rimuovere il film
+ * da Preferiti, Watchlist e Watched, e verifica se l'utente ha già scritto una recensione.
+ *
+ * @note Interagisce con la collezione MongoDB: `films` (insert/update/find).
+ * @note Interagisce con le tabelle MariaDB: `preferiti`, `watchlist`, `watched`, `recensioni`.
+ */
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');

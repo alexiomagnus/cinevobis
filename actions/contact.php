@@ -1,4 +1,11 @@
 <?php
+/**
+ * Pagina di contatto: permette a qualsiasi visitatore (anche non autenticato)
+ * di inviare un messaggio di supporto all'amministratore. Il messaggio viene
+ * salvato come notifica nel database con il riferimento all'utente se loggato.
+ *
+ * @note Interagisce con la tabella MariaDB: `notifiche`.
+ */
 require_once(__DIR__ . '/../config/config.php');
 require_once(__DIR__ . '/../config/connection.php');
 

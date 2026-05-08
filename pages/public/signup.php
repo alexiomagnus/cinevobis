@@ -1,4 +1,12 @@
 <?php
+/**
+ * Pagina di registrazione. Raccoglie nome, cognome, email, username e password
+ * dell'utente, crea un nuovo account tramite userObj::create con ruolo utente
+ * (id_profilo = 2) e stato attivo. In caso di username duplicato, mostra
+ * un messaggio di errore. Gli utenti già autenticati vengono reindirizzati alla home.
+ *
+ * @note Interagisce con la tabella MariaDB: `utenti` (tramite userObj::create).
+ */
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');

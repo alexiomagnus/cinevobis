@@ -1,4 +1,14 @@
 <?php
+/**
+ * Pagina del profilo utente (riservata agli utenti autenticati).
+ * Mostra le informazioni anagrafiche dell'account, l'anno di registrazione
+ * e il numero di film visti nell'anno corrente. Gestisce due azioni POST:
+ * - change_password: reindirizza alla pagina di cambio password.
+ * - delete_user: elimina l'account tramite userObj::delete, distrugge
+ *   la sessione e reindirizza alla home.
+ *
+ * @note Interagisce con le tabelle MariaDB: `utenti` (tramite userObj), `watched`.
+ */
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');

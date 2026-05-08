@@ -1,4 +1,13 @@
 <?php
+/**
+ * Stabilisce la connessione PDO al database MariaDB 'cinevobis'.
+ * Configura la modalità di errore su ERRMODE_EXCEPTION e il fetch mode
+ * predefinito su FETCH_ASSOC. In caso di errore critico, logga il messaggio
+ * e mostra un messaggio generico all'utente terminando l'esecuzione.
+ * Espone la variabile $conn disponibile per tutti i file che includono questo script.
+ *
+ * @note Interagisce con il database MariaDB: `cinevobis`.
+ */
 $host = '127.0.0.1';
 $dbname = 'cinevobis';
 $user = 'root';

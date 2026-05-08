@@ -1,4 +1,15 @@
 <?php
+/**
+ * Pagina di scrittura/modifica recensione (riservata agli utenti autenticati).
+ * Riceve il TMDB ID del film tramite GET e carica l'eventuale recensione
+ * già scritta dall'utente. Gestisce tre azioni POST:
+ * - write_review: inserisce o aggiorna la recensione e segna automaticamente
+ *   il film come "watched" se non lo era già.
+ * - delete_review: elimina la recensione e reindirizza alla pagina del film.
+ * Il form mostra il titolo dinamico "Scrivi" o "Modifica" in base allo stato.
+ *
+ * @note Interagisce con le tabelle MariaDB: `recensioni`, `watched`.
+ */
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 

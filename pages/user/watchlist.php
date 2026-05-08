@@ -1,4 +1,14 @@
 <?php
+/**
+ * Pagina della watchlist personale (riservata agli utenti autenticati).
+ * Recupera da MariaDB i TMDB ID dei film che l'utente intende guardare,
+ * poi interroga MongoDB con l'operatore $in per ottenere titolo, poster e
+ * anno di ciascun film. I risultati sono ordinati per voto medio decrescente
+ * e presentati in una griglia di card cliccabili.
+ *
+ * @note Interagisce con la tabella MariaDB: `watchlist`.
+ * @note Interagisce con la collezione MongoDB: `films` (query con operatore $in).
+ */
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');

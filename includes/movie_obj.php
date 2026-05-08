@@ -1,4 +1,8 @@
 <?php
+/**
+ * Rappresenta un film e si occupa di normalizzare i dati grezzi provenienti
+ * dall'API TMDB o da MongoDB in un formato strutturato e uniforme.
+ */
 class movieObj
 {
     private string $titolo;
@@ -15,6 +19,12 @@ class movieObj
     private array $registi;
 
     
+    /**
+     * Popola le proprietà del film a partire da un array grezzo (TMDB o MongoDB).
+     * Applica valori di fallback per i campi mancanti e limita il cast ai primi 12 attori.
+     *
+     * @param array $data Array associativo con i dati del film (struttura TMDB).
+     */
     public function __construct(array $data)
     {
         $this->titolo = $data['title'] ?? 'Titolo non disponibile';
@@ -37,6 +47,13 @@ class movieObj
     }
 
 
+    /**
+     * Filtra il crew del film per estrarre solo i membri con job === 'Director'.
+     * Reindizza l'array risultante per rimuovere i gap numerici lasciati da array_filter.
+     *
+     * @param array $data Array grezzo del film contenente la chiave 'credits.crew'.
+     * @return array Array dei registi con i loro dati TMDB.
+     */
     private function searchDirectors(array $data): array
     {
         $crew = $data['credits']['crew'] ?? [];
@@ -49,6 +66,13 @@ class movieObj
     }
 
 
+    /**
+     * Converte un array di risultati di ricerca TMDB in un formato semplificato
+     * adatto alla visualizzazione nelle liste (id, titolo, anno, URL poster thumbnail).
+     *
+     * @param array $movies Array di film nel formato restituito dall'endpoint /search/movie di TMDB.
+     * @return array Array semplificato con id, titolo, anno e URL poster (w92).
+     */
     public static function search(array $movies): array
     {
         $moviesList = [];
@@ -64,6 +88,12 @@ class movieObj
     }
 
 
+    /**
+     * Serializza tutte le proprietà del film in un array associativo.
+     * Utile per passare i dati alle view senza esporre l'oggetto direttamente.
+     *
+     * @return array Array associativo con tutti i campi del film (titolo, trama, cast, ecc.).
+     */
     public function toArray(): array
     {
         return [

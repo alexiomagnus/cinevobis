@@ -1,4 +1,12 @@
 <?php
+/**
+ * Homepage di Cinevobis. Recupera da MongoDB due liste di film:
+ * - "Film in evidenza": gli ultimi 12 film aggiunti al catalogo (ordinati per data).
+ * - "Migliori film": i 6 film con il voto medio più alto, da cui viene estratto
+ *   il "Film della settimana" usando il numero della settimana ISO come seed deterministico.
+ *
+ * @note Interagisce con la collezione MongoDB: `films` (database: `cinevobis`).
+ */
 require_once(__DIR__ . '/config/config.php');
 require_once(__DIR__ . '/config/connection.php');
 require_once(__DIR__ . '/includes/header_logic.php');
@@ -8,34 +16,47 @@ use MongoDB\Client;
 
 $nome = $_SESSION['nome'] ?? '';
 
-$mongoClient = new Client("mongodb://localhost:27017");
-$db = $mongoClient->selectDatabase('cinevobis');
-$collection = $db->selectCollection('films');
 
+// Connessione a MongoDB
 $recommendedFilms = [];
+$cursor = [];
+
 try {
+    $mongoClient = new Client("mongodb://localhost:27017");
+    $db = $mongoClient->selectDatabase('cinevobis');
+    $collection = $db->selectCollection('films');
+
+    // I Film in evidenza
     $cursor = $collection->find([], [
         'limit' => 12,
         'sort' => ['release_date' => -1],
         'typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']
     ]);
+
     $recommendedFilms = iterator_to_array($cursor);
+
 } catch (Exception $e) {
     error_log("Errore MongoDB: " . $e->getMessage());
 }
 
+
+// I migliori Film
 $topFilms = [];
+
 try {
     $cursor = $collection->find([], [
         'limit' => 6,
         'sort' => ['vote_average' => -1],
         'typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']
     ]);
+
     $topFilms = iterator_to_array($cursor);
+    
     // Film della settimana: cambia ogni lunedì usando il numero della settimana come seed
-    $weekSeed = (int)date('oW'); // anno ISO + numero settimana
+    $weekSeed = (int)date('oW');  // anno ISO + numero settimana
     $index = $weekSeed % count($topFilms);
     $film = $topFilms[$index] ?? null;
+
 } catch (Exception $e) {
     error_log("Errore MongoDB: " . $e->getMessage());
 }

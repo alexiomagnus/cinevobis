@@ -1,4 +1,10 @@
 <?php
+/**
+ * Pagina di ricerca film. Riceve il termine di ricerca tramite GET (?search=...),
+ * interroga l'API TMDB sull'endpoint /search/movie e ordina i risultati per popolarità
+ * decrescente con un bubble sort manuale. I risultati vengono normalizzati tramite
+ * movieObj::search() e visualizzati come lista di card cliccabili.
+ */
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');

@@ -1,4 +1,11 @@
 <?php
+/**
+ * Pagina di esplorazione per genere. Riceve l'ID e il nome del genere tramite
+ * i parametri GET (?id=...&name=...), interroga MongoDB per trovare tutti i film
+ * che contengono quel genere nell'array 'genres', e li mostra in una griglia di card.
+ *
+ * @note Interagisce con la collezione MongoDB: `films` (query su campo `genres.id`).
+ */
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');

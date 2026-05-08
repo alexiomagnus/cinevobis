@@ -1,4 +1,12 @@
 <?php
+/**
+ * Gestione notifiche (area admin). Mostra tutte le notifiche inviate dagli utenti
+ * tramite la pagina di contatto, divise in "non lette" e "lette". Permette di
+ * segnare una notifica come letta (POST con id_notifica) e di eliminare in blocco
+ * tutte le notifiche già lette (POST con campo delete).
+ *
+ * @note Interagisce con le tabelle MariaDB: `notifiche`, `utenti` (LEFT JOIN).
+ */
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');

@@ -1,4 +1,11 @@
 <?php
+/**
+ * Gestisce il processo di logout: registra la data/ora di uscita nel DB,
+ * invalida la sessione e cancella il cookie "remember_me" se presente.
+ * Al termine reindirizza l'utente alla home con il parametro ?logout=success.
+ *
+ * @note Interagisce con la tabella MariaDB: `sessioni` (tramite userObj::setDataLogout).
+ */
 require_once(__DIR__ . '/../config/config.php');
 require_once(__DIR__ . '/../config/connection.php');
 require_once(__DIR__ . '/../includes/user_obj.php');
@@ -24,7 +31,13 @@ try {
     destroy_session_and_redirect();
 }
 
-// Pulisce completamente la sessione e reindirizza
+/**
+ * Cancella completamente la sessione e il cookie "remember_me", quindi
+ * reindirizza l'utente alla home con il flag di logout avvenuto.
+ * Viene chiamata nel blocco `finally` per garantire l'esecuzione in ogni caso.
+ *
+ * @return void
+ */
 function destroy_session_and_redirect() {
 
     // AGGIUNTA: Cancella il cookie "Ricordami" impostando la scadenza nel passato

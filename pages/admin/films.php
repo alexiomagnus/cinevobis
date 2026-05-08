@@ -1,4 +1,12 @@
 <?php
+/**
+ * Archivio film (area admin, riservata al profilo id_profilo = 1).
+ * Mostra la lista completa dei film presenti in MongoDB ordinati per data
+ * di ultimo aggiornamento. Permette l'eliminazione di un singolo documento
+ * tramite il suo ObjectId MongoDB ricevuto via POST.
+ *
+ * @note Interagisce con la collezione MongoDB: `films` (find, deleteOne).
+ */
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');
