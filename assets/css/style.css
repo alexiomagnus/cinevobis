@@ -50,21 +50,6 @@ body {
     position: relative;
 }
 
-.navbar-brand::after {
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 2px;
-    bottom: 0;
-    left: 0;
-    background-color: var(--text);
-    transition: width 0.2s ease-in-out;
-}
-
-.navbar-brand:hover::after {
-    width: 100%;
-}
-
 .nav-link {
     color: var(--text-muted) !important;
     transition: color 0.2s;

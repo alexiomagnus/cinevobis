@@ -32,6 +32,10 @@ try {
         'typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']
     ]);
     $topFilms = iterator_to_array($cursor);
+    // Film della settimana: cambia ogni lunedì usando il numero della settimana come seed
+    $weekSeed = (int)date('oW'); // anno ISO + numero settimana
+    $index = $weekSeed % count($topFilms);
+    $film = $topFilms[$index] ?? null;
 } catch (Exception $e) {
     error_log("Errore MongoDB: " . $e->getMessage());
 }
@@ -52,47 +56,49 @@ try {
 
     <main class="container mt-5 mb-5 flex-grow-1">
         <div class="container">
-            <h1 class="fw-bold mb-4">Benvenuto <?= htmlspecialchars($nome) ?></h1>
+            <?php if(isset($nome)): ?>
+                <h1 class="fw-bold mb-4">Benvenuto <?= htmlspecialchars($nome) ?></h1>
+            <?php else: ?>
+                <h1 class="fw-bold mb-4">Benvenuto</h1>
+            <?php endif; ?>
 
             <?php if (!empty($topFilms)):
-                $h = $topFilms[0];
-                $heroId       = $h['id'] ?? '';
-                $heroTitolo   = $h['title'] ?? '';
-                $heroAnno     = !empty($h['release_date']) ? substr($h['release_date'], 0, 4) : '';
-                $heroRating   = isset($h['vote_average']) ? number_format((float)$h['vote_average'], 1) : null;
-                $heroOverview = $h['overview'] ?? '';
-                $heroBg       = !empty($h['backdrop_path'])
-                    ? "https://image.tmdb.org/t/p/w1280" . $h['backdrop_path']
-                    : (!empty($h['poster_path']) ? "https://image.tmdb.org/t/p/w500" . $h['poster_path'] : '');
+                $id       = $film['id'] ?? '';
+                $titolo   = $film['title'] ?? '';
+                $anno     = !empty($film['release_date']) ? substr($film['release_date'], 0, 4) : '';
+                $rating   = isset($film['vote_average']) ? number_format((float)$film['vote_average'], 1) : null;
+                $overview = $film['overview'] ?? '';
+                $bg       = !empty($film['backdrop_path'])
+                    ? "https://image.tmdb.org/t/p/w1280" . $film['backdrop_path']
+                    : (!empty($film['poster_path']) ? "https://image.tmdb.org/t/p/w500" . $film['poster_path'] : '');
             ?>
             <div class="position-relative rounded-4 overflow-hidden mb-5"
-                 style="min-height: 420px; background: url('<?= htmlspecialchars($heroBg) ?>') center/cover no-repeat #1a1a1a;">
+                 style="min-height: 420px; background: url('<?= htmlspecialchars($bg) ?>') center/cover no-repeat #1a1a1a;">
                 <div class="position-absolute top-0 start-0 w-100 h-100"
                      style="background: linear-gradient(to right, rgba(0,0,0,.85) 0%, rgba(0,0,0,.4) 60%, transparent 100%);"></div>
                 <div class="position-relative d-flex align-items-end h-100 p-4 p-md-5" style="min-height: 420px;">
                     <div style="max-width: 500px;">
-                        <div class="d-flex align-items-center gap-2 mb-2">
-                            <span class="badge bg-white bg-opacity-25 text-white border border-white border-opacity-25">🏆 Miglior voto</span>
-                            <?php if ($heroAnno): ?>
-                                <span class="text-white-50 small"><?= htmlspecialchars($heroAnno) ?></span>
+                        <div class="mb-2 d-flex align-items-center gap-2">
+                            <span class="badge bg-white bg-opacity-25 text-white border border-white border-opacity-25 fw-semibold">Film della settimana</span>
+                            <?php if ($anno): ?>
+                                <span class="text-white-50 small"><?= htmlspecialchars($anno) ?></span>
                             <?php endif; ?>
                         </div>
                         <h2 class="fw-bold text-white mb-2" style="font-size: clamp(1.6rem, 3.5vw, 2.4rem);">
-                            <?= htmlspecialchars($heroTitolo) ?>
+                            <?= htmlspecialchars($titolo) ?>
                         </h2>
-                        <?php if ($heroRating): ?>
+                        <?php if ($rating): ?>
                             <p class="text-white fw-semibold mb-2">
-                                <i class="bi bi-star-fill text-warning me-1"></i><?= $heroRating ?> <span class="text-white-50">/ 10</span>
+                                <i class="bi bi-star-fill text-warning me-1"></i><?= $rating ?> <span class="text-white-50">/ 10</span>
                             </p>
                         <?php endif; ?>
-                        <?php if ($heroOverview): ?>
+                        <?php if ($overview): ?>
                             <p class="text-white-50 small mb-3 d-none d-md-block hero-overview">
-                                <?= htmlspecialchars($heroOverview) ?>
+                                <?= htmlspecialchars($overview) ?>
                             </p>
                         <?php endif; ?>
-                        <a href="/pages/public/film.php?tmdb_id=<?= $heroId ?>"
-                           class="btn btn-light fw-bold rounded-pill px-4">
-                            <i class="bi bi-play-fill me-1"></i> Scopri di più
+                        <a href="/pages/public/film.php?tmdb_id=<?= $id ?>"
+                           class="btn btn-light fw-bold rounded-pill px-4">Scopri di più
                         </a>
                     </div>
                 </div>
