@@ -65,16 +65,12 @@ $isAdminPage = in_array($currentPage, $adminPages);
                             <li><a class="dropdown-item py-2 small" href="/pages/admin/dashboard.php"><i class="bi-speedometer2 me-2"></i>Dashboard</a></li>
                         <?php else: ?>
                             <li><a class="dropdown-item py-2 small" href="/"><i class="bi-house me-2"></i>Home</a></li>
+                            <li><a class="dropdown-item py-2 small" href="/actions/contact.php"><i class="bi bi-envelope me-2"></i>Contattaci</a></li>
                         <?php endif; ?>
 
                         <?php if (!$isAdminPage): ?>
                             <li><a class="dropdown-item py-2 small" href="/pages/user/notice_board.php"><i class="bi bi-layout-text-sidebar-reverse me-2"></i>Bacheca</a></li>
-
-                            <?php if ($_SESSION['id_profilo'] == 2): ?>
-                                <li><a class="dropdown-item py-2 small" href="/actions/contact.php"><i class="bi bi-envelope me-2"></i>Contattaci</a></li>
-                            <?php endif; ?>
                         <?php endif; ?>
-
 
                         <?php if ($_SESSION['id_profilo'] == '1' && !$isAdminPage): ?>
                             <li><hr class="dropdown-divider"></li>
