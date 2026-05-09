@@ -81,18 +81,21 @@ if ($movie_db) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $movie_db ? htmlspecialchars($titolo) : 'Film' ?> - Cinevobis</title>
+    
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
+    
     <link rel="stylesheet" href="/assets/css/style.css">
+    
     <style>
-        :root { --accent-color: #ffc107; }
-
-        .text-justify   { text-align: justify; }
-
         .cast-avatar {
             width: 60px;
             height: 60px;
             object-fit: cover;
+        }
+
+        .text-justify { 
+            text-align: justify; 
         }
     </style>
 </head>
@@ -103,50 +106,53 @@ if ($movie_db) {
         <?php if ($movie_db): ?>
             <div class="row justify-content-center">
                 <div class="col-xl-10">
-                    <div class="card shadow-sm border-0 rounded-4 p-4 p-md-5 bg-white">
+                    <div class="card p-4 p-md-5 mb-5">
 
                         <div class="row g-5 mb-5">
                             <div class="col-md-4">
                                 <?php if($poster_path): ?>
-                                    <img src="https://image.tmdb.org/t/p/w500<?= $poster_path ?>" class="img-fluid rounded-4 shadow-sm w-100" alt="Poster">
+                                    <img src="https://image.tmdb.org/t/p/w500<?= $poster_path ?>" 
+                                         class="img-fluid rounded-4 shadow-md w-100" 
+                                         alt="Poster">
                                 <?php else: ?>
-                                    <div class="bg-light d-flex align-items-center justify-content-center rounded-4 shadow-sm w-100" style="aspect-ratio: 2/3; border: 2px dashed #dee2e6;">
+                                    <div class="d-flex align-items-center justify-content-center rounded-4 shadow-sm w-100" 
+                                         style="aspect-ratio: 2/3; background-color: var(--bg-muted); border: 2px dashed var(--border);">
                                         <div class="text-center">
-                                            <i class="bi bi-film text-muted" style="font-size: 4rem;"></i>
-                                            <p class="text-muted small mt-2">Poster non disponibile</p>
+                                            <i class="bi bi-film text-muted" style="font-size: 3.5rem;"></i>
+                                            <p class="text-muted small mt-2 fw-medium">Poster non disponibile</p>
                                         </div>
                                     </div>
                                 <?php endif; ?>
 
                                 <?php if ($trailerKey): ?>
-                                    <div class="mt-3">
+                                    <div class="mt-4">
                                         <button type="button"
-                                            class="btn btn-dark w-100 py-2 fw-bold shadow-sm d-flex align-items-center justify-content-center"
+                                            class="btn btn-dark w-100 py-2 d-flex align-items-center justify-content-center"
                                             data-bs-toggle="modal"
                                             data-bs-target="#trailerModal">
-                                            <i class="bi bi-play-fill fs-4 me-2"></i> Trailer
+                                            <i class="bi bi-play-circle-fill fs-5 me-2"></i> Trailer
                                         </button>
                                     </div>
                                 <?php endif; ?>
                             </div>
 
                             <div class="col-md-8">
-                                <h1 class="fw-bold text-dark display-5 mb-3"><?= htmlspecialchars($titolo) ?></h1>
+                                <h1 class="fw-bold display-5 mb-3" style="color: var(--text);"><?= htmlspecialchars($titolo) ?></h1>
 
                                 <?php if (!empty($titolo_orig) && strcasecmp(trim($titolo_orig), trim($titolo)) !== 0): ?>
-                                    <p class="text-muted fs-5 mb-4"><?= htmlspecialchars($titolo_orig) ?></p>
+                                    <p class="fs-5 mb-4" style="color: var(--text-muted);"><?= htmlspecialchars($titolo_orig) ?></p>
                                 <?php endif; ?>
 
                                 <?php if (!empty($registi)): ?>
                                     <div class="mb-4">
-                                        <small class="text-uppercase fw-bold text-muted d-block mb-2" style="letter-spacing:1px">Regia</small>
-                                        <p class="fs-5 fw-medium mb-0">
+                                        <small class="text-uppercase fw-bold d-block mb-1" style="letter-spacing: 1px; color: var(--text-muted);">Regia</small>
+                                        <p class="fs-5 fw-medium mb-0" style="color: var(--text);">
                                             <?php 
                                             $registi_links = [];
                                             foreach ($registi as $regista) {
                                                 $name = htmlspecialchars($regista['name']);
                                                 $id = urlencode($regista['id']);
-                                                $registi_links[] = "<a href='https://www.themoviedb.org/person/$id' class='text-decoration-none link-dark'>$name</a>";
+                                                $registi_links[] = "<a href='https://www.themoviedb.org/person/$id' class='text-decoration-none' style='color: var(--accent); transition: color 0.2s;' onmouseover='this.style.color=\"var(--accent-hover)\"' onmouseout='this.style.color=\"var(--accent)\"'>$name</a>";
                                             }
                                             echo implode(', ', $registi_links);
                                             ?>
@@ -156,7 +162,8 @@ if ($movie_db) {
 
                                 <div class="d-flex flex-wrap gap-2 mb-4">
                                     <?php foreach ($generi as $genre): ?>
-                                        <span class="badge bg-white text-dark border rounded-pill px-3 py-2">
+                                        <span class="badge px-3 py-2" 
+                                              style="background-color: var(--bg-muted); color: var(--text); border: 1px solid var(--border);">
                                             <?= htmlspecialchars($genre['name']) ?>
                                         </span>
                                     <?php endforeach; ?>
@@ -164,56 +171,57 @@ if ($movie_db) {
 
                                 <div class="border-top pt-4">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <h4 class="fw-bold m-0">Trama</h4>
+                                        <h4 class="fw-bold m-0" style="color: var(--text);">Trama</h4>
                                         <div class="d-flex align-items-center fs-4 fw-bold">
                                             <i class="bi bi-star-fill text-warning me-2"></i>
                                             <span>
                                                 <?= number_format($voto, 1) ?>
-                                                <small class="text-muted fw-normal fs-6">/ 10</small>
+                                                <small style="color: var(--text-muted);" class="fw-normal fs-6">/ 10</small>
                                             </span>
                                         </div>
                                     </div>
-                                    <p class="text-justify lh-lg text-dark fs-6 mb-4"><?= nl2br(htmlspecialchars($trama)) ?></p>
+                                    <p class="text-justify lh-lg fs-6 mb-4" style="color: var(--text-muted);"><?= nl2br(htmlspecialchars($trama)) ?></p>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="row text-center py-4 bg-light rounded-4 mb-5 border mx-0">
-                            <div class="col-4 border-end">
-                                <div class="small text-muted text-uppercase fw-bold">Durata</div>
-                                <div class="fw-bold"><?= $durata ?> min</div>
+                        <div class="row text-center py-4 rounded-4 mb-5 mx-0" style="background-color: var(--bg-muted); border: 1px solid var(--border);">
+                            <div class="col-4 border-end" style="border-color: var(--border) !important;">
+                                <div class="small text-uppercase fw-bold" style="color: var(--text-muted);">Durata</div>
+                                <div class="fw-bold fs-5" style="color: var(--text);"><?= $durata ?> min</div>
                             </div>
-                            <div class="col-4 border-end">
-                                <div class="small text-muted text-uppercase fw-bold">Anno</div>
-                                <div class="fw-bold"><?= $anno ?></div>
+                            <div class="col-4 border-end" style="border-color: var(--border) !important;">
+                                <div class="small text-uppercase fw-bold" style="color: var(--text-muted);">Anno</div>
+                                <div class="fw-bold fs-5" style="color: var(--text);"><?= $anno ?></div>
                             </div>
                             <div class="col-4">
-                                <div class="small text-muted text-uppercase fw-bold">Paese</div>
-                                <div class="fw-bold"><?= $paese ?></div>
+                                <div class="small text-uppercase fw-bold" style="color: var(--text-muted);">Paese</div>
+                                <div class="fw-bold fs-5" style="color: var(--text);"><?= $paese ?></div>
                             </div>
                         </div>
 
                         <div class="mt-2">
-                            <h4 class="fw-bold mb-4">Cast Principale</h4>
+                            <h4 class="fw-bold mb-4" style="color: var(--text);">Cast Principale</h4>
                             <div class="row g-3">
                                 <?php foreach ($cast as $actor):
                                     $profile = $actor['profile_path']
                                         ? "https://image.tmdb.org/t/p/w185" . $actor['profile_path']
-                                        : "https://ui-avatars.com/api/?name=" . urlencode($actor['name']) . "&background=random";
+                                        : "https://ui-avatars.com/api/?name=" . urlencode($actor['name']) . "&background=f1f5f9&color=64748b";
                                 ?>
                                     <div class="col-12 col-sm-6 col-lg-4">
                                         <a href="https://www.themoviedb.org/person/<?= $actor['id'] ?>"
                                            class="text-decoration-none d-block">
-                                            <div class="d-flex align-items-center p-2 border rounded-3 bg-light shadow-sm transition-hover">
+                                            <div class="d-flex align-items-center p-2 rounded-3 transition-hover" 
+                                                 style="background-color: var(--bg-surface); border: 1px solid var(--border);">
                                                 <img src="<?= $profile ?>"
                                                      class="cast-avatar rounded-circle border border-2 border-white shadow-sm me-3"
                                                      loading="lazy"
                                                      alt="<?= htmlspecialchars($actor['name']) ?>">
                                                 <div class="overflow-hidden">
-                                                    <p class="mb-0 fw-bold text-dark text-truncate" style="font-size: 0.9rem;">
+                                                    <p class="mb-0 fw-bold text-truncate" style="font-size: 0.95rem; color: var(--text);">
                                                         <?= htmlspecialchars($actor['name']) ?>
                                                     </p>
-                                                    <p class="mb-0 text-muted text-truncate" style="font-size: 0.8rem;">
+                                                    <p class="mb-0 text-truncate" style="font-size: 0.85rem; color: var(--text-muted);">
                                                         <?= htmlspecialchars($actor['character']) ?>
                                                     </p>
                                                 </div>
@@ -232,11 +240,11 @@ if ($movie_db) {
             <div class="modal fade" id="trailerModal" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-xl modal-dialog-centered">
                     <div class="modal-content bg-transparent border-0">
-                        <div class="d-flex justify-content-end mb-4">
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <div class="d-flex justify-content-end mb-3">
+                            <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body p-0">
-                            <div class="ratio ratio-16x9 shadow-lg rounded-4 overflow-hidden">
+                            <div class="ratio ratio-16x9 shadow-lg rounded-4 overflow-hidden" style="background: #000;">
                                 <iframe id="trailerVideo"
                                     data-src="https://www.youtube.com/embed/<?= $trailerKey ?>?rel=0&autoplay=1"
                                     allow="autoplay; encrypted-media"

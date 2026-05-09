@@ -10,6 +10,7 @@
  * @note Interagisce con la collezione MongoDB: `films` (query con operatore $in).
  */
 require_once(__DIR__ . '/../../config/config.php');
+require_once(__DIR__ . '/../../config/functions.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');
 require_once(__DIR__ . '/../../vendor/autoload.php');
@@ -45,7 +46,7 @@ try {
 
 
 $films = [];
-$numeroWatchlist = 0;
+$count = 0;
 
 if (!empty($ids)) {
 
@@ -56,7 +57,7 @@ if (!empty($ids)) {
         $stmt = $conn->prepare($sql);
         $stmt->execute([':id_u' => $id_utente]);
 
-        $numeroWatchlist = $stmt->fetchColumn();
+        $count = $stmt->fetchColumn();
 
     } catch (PDOException $e) {
         error_log("Errore: " . $e->getMessage());
@@ -70,7 +71,6 @@ if (!empty($ids)) {
         $collection = $db->selectCollection("films");
 
         $cursor = $collection->find(
-            // $in seleziona i documenti in cui il valore di un campo corrisponde a uno qualsiasi dei valori presenti nell'array specificato
             ['id' => ['$in' => $ids]],
             [
                 'sort' => ['vote_average' => -1],
@@ -78,27 +78,11 @@ if (!empty($ids)) {
             ]
         );
 
-        // Da puntatore ad array, si estraggono i dati da MongoDB come array
-        $raw_films = iterator_to_array($cursor);
-
-        // --- Riordinamento manuale ---
-        $films_map = [];
-
-        foreach ($raw_films as $f) {
-            $films_map[$f['id']] = $f;
-        }
-
-        // Ricostruiamo la lista $films seguendo l'ordine esatto di $ids
-        $films = [];
-
-        foreach ($ids as $id) {
-            if (isset($films_map[$id])) {
-                $films[] = $films_map[$id];
-            }
-        }
+        $films = ordinamentoFilm($cursor, $ids);
 
     } catch (Exception $e) {
         error_log("Errore in MongoDB: " . $e->getMessage());
+        $films = [];
     }
 }
 ?>
@@ -120,9 +104,9 @@ if (!empty($ids)) {
         <h1 class="fw-bold mb-4">Watchlist</h1>
 
         <?php 
-        if ($numeroWatchlist > 0) {
+        if ($count > 0) {
             echo "<div class='mb-4'>";
-            echo "<small class='text-uppercase fw-bold text-muted d-block mb-2' style='letter-spacing:1px'>Hai " . htmlspecialchars($numeroWatchlist) . " Film che vorresti vedere</small>";
+            echo "<small class='text-uppercase fw-bold text-muted d-block mb-2' style='letter-spacing:1px'>Hai " . htmlspecialchars($count) . " Film che vorresti vedere</small>";
             echo "</div>";
         }
         ?>

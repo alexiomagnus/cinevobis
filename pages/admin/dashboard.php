@@ -86,118 +86,111 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Cinevobis</title>
+    <title>Dashboard Admin - Cinevobis</title>
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="/assets/css/style.css">
+    <style>
+        .card-link {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid var(--border) !important;
+            border-radius: var(--radius-md);
+        }
+        .card-link:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md) !important;
+            border-color: var(--accent) !important;
+        }
+        .stat-card {
+            border-left: 3px solid var(--border);
+            border-radius: 8px;
+        }
+        .stat-card .stat-label {
+            font-size: 0.7rem;
+            letter-spacing: 0.5px;
+        }
+        /* Card gestione più grandi */
+        .action-card {
+            padding: 2.5rem 1.5rem !important;
+            min-height: 220px;
+        }
+        .action-card .card-icon {
+            font-size: 3.5rem;
+            line-height: 1;
+        }
+    </style>
 </head>
-<body class="d-flex flex-column min-vh-100">
+<body class="d-flex flex-column min-vh-100 bg-light">
     <?php require_once(__DIR__ . '/../../includes/header.php'); ?>
 
     <main class="container flex-grow-1 py-5">
 
-        <!-- Titolo dashboard -->
         <div class="row mb-4">
-            <div class="col-12">
-                <h1 class="fw-bold mb-0">Dashboard</h1>
+            <div class="col-12 text-center text-sm-start">
+                <h1 class="fw-bold h3 mt-1">
+                    Dashboard <span class="text-muted fw-normal">| Benvenuto <?= htmlspecialchars($username) ?></span>
+                </h1>
             </div>
         </div>
 
         <!-- Statistiche -->
         <div class="row g-3 mb-5">
-            <div class="col-6 col-lg-3">
-                <div class="p-3 rounded-2 bg-body-secondary">
-                    <div class="text-muted small mb-1">Film nel catalogo</div>
-                    <div class="fs-3 fw-medium"><?= $totaleFilm ?></div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm p-3 stat-card bg-white">
+                    <div class="text-muted stat-label fw-bold text-uppercase mb-1">Film</div>
+                    <div class="fs-4 fw-bold text-dark"><?= number_format($totaleFilm, 0, ',', '.') ?></div>
                 </div>
             </div>
-            <div class="col-6 col-lg-3">
-                <div class="p-3 rounded-2 bg-body-secondary">
-                    <div class="text-muted small mb-1">Utenti</div>
-                    <div class="fs-3 fw-medium"><?= $totaleUtenti ?></div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm p-3 stat-card bg-white">
+                    <div class="text-muted stat-label fw-bold text-uppercase mb-1">Utenti</div>
+                    <div class="fs-4 fw-bold text-dark"><?= number_format($totaleUtenti, 0, ',', '.') ?></div>
                 </div>
             </div>
-            <div class="col-6 col-lg-3">
-                <div class="p-3 rounded-2 bg-body-secondary">
-                    <div class="text-muted small mb-1">Sessioni</div>
-                    <div class="fs-3 fw-medium"><?= $totaleSessioni ?></div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm p-3 stat-card bg-white">
+                    <div class="text-muted stat-label fw-bold text-uppercase mb-1">Sessioni</div>
+                    <div class="fs-4 fw-bold text-dark"><?= number_format($totaleSessioni, 0, ',', '.') ?></div>
                 </div>
             </div>
-            <div class="col-6 col-lg-3">
-                <div class="p-3 rounded-2 bg-body-secondary">
-                    <div class="text-muted small mb-1">Notifiche da leggere</div>
-                    <div class="fs-3 fw-medium"><?= $totaleNotifiche ?></div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm p-3 stat-card bg-white">
+                    <div class="text-muted stat-label fw-bold text-uppercase mb-1">Messaggi</div>
+                    <div class="fs-4 fw-bold text-dark"><?= number_format($totaleNotifiche, 0, ',', '.') ?></div>
                 </div>
             </div>
         </div>
 
-        <!-- Sezioni di gestione -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <h2 class="h5 fw-semibold text-uppercase text-muted mb-3">
-                    Gestione
-                </h2>
-            </div>
-        </div>
+        <h2 class="h6 fw-bold text-uppercase text-muted mb-4">Gestione Sistema</h2>
 
+        <!-- Card azioni -->
         <div class="row g-4">
-            <!-- Gestione film -->
             <div class="col-12 col-md-6 col-lg-3">
-                <a href="films.php" class="text-decoration-none h-100 d-block">
-                    <div class="card border-0 shadow-sm text-center p-4 h-100 card-hover">
-                        <div class="card-body d-flex flex-column justify-content-center">
-                            <div class="display-4 mb-3 text-warning">
-                                <i class="bi bi-film"></i>
-                            </div>
-                            <h2 class="h4 fw-bold mb-2 text-dark">Archivio Film</h2>
-                            <p class="text-muted mb-0 small">Visualizza i film presenti nel database</p>
-                        </div>
-                    </div>
+                <a href="films.php" class="card card-link action-card h-100 text-decoration-none bg-white text-center d-flex flex-column align-items-center justify-content-center">
+                    <div class="card-icon text-warning mb-3"><i class="bi bi-collection-play-fill"></i></div>
+                    <h3 class="h5 fw-bold text-dark mb-2">Archivio Film</h3>
+                    <p class="text-muted small mb-0">Gestisci il catalogo multimediale e i film</p>
                 </a>
             </div>
-
-            <!-- Gestione utenti -->
             <div class="col-12 col-md-6 col-lg-3">
-                <a href="users.php" class="text-decoration-none h-100 d-block">
-                    <div class="card border-0 shadow-sm text-center p-4 h-100 card-hover">
-                        <div class="card-body d-flex flex-column justify-content-center">
-                            <div class="display-4 mb-3 text-success">
-                                <i class="bi bi-people-fill"></i>
-                            </div>
-                            <h2 class="h4 fw-bold mb-2 text-dark">Gestione Utenti</h2>
-                            <p class="text-muted mb-0 small">Visualizza e gestisci gli utenti</p>
-                        </div>
-                    </div>
+                <a href="users.php" class="card card-link action-card h-100 text-decoration-none bg-white text-center d-flex flex-column align-items-center justify-content-center">
+                    <div class="card-icon text-success mb-3"><i class="bi bi-person-lines-fill"></i></div>
+                    <h3 class="h5 fw-bold text-dark mb-2">Utenti</h3>
+                    <p class="text-muted small mb-0">Amministra gli account e i ruoli utenti</p>
                 </a>
             </div>
-
-            <!-- Gestione sessioni -->
             <div class="col-12 col-md-6 col-lg-3">
-                <a href="sessions.php" class="text-decoration-none h-100 d-block">
-                    <div class="card border-0 shadow-sm text-center p-4 h-100 card-hover">
-                        <div class="card-body d-flex flex-column justify-content-center">
-                            <div class="display-4 mb-3 text-primary">
-                                <i class="bi bi-calendar-event"></i>
-                            </div>
-                            <h2 class="h4 fw-bold mb-2 text-dark">Gestione Sessioni</h2>
-                            <p class="text-muted mb-0 small">Visualizza le sessioni</p>
-                        </div>
-                    </div>
+                <a href="sessions.php" class="card card-link action-card h-100 text-decoration-none bg-white text-center d-flex flex-column align-items-center justify-content-center">
+                    <div class="card-icon text-primary mb-3"><i class="bi bi-shield-lock-fill"></i></div>
+                    <h3 class="h5 fw-bold text-dark mb-2">Log Accessi</h3>
+                    <p class="text-muted small mb-0">Monitora la sicurezza e le sessioni attive</p>
                 </a>
             </div>
-
-            <!-- Gestione notifiche -->
             <div class="col-12 col-md-6 col-lg-3">
-                <a href="notifications.php" class="text-decoration-none h-100 d-block">
-                    <div class="card border-0 shadow-sm text-center p-4 h-100 card-hover">
-                        <div class="card-body d-flex flex-column justify-content-center">
-                            <div class="display-4 mb-3 text-danger">
-                                <i class="bi bi-bell-fill"></i>
-                            </div>
-                            <h2 class="h4 fw-bold mb-2 text-dark">Gestione Notifiche</h2>
-                            <p class="text-muted mb-0 small">Visualizza i report inviati dagli utenti</p>
-                        </div>
-                    </div>
+                <a href="notifications.php" class="card card-link action-card h-100 text-decoration-none bg-white text-center d-flex flex-column align-items-center justify-content-center">
+                    <div class="card-icon text-danger mb-3"><i class="bi bi-chat-left-dots-fill"></i></div>
+                    <h3 class="h5 fw-bold text-dark mb-2">Messaggi</h3>
+                    <p class="text-muted small mb-0">Gestisci le comunicazioni degli utenti</p>
                 </a>
             </div>
         </div>
@@ -206,6 +199,5 @@ try {
 
     <?php require_once(__DIR__ . '/../../includes/footer.php'); ?>
     <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/assets/js/script.js"></script>
 </body>
 </html>

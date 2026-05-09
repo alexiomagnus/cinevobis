@@ -1,5 +1,4 @@
 <?php
-// Session_start() deve essere chiamato all'inizio di ogni files
 $isLogged = isset($_SESSION['username']);
 $currentPage = basename($_SERVER['SCRIPT_NAME']);
 
@@ -24,10 +23,28 @@ $isAdminPage = in_array($currentPage, $adminPages);
         <?php endif; ?>
 
         <div class="ms-auto d-flex align-items-center gap-3" style="z-index: 2;">
+
             <?php if (!$isAdminPage): ?>
                 <form action="/pages/public/search.php" method="GET" class="d-flex align-items-center m-0">
                     <input type="text" name="search" placeholder="Cerca un film..." class="form-control form-control-sm shadow-none rounded-3 me-2" style="min-width: 220px;" required value="<?= htmlspecialchars($_GET['search'] ?? '') ?>">
                 </form>
+            <?php endif; ?>
+
+            <?php if ($isLogged && !$isAdminPage): ?>
+                <div class="d-flex align-items-center gap-1">
+                    <a href="/pages/user/favorites.php" class="btn btn-sm btn-outline-secondary border-0 px-2" title="Preferiti">
+                        <i class="bi bi-heart-fill"></i>
+                    </a>
+                    <a href="/pages/user/watchlist.php" class="btn btn-sm btn-outline-secondary border-0 px-2" title="Watchlist">
+                        <i class="bi bi-bookmark"></i>
+                    </a>
+                    <a href="/pages/user/watched.php" class="btn btn-sm btn-outline-secondary border-0 px-2" title="Watched">
+                        <i class="bi bi-eye-fill"></i>
+                    </a>
+                    <a href="/pages/user/reviews.php" class="btn btn-sm btn-outline-secondary border-0 px-2" title="Recensioni">
+                        <i class="bi bi-pencil-fill"></i>
+                    </a>
+                </div>
             <?php endif; ?>
 
             <?php if (!$isLogged): ?>
@@ -42,45 +59,34 @@ $isAdminPage = in_array($currentPage, $adminPages);
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg mt-2">
 
-                        <li><a class="dropdown-item py-2 small" href="/pages/user/profile.php">Profilo</a></li>
+                        <li><a class="dropdown-item py-2 small" href="/pages/user/profile.php"><i class="bi bi-person me-2"></i>Profilo</a></li>
 
-                        <?php if(!$isAdminPage): ?>
-                            <li><a class="dropdown-item py-2 small" href="/pages/user/favorites.php">Preferiti</a></li>
-                            <li><a class="dropdown-item py-2 small" href="/pages/user/watchlist.php">Watchlist</a></li>
-                            <li><a class="dropdown-item py-2 small" href="/pages/user/watched.php">Watched</a></li>
-                            <li><a class="dropdown-item py-2 small" href="/pages/user/reviews.php">Recensioni</a></li>
-                            <li><a class="dropdown-item py-2 small" href="/pages/user/notice_board.php">Bacheca</a></li>
-                            
+                        <?php if ($isAdminPage): ?>
+                            <li><a class="dropdown-item py-2 small" href="/pages/admin/dashboard.php"><i class="bi-speedometer2 me-2"></i>Dashboard</a></li>
+                        <?php else: ?>
+                            <li><a class="dropdown-item py-2 small" href="/"><i class="bi-house me-2"></i>Home</a></li>
+                        <?php endif; ?>
+
+                        <?php if (!$isAdminPage): ?>
+                            <li><a class="dropdown-item py-2 small" href="/pages/user/notice_board.php"><i class="bi bi-layout-text-sidebar-reverse me-2"></i>Bacheca</a></li>
+
                             <?php if ($_SESSION['id_profilo'] == 2): ?>
-                                <li><a class="dropdown-item py-2 small" href="/actions/contact.php">Contattaci</a></li>
+                                <li><a class="dropdown-item py-2 small" href="/actions/contact.php"><i class="bi bi-envelope me-2"></i>Contattaci</a></li>
                             <?php endif; ?>
                         <?php endif; ?>
 
-                        <?php if($isAdminPage): ?>
-                            <li><a class="dropdown-item py-2 small" href="/pages/admin/dashboard.php">Dashboard</a></li>
-                        <?php else: ?>
-                            <li><a class="dropdown-item py-2 small" href="/">Home</a></li>
-                        <?php endif; ?>
-                        
 
                         <?php if ($_SESSION['id_profilo'] == '1' && !$isAdminPage): ?>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item py-2 small fw-bold text" href="/pages/admin/dashboard.php">Dashboard</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item py-2 small fw-bold" href="/pages/admin/dashboard.php">Dashboard</a></li>
                         <?php endif; ?>
-
 
                         <?php if ($isAdminPage): ?>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item py-2 small fw-bold text" href="/">Esci</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item py-2 small fw-bold" href="/">Esci</a></li>
                         <?php endif; ?>
 
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
+                        <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item py-2 small fw-bold text-danger" href="/actions/logout.php">Logout</a></li>
                     </ul>
                 </div>

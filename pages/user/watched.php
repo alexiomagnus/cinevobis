@@ -9,6 +9,7 @@
  * @note Interagisce con la collezione MongoDB: `films` (query con operatore $in).
  */
 require_once(__DIR__ . '/../../config/config.php');
+require_once(__DIR__ . '/../../config/functions.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');
 require_once(__DIR__ . '/../../vendor/autoload.php');
@@ -44,7 +45,7 @@ try {
 
 // Connessione a MongoDB e ricerca film
 $films = [];
-$numeroWatched = 0;
+$count = 0;
 
 if (!empty($ids)) {
 
@@ -55,7 +56,7 @@ if (!empty($ids)) {
         $stmt = $conn->prepare($sql);
         $stmt->execute([':id_u' => $id_utente]);
 
-        $numeroWatched = $stmt->fetchColumn();
+        $count = $stmt->fetchColumn();
 
     } catch (PDOException $e) {
         error_log("Errore: " . $e->getMessage());
@@ -76,27 +77,11 @@ if (!empty($ids)) {
             ]
         );
 
-        // Da puntatore ad array, si estraggono i dati da MongoDB come array
-        $raw_films = iterator_to_array($cursor);
-
-        // --- Riordinamento manuale ---
-        $films_map = [];
-
-        foreach ($raw_films as $f) {
-            $films_map[$f['id']] = $f;
-        }
-
-        // Ricostruiamo la lista $films seguendo l'ordine esatto di $ids
-        $films = [];
-
-        foreach ($ids as $id) {
-            if (isset($films_map[$id])) {
-                $films[] = $films_map[$id];
-            }
-        }
+        $films = ordinamentoFilm($cursor, $ids);
 
     } catch (Exception $e) {
         error_log("Errore in MongoDB: " . $e->getMessage());
+        $films = [];
     }
 }
 ?>
@@ -118,9 +103,9 @@ if (!empty($ids)) {
         <h1 class="fw-bold mb-4">Watched</h1>
 
         <?php 
-            if ($numeroWatched > 0) {
+            if ($count > 0) {
                 echo "<div class='mb-4'>";
-                echo "<small class='text-uppercase fw-bold text-muted d-block mb-2' style='letter-spacing:1px'>Hai visto " . htmlspecialchars($numeroWatched) . " Film</small>";
+                echo "<small class='text-uppercase fw-bold text-muted d-block mb-2' style='letter-spacing:1px'>Hai visto " . htmlspecialchars($count) . " Film</small>";
                 echo "</div>";
             }
         ?>

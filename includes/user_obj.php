@@ -223,7 +223,7 @@ class userObj {
      * @note Interagisce con le tabelle MariaDB: `sessioni`, `utenti` (JOIN).
      */
     public function readAccess(int $num) {
-        $sql = "SELECT u.username, s.data_login, s.data_logout
+        $sql = "SELECT u.username, u.nome, u.cognome, s.data_login, s.data_logout
                 FROM sessioni s
                 JOIN utenti u ON u.id_utente = s.id_utente
                 ORDER BY s.data_login DESC

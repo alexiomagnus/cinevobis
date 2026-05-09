@@ -11,6 +11,7 @@
  * - MongoDB: collezione `films` (per i metadati dei media).
  */
 require_once(__DIR__ . '/../../config/config.php');
+require_once(__DIR__ . '/../../config/functions.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');
 require_once(__DIR__ . '/../../vendor/autoload.php');
@@ -61,6 +62,7 @@ try {
 }
 
 if (!empty($ids)) {
+    // Connessione a MongoDB e ricerca film
     try {
         $mongoClient = new Client("mongodb://localhost:27017");
         $db = $mongoClient->selectDatabase("cinevobis");
@@ -68,30 +70,17 @@ if (!empty($ids)) {
 
         $cursor = $collection->find(
             ['id' => ['$in' => $ids]],
-            ['typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']]
+            [
+                'sort' => ['vote_average' => -1],
+                'typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array'],
+            ]
         );
-        
-        // Da puntatore ad array, si estraggono i dati da MongoDB come array
-        $raw_films = iterator_to_array($cursor);
 
-        // --- Riordinamento manuale ---
-        $films_map = [];
-
-        foreach ($raw_films as $f) {
-            $films_map[$f['id']] = $f;
-        }
-
-        // Ricostruiamo la lista $films seguendo l'ordine esatto di $ids
-        $films = [];
-
-        foreach ($ids as $id) {
-            if (isset($films_map[$id])) {
-                $films[] = $films_map[$id];
-            }
-        }
+        $films = ordinamentoFilm($cursor, $ids);
 
     } catch (Exception $e) {
         error_log("Errore in MongoDB: " . $e->getMessage());
+        $films = [];
     }
 }
 ?>

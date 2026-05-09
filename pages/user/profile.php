@@ -53,13 +53,14 @@ if (isset($_POST['delete_user']) && $username) {
 }
 
 // Film visti nell'anno corrente
-$numeroFilmVisti = 0;
+$count = 0;
+
 try {
     $sql = "SELECT COUNT(*) FROM watched WHERE id_utente = :id_utente AND YEAR(data_aggiunto) = YEAR(CURRENT_DATE)";
     $stmt = $conn->prepare($sql);
     $stmt->execute([':id_utente' => $_SESSION['id_utente']]);
 
-    $numeroFilmVisti = $stmt->fetchColumn();
+    $count = $stmt->fetchColumn();
 
 } catch (PDOException $e) {
     error_log("Errore nel DB: " . $e->getMessage());
@@ -72,13 +73,15 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profilo - Cinevobis</title>
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="/assets/css/style.css">
 </head>
-<body>
+<body style="background-color: var(--bg);">
 
     <div class="container-fluid p-0 overflow-hidden">
         <div class="row g-0 vh-100">
-            <div class="col-lg-6 d-flex flex-column justify-content-center align-items-center position-relative px-4">
+            
+            <div class="col-lg-6 d-flex flex-column justify-content-center align-items-center position-relative px-4 vh-100 overflow-hidden">
                 
                 <a href="javascript:void(0)"
                    onclick="closeAndRedirect()"
@@ -86,81 +89,93 @@ try {
                    aria-label="Close">
                 </a>
 
-                <div style="max-width: 500px; width: 100%;">
-                    <h1 class="display-6 fw-bolder mb-2">Profilo</h1>
-                    <p class="text-secondary mb-4">Informazioni account Cinevobis</p>
-
+                <div style="max-width: 550px; width: 100%;">
+                    
                     <?php if (isset($errore)): ?>
-                        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                        <div class="alert alert-danger mb-4" role="alert">
                             <?= htmlspecialchars($errore) ?>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     <?php endif; ?>
 
                     <?php if ($userData): ?>
-                        <div class="row mb-3 pb-2 border-bottom">
-                            <div class="col-md-6">
-                                <label class="small text-uppercase text-muted fw-bold">Username</label>
-                                <p class="fs-6 mb-0 text-break"><?= htmlspecialchars($userData['username']) ?></p>
+                        
+                        <div class="mb-5">
+                            <h1 class="display-6 fw-bolder mb-1">Profilo</h1>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-sm-6">
+                                <div class="p-3 rounded-4" style="background-color: var(--bg-surface); border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background-color: rgba(99, 102, 241, 0.1); color: var(--accent);">
+                                            <i class="bi bi-film fs-5"></i>
+                                        </div>
+                                        <div>
+                                            <p class="small fw-bold mb-0" style="color: var(--text-muted);">Film visti nel <?= date('Y') ?></p>
+                                            <h4 class="mb-0 fw-bolder"><?= htmlspecialchars($count); ?></h4>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-md-6">
-                                <label class="small text-uppercase text-muted fw-bold">Email</label>
-                                <p class="fs-6 mb-0 text-break"><?= htmlspecialchars($userData['email']) ?></p>
+                            <div class="col-sm-6">
+                                <div class="p-3 rounded-4" style="background-color: var(--bg-surface); border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background-color: rgba(99, 102, 241, 0.1); color: var(--accent);">
+                                            <i class="bi bi-calendar-check fs-5"></i>
+                                        </div>
+                                        <div>
+                                            <p class="small fw-bold mb-0" style="color: var(--text-muted);">Membro dal</p>
+                                            <h4 class="mb-0 fw-bolder"><?= htmlspecialchars($dataRegistrazione); ?></h4>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="row mb-3 pb-2 border-bottom">
-                            <div class="col-md-6">
-                                <label class="small text-uppercase text-muted fw-bold">Nome</label>
-                                <p class="fs-6 mb-0 text-break"><?= htmlspecialchars($userData['nome'] ?? 'Non specificato') ?></p>
+                        <div class="rounded-4 mb-4" style="background-color: var(--bg-surface); border: 1px solid var(--border); box-shadow: var(--shadow-sm); overflow: hidden;">
+                            <div class="d-flex justify-content-between p-3 border-bottom">
+                                <span style="color: var(--text-muted);">Username</span>
+                                <span class="fw-medium text-end"><?= htmlspecialchars($userData['username']) ?></span>
                             </div>
-                            <div class="col-md-6">
-                                <label class="small text-uppercase text-muted fw-bold">Cognome</label>
-                                <p class="fs-6 mb-0 text-break"><?= htmlspecialchars($userData['cognome'] ?? 'Non specificato') ?></p>
+                            <div class="d-flex justify-content-between p-3 border-bottom">
+                                <span style="color: var(--text-muted);">Email</span>
+                                <span class="fw-medium text-end"><?= htmlspecialchars($userData['email']) ?></span>
                             </div>
-                        </div>
-
-                        <div class="row mb-5">
-                            <div class="col-12">
-                                <label class="small text-uppercase text-muted fw-bold">Membro dal</label>
-                                <p class="fs-6 mb-0 text-break"><?= htmlspecialchars($dataRegistrazione); ?></p>
+                            <div class="d-flex justify-content-between p-3 border-bottom">
+                                <span style="color: var(--text-muted);">Nome</span>
+                                <span class="fw-medium text-end"><?= htmlspecialchars($userData['nome'] ?? 'Non inserito') ?></span>
                             </div>
-                        </div>
-
-                        <div class="row mb-5">
-                            <div class="col-12">
-                                <label class="small text-uppercase text-muted fw-bold">Film visti nel <?php echo date('Y'); ?></label>
-                                <p class="fs-6 mb-0 text-break"><?= htmlspecialchars($numeroFilmVisti); ?></p>
+                            <div class="d-flex justify-content-between p-3">
+                                <span style="color: var(--text-muted);">Cognome</span>
+                                <span class="fw-medium text-end"><?= htmlspecialchars($userData['cognome'] ?? 'Non inserito') ?></span>
                             </div>
                         </div>
                         
                         <form method="POST">
-                            <div class="d-flex gap-3 mt-4">
-                                <button type="submit" name="change_password" class="btn btn-dark btn-lg flex-fill py-3 fw-bold">
-                                    Cambia password
-                                </button>
-                            </div>
-                            
-                            <div class="d-flex gap-3 mt-4">
-                                <button type="submit" name="delete_user" class="btn btn-outline-danger btn-lg flex-fill py-3 fw-bold"
-                                        onclick="return confirm('Sei sicuro? Questa azione è irreversibile.');">
-                                    Elimina account
-                                </button>
+                            <div class="rounded-4 overflow-hidden" style="background-color: var(--bg-surface); border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
+                                <div class="p-1 border-bottom">
+                                    <button type="submit" name="change_password" class="btn w-100 d-flex justify-content-between align-items-center text-start border-0" style="color: var(--text); padding: 12px;">
+                                        <span class="fw-medium">Modifica la password</span>
+                                        <i class="bi bi-chevron-right" style="color: var(--text-muted);"></i>
+                                    </button>
+                                </div>
+                                <div class="p-1 bg-danger bg-opacity-10">
+                                    <button type="submit" name="delete_user" class="btn w-100 d-flex justify-content-between align-items-center text-start text-danger border-0" style="padding: 12px;" onclick="return confirm('Stai per eliminare definitivamente il tuo account su Cinevobis. Confermi?');">
+                                        <span class="fw-bold">Elimina account</span>
+                                        <i class="bi bi-trash3"></i>
+                                    </button>
+                                </div>
                             </div>
                         </form>
                             
-                    <?php else: ?>
-                        <div class="alert alert-warning text-center">Utente non trovato.</div>
-                        <div class="d-grid">
-                            <a href="/index.php" class="btn btn-dark">Torna alla Home</a>
-                        </div>
                     <?php endif; ?>
                 </div>
             </div>
 
-            <div class="col-lg-6 d-none d-lg-block bg-secondary" 
-                 style="background-image: url('/assets/img/astronaut.jpeg'); background-size: cover; background-position: center;">
+            <div class="col-lg-6 d-none d-lg-block" 
+                 style="background-image: url('/assets/img/astronaut.jpeg'); background-size: cover; background-position: center; border-left: 1px solid var(--border);">
             </div>
+
         </div>
     </div>
 
