@@ -204,8 +204,8 @@ input[name="search"]:focus {
 }
 
 .transition-hover:hover, .card-hover:hover {
-    transform: translateY(-6px);
-    box-shadow: var(--shadow-lg) !important;
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md) !important;
     border-color: rgba(99, 102, 241, 0.3) !important;
 }
 
