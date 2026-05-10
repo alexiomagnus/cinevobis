@@ -472,7 +472,7 @@ try {
                                             <i class="bi bi-eye-fill me-1"></i> <?= $is_watched ? 'Rimuovi' : 'Visto' ?>
                                         </button>
 
-                                        <a href="/pages/user/review.php?tmdb_id=<?= urlencode($tmdb_id) ?>" class="btn btn-dark btn-sm rounded-pill px-3 ms-md-auto mt-2 mt-md-0">
+                                        <a href="/pages/user/review.php?tmdb_id=<?= urlencode($tmdb_id) ?>" class="btn btn-dark btn-sm rounded-pill px-3">
                                             <i class="bi bi-pencil-fill me-1"></i> <?= $is_review ? "Modifica recensione" : "Scrivi recensione" ?>
                                         </a>
                                     </form>

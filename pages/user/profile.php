@@ -133,21 +133,21 @@ try {
                         </div>
 
                         <div class="rounded-4 mb-4" style="background-color: var(--bg-surface); border: 1px solid var(--border); box-shadow: var(--shadow-sm); overflow: hidden;">
-                            <div class="d-flex justify-content-between p-3 border-bottom">
-                                <span style="color: var(--text-muted);">Username</span>
-                                <span class="fw-medium text-end"><?= htmlspecialchars($userData['username']) ?></span>
+                            <div class="d-flex justify-content-between align-items-center p-3 border-bottom gap-3">
+                                <span style="color: var(--text-muted); white-space: nowrap;">Username</span>
+                                <span class="fw-medium text-end text-truncate"><?= htmlspecialchars($userData['username']) ?></span>
                             </div>
-                            <div class="d-flex justify-content-between p-3 border-bottom">
-                                <span style="color: var(--text-muted);">Email</span>
-                                <span class="fw-medium text-end"><?= htmlspecialchars($userData['email']) ?></span>
+                            <div class="d-flex justify-content-between align-items-center p-3 border-bottom gap-3">
+                                <span style="color: var(--text-muted); white-space: nowrap;">Email</span>
+                                <span class="fw-medium text-end text-truncate"><?= htmlspecialchars($userData['email']) ?></span>
                             </div>
-                            <div class="d-flex justify-content-between p-3 border-bottom">
-                                <span style="color: var(--text-muted);">Nome</span>
-                                <span class="fw-medium text-end"><?= htmlspecialchars($userData['nome'] ?? 'Non inserito') ?></span>
+                            <div class="d-flex justify-content-between align-items-center p-3 border-bottom gap-3">
+                                <span style="color: var(--text-muted); white-space: nowrap;">Nome</span>
+                                <span class="fw-medium text-end text-truncate"><?= htmlspecialchars($userData['nome'] ?? 'Non inserito') ?></span>
                             </div>
-                            <div class="d-flex justify-content-between p-3">
-                                <span style="color: var(--text-muted);">Cognome</span>
-                                <span class="fw-medium text-end"><?= htmlspecialchars($userData['cognome'] ?? 'Non inserito') ?></span>
+                            <div class="d-flex justify-content-between align-items-center p-3 gap-3">
+                                <span style="color: var(--text-muted); white-space: nowrap;">Cognome</span>
+                                <span class="fw-medium text-end text-truncate"><?= htmlspecialchars($userData['cognome'] ?? 'Non inserito') ?></span>
                             </div>
                         </div>
                         
