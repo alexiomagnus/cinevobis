@@ -54,7 +54,7 @@ config/
   functions.php
 database/
   credentials.md
-  dump-cinevobis-202605101259.sql
+  dump-cinevobis.sql
 includes/
   footer.php
   header_logic.php
@@ -71,17 +71,20 @@ pages/
     sessions.php
     users.php
   public/
+    community_reviews.php
     film.php
+    genres.php
     login.php
+    notice_board.php
     privacy.php
+    recommended_films.php
     search_genre.php
     search.php
     signup.php
     terms.php
-    users_reviews.php
+    top_films.php
   user/
     favorites.php
-    notice_board.php
     profile.php
     review.php
     reviews.php
@@ -95,7 +98,7 @@ package.json
 
 # Files
 
-## File: database/dump-cinevobis-202605101259.sql
+## File: database/dump-cinevobis.sql
 ```sql
 /*M!999999\- enable the sandbox mode */ 
 -- MariaDB dump 10.19-11.8.6-MariaDB, for Linux (x86_64)
@@ -655,98 +658,213 @@ SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 -- Dump completed on 2026-05-10 12:59:17
 ```
 
-## File: config/functions.php
+## File: pages/public/community_reviews.php
 ```php
 <?php
-function movie_sorting($cursor, $ids) {
-    // Trasforma il cursore MongoDB in un array associativo
-    $raw_films = iterator_to_array($cursor);
+// Mostra le recensioni degli utenti per un film specifico.
+require_once(__DIR__ . '/../../config/config.php');
+require_once(__DIR__ . '/../../config/connection.php');
+require_once(__DIR__ . '/../../includes/header_logic.php');
+require_once(__DIR__ . '/../../vendor/autoload.php');
 
-    // Mappa i film usando il loro ID come chiave per un accesso rapido
-    $films_map = [];
-    foreach ($raw_films as $f) {
-        $films_map[$f['id']] = $f;
-    }
+$recensioni_altri = [];
+$movie_id = $_GET['tmdb_id'] ?? null;
 
-    // Inizializza l'array
-    $films = [];
-    
-    // Ricostruisce la lista seguendo l'ordine esatto di $ids
-    foreach ($ids as $id) {
-        if (isset($films_map[$id])) {
-            $films[] = $films_map[$id];
+// Recuperiamo le recensioni degli altri utenti
+try {   
+    $sql = "SELECT r.commento, r.voto, u.nome, u.cognome
+            FROM recensioni r
+            JOIN utenti u ON r.id_utente = u.id_utente 
+            WHERE tmdb_id = :tmdb_id
+            ORDER BY r.tmdb_id DESC";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([':tmdb_id' => $movie_id]);
+
+    $recensioni_altri = $stmt->fetchAll();
+
+} catch (PDOException $e) {
+    error_log("Errore nel DB: " . $e->getMessage());
+}
+?>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recensioni della Community - Cinevobis</title>
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <style>
+        :root { --accent-color: #ffc107; }
+        .text-justify { text-align: justify; }
+        .review-poster {
+            width: 120px;
+            min-width: 120px;
+            aspect-ratio: 2/3;
+            object-fit: cover;
+            border-radius: 0.5rem 0 0 0.5rem;
         }
-    }
-
-    return $films;
-}
-
-function order_of_popularity ($n, $results) {
-    // Ordinare per popolarità
-    for ($i = 0; $i < $n - 1; $i++) {
-        for ($j = $i + 1; $j < $n; $j++) {
-            if ($results[$i]['popularity'] < $results[$j]['popularity']) {
-                // scambio
-                $temp = $results[$i];
-                $results[$i] = $results[$j];
-                $results[$j] = $temp;
-            }
+        .transition-hover:hover {
+            transform: translateY(-5px);
+            transition: transform 0.3s ease;
         }
-    }
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
 
-    return $results;
-}
+    <?php require_once(__DIR__ . '/../../includes/header.php'); ?>
+
+    <main class="container mt-5 mb-5 flex-grow-1">
+        <h1 class="fw-bold mb-2">Recensioni della Community</h1>
+        <p class="text-muted mb-4">Scopri cosa pensano gli altri utenti</p>
+
+            <div class="row row-cols-1 row-cols-md-2 g-4">
+                <?php foreach ($recensioni_altri as $r): 
+                    $poster_url = !empty($r['poster']) ? "https://image.tmdb.org/t/p/w500" . $r['poster'] : "https://via.placeholder.com/500x750?text=No+Poster";
+                ?>
+                <div class="col">
+                        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden transition-hover">
+                            <div class="d-flex h-100">
+
+                                <div class="card-body d-flex flex-column justify-content-between p-3">
+                                    <div>
+                                        <div class="small mb-2" style="color: var(--accent);">
+                                            <i class="bi bi-person-circle me-1"></i><?= htmlspecialchars($r['nome']) . " " . htmlspecialchars($r['cognome'])?>
+                                        </div>
+
+                                        <?php if (!empty($r['commento'])): ?>
+                                            <p class="text-muted small mb-2 text-justify">
+                                                "<?= nl2br(htmlspecialchars($r['commento'])) ?>"
+                                            </p>
+                                        <?php endif; ?>
+                                    </div>
+
+                                    <div class="d-flex align-items-center gap-1 mt-2">
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <span class="fw-bold fs-5"><?= number_format($r['voto'], 1) ?></span>
+                                        <span class="text-muted small">/10</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <?php endforeach; ?>
+            </div>
+    </main>
+
+    <?php require_once(__DIR__ . '/../../includes/footer.php'); ?>
+
+    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
 ```
 
-## File: package.json
-```json
-{
-  "name": "cinevobis",
-  "version": "1.0.0",
-  "description": "PHP project with a MySQL Database",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/alexiomagnus/cinevobis.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/alexiomagnus/cinevobis/issues"
-  },
-  "homepage": "https://github.com/alexiomagnus/cinevobis#readme",
-  "dependencies": {
-    "bootstrap": "^5.3.8",
-    "bootstrap-icons": "^1.13.1",
-    "tom-select": "^2.5.2"
-  }
-}
-```
-
-## File: database/credentials.md
-```markdown
-- password: film
-```
-
-## File: pages/user/notice_board.php
+## File: pages/public/genres.php
 ```php
 <?php
-/**
- * Pagina bacheca globale che mostra le ultime 20 recensioni inserite nel sistema.
- * Recupera i dati testuali (voto, commento, autore) da MariaDB e i dettagli 
- * tecnici del film (titolo, locandina, ecc.) da MongoDB.
- * * Il recupero da MongoDB avviene tramite una query batch ($in) su TMDB ID,
- * con successivo riordinamento manuale per preservare la cronologia (data_aggiunto).
- *
- * @note Interagisce con:
- * - MariaDB: tabelle `recensioni` e `utenti` (per i dati sociali).
- * - MongoDB: collezione `films` (per i metadati dei media).
- */
+require_once(__DIR__ . '/../../config/config.php');
+require_once(__DIR__ . '/../../config/connection.php');
+require_once(__DIR__ . '/../../includes/header_logic.php');
+require_once(__DIR__ . '/../../vendor/autoload.php');
+
+use MongoDB\Client;
+
+$generi = [];
+$errorMessage = null;
+
+try {
+    $mongoClient = new MongoDB\Client("mongodb://localhost:27017");
+    $db = $mongoClient->selectDatabase("cinevobis");
+    $collection = $db->selectCollection("films");
+
+    $pipeline = [
+        ['$unwind' => '$genres'],
+        ['$group' => [
+            '_id'  => '$genres.id',
+            'name' => ['$first' => '$genres.name'],
+        ]],
+        ['$sort' => ['name' => 1]],
+    ];
+
+    $generi = $collection->aggregate($pipeline)->toArray();
+
+} catch (Exception $e) {
+    error_log("Errore con MongoDB: " . $e->getMessage());
+    $errorMessage = "Impossibile caricare i generi. Riprova più tardi.";
+}
+?>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cinevobis - Generi</title>
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+    <?php include(__DIR__ . "/../../includes/header.php"); ?>
+
+    <main class="container mt-5 mb-5 flex-grow-1">
+        <div class="container">
+
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <i class="bi bi-grid-fill" style="color: var(--accent); font-size: 1.6rem"></i>
+                <h1 class="fw-bold mb-0">Generi</h1>
+            </div>
+            <p class="mb-4" style="color: var(--text-muted);">Esplora il catalogo per categoria</p>
+
+            <?php if ($errorMessage): ?>
+                <div class="alert alert-danger">
+                    <i class="bi bi-exclamation-triangle me-2"></i><?= htmlspecialchars($errorMessage) ?>
+                </div>
+
+            <?php elseif (empty($generi)): ?>
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>Nessun genere trovato.
+                </div>
+
+            <?php else: ?>
+                <!-- row-cols-md-3 su tablet (era 4), row-cols-lg-4 solo su desktop -->
+                <div class="row row-cols-2 row-cols-sm-3 row-cols-md-3 row-cols-lg-4 g-3">
+                    <?php foreach ($generi as $genere):
+                        $gId   = (int) $genere['_id'];
+                        $gName = $genere['name'];
+                    ?>
+                    <div class="col">
+                        <a href="search_genre.php?id=<?= urlencode($gId) ?>&name=<?= urlencode($gName) ?>"
+                           class="card transition-hover text-decoration-none d-flex flex-row align-items-center gap-2 p-3"
+                           style="color: var(--text);">
+                            <i class="bi bi-film flex-shrink-0" style="font-size: 1.2rem; color: var(--accent);"></i>
+                            <!-- rimosso text-truncate, aggiunto word-break per evitare tagli -->
+                            <span class="fw-semibold" style="font-size: 0.9rem; word-break: break-word;">
+                                <?= htmlspecialchars($gName) ?>
+                            </span>
+                        </a>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+
+        </div>
+    </main>
+
+    <?php require_once(__DIR__ . '/../../includes/footer.php'); ?>
+
+    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+```
+
+## File: pages/public/notice_board.php
+```php
+<?php
+// Bacheca globale: mostra le ultime recensioni con i dettagli dei film.
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/functions.php');
 require_once(__DIR__ . '/../../config/connection.php');
@@ -754,14 +872,6 @@ require_once(__DIR__ . '/../../includes/header_logic.php');
 require_once(__DIR__ . '/../../vendor/autoload.php');
 
 use MongoDB\Client;
-
-// Controllo autenticazione
-$username = $_SESSION['username'] ?? '';
-
-if (!$username) {
-    header("Location: /index.php");
-    exit();
-}
 
 // Configurazione query
 $limit = 20;
@@ -868,9 +978,7 @@ if (!empty($ids)) {
                 foreach ($films as $film):
                     $id = (int) ($film['id'] ?? 0);
                     $titolo = $film['title'] ?? 'Titolo non disponibile';
-                    $poster = !empty($film['poster_path'])
-                        ? "https://image.tmdb.org/t/p/w500" . $film['poster_path']
-                        : "https://via.placeholder.com/500x750?text=No+Poster";
+                    $poster = !empty($film['poster_path']) ? "https://image.tmdb.org/t/p/w500" . $film['poster_path'] : "https://via.placeholder.com/500x750?text=No+Poster";
                     
                     $rec = $recensioni_map[$id] ?? [];
                     $voto = isset($rec['voto']) ? (float) $rec['voto'] : null;
@@ -892,7 +1000,7 @@ if (!empty($ids)) {
                                         </a>
                                     </h5>
                                     
-                                    <div class="small text-primary mb-2">
+                                    <div class="small mb-2" style="color: var(--accent);">
                                         <i class="bi bi-person-circle me-1"></i><?= htmlspecialchars($autore) ?>
                                     </div>
 
@@ -927,23 +1035,296 @@ if (!empty($ids)) {
 </html>
 ```
 
+## File: pages/public/recommended_films.php
+```php
+<?php
+require_once(__DIR__ . '/../../config/config.php');
+require_once(__DIR__ . '/../../config/connection.php');
+require_once(__DIR__ . '/../../includes/header_logic.php');
+require_once(__DIR__ . '/../../vendor/autoload.php');
+
+use MongoDB\Client;
+
+// Prepara l'array di dati che verrà popolato dal database.
+$recommendedFilms = [];
+
+try {
+    // Connessione a MongoDB locale e selezione della collezione film.
+    $mongoClient = new Client("mongodb://localhost:27017");
+    $db = $mongoClient->selectDatabase('cinevobis');
+    $collection = $db->selectCollection('films');
+
+    // Prende i film in evidenza ordinati per data di uscita.
+    $cursor = $collection->find([], [
+        'limit' => 24,
+        'sort' => ['release_date' => -1],
+        'typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']
+    ]);
+
+    $recommendedFilms = iterator_to_array($cursor);
+
+} catch (Exception $e) {
+    error_log("Errore MongoDB: " . $e->getMessage());
+}
+?>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>In evidenza - Cinevobis</title>
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+    <?php include(__DIR__ . "/../../includes/header.php"); ?>
+    
+    <main class="container mt-5 mb-5 flex-grow-1">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="fw-bold m-0">I Film in evidenza</h1>
+        </div>
+
+        <?php if (empty($recommendedFilms)): ?>
+            <div class="alert alert-info shadow-sm rounded-4 border-0">
+                <i class="bi bi-info-circle me-2"></i>Nessun film trovato nel database.
+            </div>
+        <?php else: ?>
+            <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 row-cols-xl-6 g-3">
+                <?php 
+                /** @var array $film */
+                foreach ($recommendedFilms as $film):
+                    $id     = $film['id'] ?? '';
+                    $titolo = $film['title'] ?? 'Titolo non disponibile';
+                    $poster = !empty($film['poster_path']) ? "https://image.tmdb.org/t/p/w500" . $film['poster_path'] : "https://via.placeholder.com/500x750?text=No+Poster";
+                    $anno   = !empty($film['release_date']) ? substr($film['release_date'], 0, 4) : '';
+                ?>
+                <div class="col">
+                    <a href="/pages/public/film.php?tmdb_id=<?= $id ?>" class="text-decoration-none text-dark d-block h-100">
+                        <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden transition-hover">
+                            <img src="<?= $poster ?>" class="card-img-top w-100" alt="<?= htmlspecialchars($titolo) ?>" loading="lazy" style="object-fit: cover; aspect-ratio: 2/3;">
+                            <div class="card-body p-2 d-flex flex-column bg-white">
+                                <h6 class="card-title fw-bold text-truncate mb-1" style="font-size: 0.95rem;" title="<?= htmlspecialchars($titolo) ?>"><?= htmlspecialchars($titolo) ?></h6>
+                                <div class="mt-auto">
+                                    <small class="text-muted fw-medium" style="font-size: 0.85rem;"><?= htmlspecialchars($anno) ?></small>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </main>
+
+    <?php require_once(__DIR__ . '/../../includes/footer.php'); ?>
+
+    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+```
+
+## File: pages/public/top_films.php
+```php
+<?php
+require_once(__DIR__ . '/../../config/config.php');
+require_once(__DIR__ . '/../../config/connection.php');
+require_once(__DIR__ . '/../../includes/header_logic.php');
+require_once(__DIR__ . '/../../vendor/autoload.php');
+
+use MongoDB\Client;
+
+// Prepara gli array di dati che verranno popolati dal database.
+$topFilms = [];
+
+try {
+    // Connessione a MongoDB locale e selezione della collezione film.
+    $mongoClient = new Client("mongodb://localhost:27017");
+    $db = $mongoClient->selectDatabase('cinevobis');
+    $collection = $db->selectCollection('films');
+
+    // Prende i migliori film ordinati per voto medio.
+    $cursor = $collection->find([], [
+        'limit' => 24,
+        'sort' => ['vote_average' => -1],
+        'typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']
+    ]);
+
+    $topFilms = iterator_to_array($cursor);
+
+} catch (Exception $e) {
+    error_log("Errore MongoDB: " . $e->getMessage());
+}
+?>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Migliori - Cinevobis</title>
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+    <?php include(__DIR__ . "/../../includes/header.php"); ?>
+    
+    <main class="container mt-5 mb-5 flex-grow-1">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="fw-bold m-0">I migliori Film</h1>
+        </div>
+
+        <?php if (empty($topFilms)): ?>
+            <div class="alert alert-info shadow-sm rounded-4 border-0">
+                <i class="bi bi-info-circle me-2"></i>Nessun film trovato nel database.
+            </div>
+        <?php else: ?>
+            <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 row-cols-xl-6 g-3">
+                <?php 
+                /** @var array $film */
+                foreach ($topFilms as $film):
+                    $id     = $film['id'] ?? '';
+                    $titolo = $film['title'] ?? 'Titolo non disponibile';
+                    $poster = !empty($film['poster_path']) ? "https://image.tmdb.org/t/p/w500" . $film['poster_path'] : "https://via.placeholder.com/500x750?text=No+Poster";
+                    $anno   = !empty($film['release_date']) ? substr($film['release_date'], 0, 4) : '';
+                ?>
+                <div class="col">
+                    <a href="/pages/public/film.php?tmdb_id=<?= $id ?>" class="text-decoration-none text-dark d-block h-100">
+                        <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden transition-hover">
+                            <img src="<?= $poster ?>" class="card-img-top w-100" alt="<?= htmlspecialchars($titolo) ?>" loading="lazy" style="object-fit: cover; aspect-ratio: 2/3;">
+                            <div class="card-body p-2 d-flex flex-column bg-white">
+                                <h6 class="card-title fw-bold text-truncate mb-1" style="font-size: 0.95rem;" title="<?= htmlspecialchars($titolo) ?>"><?= htmlspecialchars($titolo) ?></h6>
+                                <div class="mt-auto">
+                                    <small class="text-muted fw-medium" style="font-size: 0.85rem;"><?= htmlspecialchars($anno) ?></small>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </main>
+
+    <?php require_once(__DIR__ . '/../../includes/footer.php'); ?>
+
+    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+```
+
+## File: config/functions.php
+```php
+<?php
+function movie_sorting($cursor, $ids) {
+    // Trasforma il cursore MongoDB in un array associativo
+    $raw_films = iterator_to_array($cursor);
+
+    // Mappa i film usando il loro ID come chiave per un accesso rapido
+    $films_map = [];
+    foreach ($raw_films as $f) {
+        $films_map[$f['id']] = $f;
+    }
+
+    // Inizializza l'array
+    $films = [];
+    
+    // Ricostruisce la lista seguendo l'ordine esatto di $ids
+    foreach ($ids as $id) {
+        if (isset($films_map[$id])) {
+            $films[] = $films_map[$id];
+        }
+    }
+
+    return $films;
+}
+
+function order_of_popularity ($n, $results) {
+    // Ordinare per popolarità
+    for ($i = 0; $i < $n - 1; $i++) {
+        for ($j = $i + 1; $j < $n; $j++) {
+            if ($results[$i]['popularity'] < $results[$j]['popularity']) {
+                // scambio
+                $temp = $results[$i];
+                $results[$i] = $results[$j];
+                $results[$j] = $temp;
+            }
+        }
+    }
+
+    return $results;
+}
+```
+
+## File: package.json
+```json
+{
+  "name": "cinevobis",
+  "version": "1.0.0",
+  "description": "PHP project with a MySQL Database",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexiomagnus/cinevobis.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/alexiomagnus/cinevobis/issues"
+  },
+  "homepage": "https://github.com/alexiomagnus/cinevobis#readme",
+  "dependencies": {
+    "bootstrap": "^5.3.8",
+    "bootstrap-icons": "^1.13.1",
+    "tom-select": "^2.5.2"
+  }
+}
+```
+
+## File: database/credentials.md
+```markdown
+- password: film
+```
+
 ## File: .gitignore
 ```
 /vendor/
 /node_modules/
 .env
 config/php_errors.log
+repomix-output.md
+```
+
+## File: composer.json
+```json
+{
+    "name": "alexio/cinevobis",
+    "description": "PHP project with a MySQL Database",
+    "require": {
+        "vlucas/phpdotenv": "^5.6",
+        "kiwilan/php-tmdb": "^0.1.12",
+        "mongodb/mongodb": "^2.2"
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
+    }
+}
 ```
 
 ## File: includes/header_logic.php
 ```php
 <?php
-/**
- * Logica di routing lato server per le azioni inviate tramite i form dell'header
- * (navbar). Intercetta le richieste POST e reindirizza alle pagine appropriate:
- * logout, login, signup e profilo. Viene incluso in ogni pagina che usa l'header
- * per garantire che i pulsanti della navbar funzionino correttamente.
- */
+// Logica di routing per le azioni inviate dai form dell'header.
+// Gestisce redirect per logout, login, signup e profilo.
 $currentPage = basename($_SERVER['SCRIPT_NAME']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -969,13 +1350,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ## File: pages/public/search_genre.php
 ```php
 <?php
-/**
- * Pagina di esplorazione per genere. Riceve l'ID e il nome del genere tramite
- * i parametri GET (?id=...&name=...), interroga MongoDB per trovare tutti i film
- * che contengono quel genere nell'array 'genres', e li mostra in una griglia di card.
- *
- * @note Interagisce con la collezione MongoDB: `films` (query su campo `genres.id`).
- */
+// Pagina di esplorazione per genere. Riceve id e nome via GET, trova i film
+// con quel genere in MongoDB e li mostra in una griglia di card.
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');
@@ -1036,33 +1412,23 @@ if (!empty($id_genere)) {
             <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 row-cols-xl-6 g-3">
                 
                 <?php 
-                /** * Iterazione della collezione di film.
-                 * Ogni elemento $film è un array associativo contenente i dati del database.
-                 */
+                // Iterazione della lista di film recuperata da MongoDB.
                 foreach ($cursor as $film): 
                     
-                    // 1. Recupero dell'ID (fondamentale per link o operazioni specifiche)
+                    // Recupero dell'ID per generare il link alla pagina del film.
                     $id = $film['id'] ?? '';
 
-                    // 2. Gestione del Titolo con valore di fallback (default) se mancante
+                    // Titolo con valore di fallback se il campo non è presente.
                     $titolo = $film['title'] ?? 'Titolo non disponibile';
 
-                    /**
-                     * 3. Costruzione dell'URL del Poster
-                     * Se il percorso esiste, concateniamo l'URL base di TMDB.
-                     * Altrimenti, usiamo un'immagine segnaposto (placeholder) per non rompere il layout.
-                     */
+                    // Costruzione dell'URL del poster o fallback placeholder.
                     $baseUrl = "https://image.tmdb.org/t/p/w500";
                     $placeholderUrl = "https://via.placeholder.com/500x750?text=Immagine+non+disponibile";
 
                     $posterPath = $film['poster_path'] ?? '';
                     $poster = !empty($posterPath) ? $baseUrl . $posterPath : $placeholderUrl;
 
-                    /**
-                     * 4. Estrazione dell'Anno
-                     * La data arriva solitamente in formato 'YYYY-MM-DD'.
-                     * Usiamo substr per prendere solo i primi 4 caratteri (l'anno).
-                     */
+                    // Estraggo l'anno dalla data di rilascio nel formato YYYY-MM-DD.
                     $dataRilascio = $film['release_date'] ?? '';
                     $anno = !empty($dataRilascio) ? substr($dataRilascio, 0, 4) : 'N.D.';
                 ?>
@@ -1098,6 +1464,7 @@ if (!empty($id_genere)) {
 ## File: pages/public/terms.php
 ```php
 <?php
+// Pagina termini di servizio
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');
@@ -1152,34 +1519,10 @@ require_once(__DIR__ . '/../../includes/user_obj.php');
 </html>
 ```
 
-## File: composer.json
-```json
-{
-    "name": "alexio/cinevobis",
-    "description": "PHP project with a MySQL Database",
-    "require": {
-        "vlucas/phpdotenv": "^5.6",
-        "kiwilan/php-tmdb": "^0.1.12",
-        "mongodb/mongodb": "^2.2"
-    },
-    "config": {
-        "allow-plugins": {
-            "php-http/discovery": true
-        }
-    }
-}
-```
-
 ## File: actions/contact.php
 ```php
 <?php
-/**
- * Pagina di contatto: permette a qualsiasi visitatore (anche non autenticato)
- * di inviare un messaggio di supporto all'amministratore. Il messaggio viene
- * salvato come notifica nel database con il riferimento all'utente se loggato.
- *
- * @note Interagisce con la tabella MariaDB: `notifiche`.
- */
+// Gestisce l'invio dei messaggi di contatto e li salva come notifiche.
 require_once(__DIR__ . '/../config/config.php');
 require_once(__DIR__ . '/../config/connection.php');
 
@@ -1286,43 +1629,6 @@ if (isset($_POST['invia'])) {
 </html>
 ```
 
-## File: config/connection.php
-```php
-<?php
-/**
- * Stabilisce la connessione PDO al database MariaDB 'cinevobis'.
- * Configura la modalità di errore su ERRMODE_EXCEPTION e il fetch mode
- * predefinito su FETCH_ASSOC. In caso di errore critico, logga il messaggio
- * e mostra un messaggio generico all'utente terminando l'esecuzione.
- * Espone la variabile $conn disponibile per tutti i file che includono questo script.
- *
- * @note Interagisce con il database MariaDB: `cinevobis`.
- */
-require_once(__DIR__ . '/../vendor/autoload.php');
-
-use Dotenv\Dotenv;
-
-// Inizializza Dotenv puntando alla cartella del progetto
-$dotenv = Dotenv::createImmutable(__DIR__ . "/../");
-$dotenv->load();
-
-$host = $_ENV['DB_HOST'];
-$dbname = $_ENV['DB_NAME'];
-$user = $_ENV['DB_USER'];
-$password = $_ENV['DB_PASS'];
-
-try {
-    $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $password);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    error_log("Errore critico DB: " . $e->getMessage());
-    
-    // Mostrare all'utente un messaggio generico
-    die("Spiacenti, il servizio è momentaneamente non disponibile");
-}
-```
-
 ## File: config/config.php
 ```php
 <?php
@@ -1367,9 +1673,41 @@ if (isset($_SESSION['last_activity'])) {
 $_SESSION['last_activity'] = time();
 ```
 
+## File: config/connection.php
+```php
+<?php
+// Connessione PDO a MariaDB per il database 'cinevobis'.
+// Imposta ERRMODE_EXCEPTION e FETCH_ASSOC per ottenere risultati consistenti.
+// In caso di errore logga il problema e mostra un messaggio generico all'utente.
+require_once(__DIR__ . '/../vendor/autoload.php');
+
+use Dotenv\Dotenv;
+
+// Inizializza Dotenv puntando alla cartella del progetto
+$dotenv = Dotenv::createImmutable(__DIR__ . "/../");
+$dotenv->load();
+
+$host = $_ENV['DB_HOST'];
+$dbname = $_ENV['DB_NAME'];
+$user = $_ENV['DB_USER'];
+$password = $_ENV['DB_PASS'];
+
+try {
+    $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    error_log("Errore critico DB: " . $e->getMessage());
+    
+    // Mostrare all'utente un messaggio generico
+    die("Spiacenti, il servizio è momentaneamente non disponibile");
+}
+```
+
 ## File: pages/public/privacy.php
 ```php
 <?php
+// Pagina privacy
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');
@@ -1424,17 +1762,105 @@ require_once(__DIR__ . '/../../includes/user_obj.php');
 </html>
 ```
 
+## File: includes/movie_obj.php
+```php
+<?php
+// Gestisce la normalizzazione dei dati di un film provenienti da TMDB o MongoDB.
+class movieObj
+{
+    private string $titolo;
+    private string $titolo_orig;
+    private string $trama;
+    private ?string $poster_path;
+    private float $voto;
+    private $durata;
+    private $anno;
+    private array $generi;
+    private array $cast;
+    private ?string $trailer_key;
+    private string $paese;
+    private array $registi;
+
+    // Costruttore della classe: estrae e normalizza i dettagli essenziali del film 
+    // (titolo, trama, cast, ecc.) a partire dall'array di dati grezzi ricevuto in input.
+    public function __construct(array $data)
+    {
+        $this->titolo = $data['title'] ?? 'Titolo non disponibile';
+        $this->titolo_orig = $data['original_title'] ?? '';
+
+        $this->trama = !empty($data['overview']) ? $data['overview'] : 'Nessuna trama disponibile';        
+        $this->poster_path = !empty($data['poster_path']) ? $data['poster_path'] : null;
+
+        $this->voto = (float)($data['vote_average'] ?? 0);
+        $this->trailer_key = $data['videos']['results'][0]['key'] ?? null;
+
+        $this->durata = $data['runtime'] ?? 'N/A';
+        $this->anno = !empty($data['release_date']) ? substr($data['release_date'], 0, 4) : 'N/A';
+
+        $this->generi = $data['genres'] ?? [];
+        $this->paese = $data['production_countries'][0]['name'] ?? 'Nessun paese';
+        
+        // Limita il cast ai primi 12 attori per evitare array troppo pesanti
+        $this->cast = array_slice($data['credits']['cast'] ?? [], 0, 12);
+        $this->registi = $this->searchDirectors($data);
+    }
+
+    // Funzione privata di supporto: analizza i dati della troupe (crew) 
+    // e filtra l'array per restituire esclusivamente i membri col ruolo di regista.
+    private function searchDirectors(array $data): array
+    {
+        $crew = $data['credits']['crew'] ?? [];
+
+        $directors = array_filter($crew, function ($persona) {
+            return ($persona['job'] ?? '') === 'Director';
+        });
+
+        return array_values($directors);
+    }
+
+    // Metodo statico: processa una lista di risultati grezzi (es. risultati di ricerca TMDB)
+    // e restituisce un array semplificato contenente solo ID, titolo, anno e URL della locandina.
+    public static function search(array $movies): array
+    {
+        $moviesList = [];
+        foreach ($movies as $movie) {
+            $moviesList[] = [
+                'id' => $movie['id'],
+                'titolo' => $movie['title'] ?? 'Titolo non disponibile.',
+                'anno'   => !empty($movie['release_date']) ? substr($movie['release_date'], 0, 4) : null,
+                'poster' => !empty($movie['poster_path']) ? 'https://image.tmdb.org/t/p/w92' . $movie['poster_path'] : null
+            ];
+        }
+        return $moviesList;
+    }
+
+    // Restituisce tutte le proprietà dell'oggetto film formattate in un array associativo, 
+    // ideale per il salvataggio su database documentali (come MongoDB) o per risposte JSON.
+    public function toArray(): array
+    {
+        return [
+            'titolo' => $this->titolo,
+            'titolo_orig' => $this->titolo_orig,
+            'trama' => $this->trama,
+            'poster_path' => $this->poster_path,
+            'voto' => $this->voto,
+            'durata' => $this->durata,
+            'anno' => $this->anno,
+            'generi' => $this->generi,
+            'paese' => $this->paese,
+            'cast' => $this->cast,
+            'registi' => $this->registi,
+            'trailer_key' => $this->trailer_key
+        ];
+    }
+}
+?>
+```
+
 ## File: pages/admin/film_db.php
 ```php
 <?php
-/**
- * Pagina di dettaglio film per l'area admin. A differenza della versione pubblica,
- * recupera i dati esclusivamente da MongoDB (senza interrogare l'API TMDB)
- * e li visualizza in sola lettura con poster, trama, cast, registi e trailer.
- * Riceve il TMDB ID tramite GET (?tmdb_id=...).
- *
- * @note Interagisce con la collezione MongoDB: `films` (findOne).
- */
+// Pagina admin di dettaglio film che legge i dati direttamente da MongoDB.
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');
@@ -1444,20 +1870,31 @@ require_once(__DIR__ . '/../../vendor/autoload.php');
 
 use MongoDB\Client;
 
+
+// Controllo autenticazione
+$username   = $_SESSION['username']   ?? '';
+$id_profilo = $_SESSION['id_profilo'] ?? 0;
+
+if (!$username || $id_profilo != 1) {
+    header("Location: /index.php");
+    exit();
+}
+
+
 // Dichiarazione variabili
 $movie_db = null;
-$errore = "";
+$data     = [];
+$errore   = "";
 
 $movie_id = $_GET['tmdb_id'] ?? null;
 
 if (empty($movie_id)) {
     $errore = "Nessun film selezionato";
 } else {
-    // Connessione a MongoDB e recupero diretto
     try {
         $mongoClient = new Client("mongodb://localhost:27017");
-        $db = $mongoClient->selectDatabase('cinevobis');
-        $collection = $db->selectCollection('films');
+        $db          = $mongoClient->selectDatabase('cinevobis');
+        $collection  = $db->selectCollection('films');
 
         $movie_db = $collection->findOne(
             ['id' => (int)$movie_id],
@@ -1466,6 +1903,8 @@ if (empty($movie_id)) {
 
         if ($movie_db === null) {
             $errore = "Film non trovato nel database";
+        } else {
+            $data = (new movieObj($movie_db))->toArray();
         }
 
     } catch (Exception $e) {
@@ -1473,58 +1912,21 @@ if (empty($movie_id)) {
         $errore = "Errore di connessione al database";
     }
 }
-
-// 3. Estrazione dati
-$titolo = $trama = $poster_path = $trailerKey = $paese = '';
-$voto = 0;
-$durata = $anno = '';
-$generi = $cast = $registi = [];
-
-if ($movie_db) {
-    $movieObj = new movieObj($movie_db);
-    $data = $movieObj->toArray();
-
-    $titolo = $data['titolo'];
-    $titolo_orig = $data['titolo_orig'];
-
-    $trama = $data['trama'];
-    $poster_path = $data['poster_path'];
-
-    $voto = $data['voto'];
-    $trailerKey = $data['trailer_key'];
-
-    $durata = $data['durata'];
-    $anno = $data['anno'];
-
-    $generi = $data['generi'];
-    $paese = $data['paese'];
-
-    $cast = $data['cast'];
-    $registi = $data['registi'];
-}
 ?>
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $movie_db ? htmlspecialchars($titolo) : 'Film' ?> - Cinevobis</title>
+    <title><?= $movie_db ? htmlspecialchars($data['titolo']) : 'Film' ?> - Cinevobis</title>
     
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
-    
     <link rel="stylesheet" href="/assets/css/style.css">
     
     <style>
-        .cast-avatar {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-        }
-
-        .text-justify { 
-            text-align: justify; 
-        }
+        .cast-avatar { width: 60px; height: 60px; object-fit: cover; }
+        .text-justify { text-align: justify; }
     </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
@@ -1538,8 +1940,8 @@ if ($movie_db) {
 
                         <div class="row g-5 mb-5">
                             <div class="col-md-4">
-                                <?php if($poster_path): ?>
-                                    <img src="https://image.tmdb.org/t/p/w500<?= $poster_path ?>" 
+                                <?php if ($data['poster_path']): ?>
+                                    <img src="https://image.tmdb.org/t/p/w500<?= $data['poster_path'] ?>" 
                                          class="img-fluid rounded-4 shadow-md w-100" 
                                          alt="Poster">
                                 <?php else: ?>
@@ -1552,7 +1954,7 @@ if ($movie_db) {
                                     </div>
                                 <?php endif; ?>
 
-                                <?php if ($trailerKey): ?>
+                                <?php if ($data['trailer_key']): ?>
                                     <div class="mt-4">
                                         <button type="button"
                                             class="btn btn-dark w-100 py-2 d-flex align-items-center justify-content-center"
@@ -1565,23 +1967,22 @@ if ($movie_db) {
                             </div>
 
                             <div class="col-md-8">
-                                <h1 class="fw-bold display-5 mb-3" style="color: var(--text);"><?= htmlspecialchars($titolo) ?></h1>
+                                <h1 class="fw-bold display-5 mb-3" style="color: var(--text);"><?= htmlspecialchars($data['titolo']) ?></h1>
 
-                                <?php if (!empty($titolo_orig) && strcasecmp(trim($titolo_orig), trim($titolo)) !== 0): ?>
-                                    <p class="fs-5 mb-4" style="color: var(--text-muted);"><?= htmlspecialchars($titolo_orig) ?></p>
+                                <?php if (!empty($data['titolo_orig']) && strcasecmp(trim($data['titolo_orig']), trim($data['titolo'])) !== 0): ?>
+                                    <p class="fs-5 mb-4" style="color: var(--text-muted);"><?= htmlspecialchars($data['titolo_orig']) ?></p>
                                 <?php endif; ?>
 
-                                <?php if (!empty($registi)): ?>
+                                <?php if (!empty($data['registi'])): ?>
                                     <div class="mb-4">
                                         <small class="text-uppercase fw-bold d-block mb-1" style="letter-spacing: 1px; color: var(--text-muted);">Regia</small>
                                         <p class="fs-5 fw-medium mb-0" style="color: var(--text);">
-                                            <?php 
-                                            $registi_links = [];
-                                            foreach ($registi as $regista) {
+                                            <?php
+                                            $registi_links = array_map(function ($regista) {
                                                 $name = htmlspecialchars($regista['name']);
-                                                $id = urlencode($regista['id']);
-                                                $registi_links[] = "<a href='https://www.themoviedb.org/person/$id' class='text-decoration-none' style='color: var(--accent); transition: color 0.2s;' onmouseover='this.style.color=\"var(--accent-hover)\"' onmouseout='this.style.color=\"var(--accent)\"'>$name</a>";
-                                            }
+                                                $id   = urlencode($regista['id']);
+                                                return "<a href='https://www.themoviedb.org/person/$id' class='text-decoration-none' style='color: var(--accent); transition: color 0.2s;' onmouseover='this.style.color=\"var(--accent-hover)\"' onmouseout='this.style.color=\"var(--accent)\"'>$name</a>";
+                                            }, $data['registi']);
                                             echo implode(', ', $registi_links);
                                             ?>
                                         </p>
@@ -1589,7 +1990,7 @@ if ($movie_db) {
                                 <?php endif; ?>
 
                                 <div class="d-flex flex-wrap gap-2 mb-4">
-                                    <?php foreach ($generi as $genre): ?>
+                                    <?php foreach ($data['generi'] as $genre): ?>
                                         <span class="badge px-3 py-2" 
                                               style="background-color: var(--bg-muted); color: var(--text); border: 1px solid var(--border);">
                                             <?= htmlspecialchars($genre['name']) ?>
@@ -1603,12 +2004,12 @@ if ($movie_db) {
                                         <div class="d-flex align-items-center fs-4 fw-bold">
                                             <i class="bi bi-star-fill text-warning me-2"></i>
                                             <span>
-                                                <?= number_format($voto, 1) ?>
+                                                <?= number_format($data['voto'], 1) ?>
                                                 <small style="color: var(--text-muted);" class="fw-normal fs-6">/ 10</small>
                                             </span>
                                         </div>
                                     </div>
-                                    <p class="text-justify lh-lg fs-6 mb-4" style="color: var(--text-muted);"><?= nl2br(htmlspecialchars($trama)) ?></p>
+                                    <p class="text-justify lh-lg fs-6 mb-4" style="color: var(--text-muted);"><?= nl2br(htmlspecialchars($data['trama'])) ?></p>
                                 </div>
                             </div>
                         </div>
@@ -1616,23 +2017,25 @@ if ($movie_db) {
                         <div class="row text-center py-4 rounded-4 mb-5 mx-0" style="background-color: var(--bg-muted); border: 1px solid var(--border);">
                             <div class="col-4 border-end" style="border-color: var(--border) !important;">
                                 <div class="small text-uppercase fw-bold" style="color: var(--text-muted);">Durata</div>
-                                <div class="fw-bold fs-5" style="color: var(--text);"><?= $durata ?> min</div>
+                                <div class="fw-bold fs-5" style="color: var(--text);"><?= $data['durata'] ?> min</div>
                             </div>
                             <div class="col-4 border-end" style="border-color: var(--border) !important;">
                                 <div class="small text-uppercase fw-bold" style="color: var(--text-muted);">Anno</div>
-                                <div class="fw-bold fs-5" style="color: var(--text);"><?= $anno ?></div>
+                                <div class="fw-bold fs-5" style="color: var(--text);"><?= $data['anno'] ?></div>
                             </div>
                             <div class="col-4">
                                 <div class="small text-uppercase fw-bold" style="color: var(--text-muted);">Paese</div>
-                                <div class="fw-bold fs-5" style="color: var(--text);"><?= $paese ?></div>
+                                <div class="fw-bold fs-5" style="color: var(--text);"><?= $data['paese'] ?></div>
                             </div>
                         </div>
 
                         <div class="mt-2">
                             <h4 class="fw-bold mb-4" style="color: var(--text);">Cast Principale</h4>
                             <div class="row g-3">
-                                <?php foreach ($cast as $actor):
-                                    $profile = $actor['profile_path'] ? "https://image.tmdb.org/t/p/w185" . $actor['profile_path'] : "https://ui-avatars.com/api/?name=" . urlencode($actor['name']) . "&background=f1f5f9&color=64748b";
+                                <?php foreach ($data['cast'] as $actor):
+                                    $profile = $actor['profile_path']
+                                        ? "https://image.tmdb.org/t/p/w185" . $actor['profile_path']
+                                        : "https://ui-avatars.com/api/?name=" . urlencode($actor['name']) . "&background=f1f5f9&color=64748b";
                                 ?>
                                     <div class="col-12 col-sm-6 col-lg-4">
                                         <a href="https://www.themoviedb.org/person/<?= $actor['id'] ?>"
@@ -1662,7 +2065,7 @@ if ($movie_db) {
                 </div>
             </div>
 
-            <?php if ($trailerKey): ?>
+            <?php if ($data['trailer_key']): ?>
             <div class="modal fade" id="trailerModal" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-xl modal-dialog-centered">
                     <div class="modal-content bg-transparent border-0">
@@ -1672,7 +2075,7 @@ if ($movie_db) {
                         <div class="modal-body p-0">
                             <div class="ratio ratio-16x9 shadow-lg rounded-4 overflow-hidden" style="background: #000;">
                                 <iframe id="trailerVideo"
-                                    data-src="https://www.youtube.com/embed/<?= $trailerKey ?>?rel=0&autoplay=1"
+                                    data-src="https://www.youtube.com/embed/<?= $data['trailer_key'] ?>?rel=0&autoplay=1"
                                     allow="autoplay; encrypted-media"
                                     allowfullscreen>
                                 </iframe>
@@ -1696,489 +2099,10 @@ if ($movie_db) {
 </html>
 ```
 
-## File: pages/public/users_reviews.php
-```php
-<?php
-/**
- * Pagina pubblica che mostra le recensioni scritte dagli utenti per un film specifico.
- * Riceve il TMDB ID del film tramite GET (?tmdb_id=...) e recupera commento, voto
- * e dati anagrafici di ogni recensore tramite JOIN tra le tabelle recensioni e utenti.
- *
- * @note Interagisce con le tabelle MariaDB: `recensioni`, `utenti` (JOIN).
- */
-require_once(__DIR__ . '/../../config/config.php');
-require_once(__DIR__ . '/../../config/connection.php');
-require_once(__DIR__ . '/../../includes/header_logic.php');
-require_once(__DIR__ . '/../../vendor/autoload.php');
-
-$recensioni_altri = [];
-$movie_id = $_GET['tmdb_id'] ?? null;
-
-// Recuperiamo le recensioni degli altri utenti
-try {   
-    $sql = "SELECT r.commento, r.voto, u.nome, u.cognome
-            FROM recensioni r
-            JOIN utenti u ON r.id_utente = u.id_utente 
-            WHERE tmdb_id = :tmdb_id
-            ORDER BY r.tmdb_id DESC";
-
-    $stmt = $conn->prepare($sql);
-    $stmt->execute([':tmdb_id' => $movie_id]);
-
-    $recensioni_altri = $stmt->fetchAll();
-
-} catch (PDOException $e) {
-    error_log("Errore nel DB: " . $e->getMessage());
-}
-?>
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recensioni della Community - Cinevobis</title>
-    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <style>
-        :root { --accent-color: #ffc107; }
-        .text-justify { text-align: justify; }
-        .review-poster {
-            width: 120px;
-            min-width: 120px;
-            aspect-ratio: 2/3;
-            object-fit: cover;
-            border-radius: 0.5rem 0 0 0.5rem;
-        }
-        .transition-hover:hover {
-            transform: translateY(-5px);
-            transition: transform 0.3s ease;
-        }
-    </style>
-</head>
-<body class="d-flex flex-column min-vh-100">
-
-    <?php require_once(__DIR__ . '/../../includes/header.php'); ?>
-
-    <main class="container mt-5 mb-5 flex-grow-1">
-        <h1 class="fw-bold mb-2">Recensioni della Community</h1>
-        <p class="text-muted mb-4">Scopri cosa pensano gli altri utenti</p>
-
-            <div class="row row-cols-1 row-cols-md-2 g-4">
-                <?php foreach ($recensioni_altri as $r): 
-                    $poster_url = !empty($r['poster']) ? "https://image.tmdb.org/t/p/w500" . $r['poster'] : "https://via.placeholder.com/500x750?text=No+Poster";
-                ?>
-                <div class="col">
-                        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden transition-hover">
-                            <div class="d-flex h-100">
-
-                                <div class="card-body d-flex flex-column justify-content-between p-3">
-                                    <div>
-                                        <h5 class="fw-bold mb-1 text-dark">
-                                            <?= htmlspecialchars($r['titolo']) ?>
-                                        </h5>
-                                        
-                                        <div class="small text-primary mb-2">
-                                            <i class="bi bi-person-circle me-1"></i><?= htmlspecialchars($r['nome']) . " " . htmlspecialchars($r['cognome'])?>
-                                        </div>
-
-                                        <?php if (!empty($r['commento'])): ?>
-                                            <p class="text-muted small mb-2 text-justify">
-                                                "<?= nl2br(htmlspecialchars($r['commento'])) ?>"
-                                            </p>
-                                        <?php endif; ?>
-                                    </div>
-
-                                    <div class="d-flex align-items-center gap-1 mt-2">
-                                        <i class="bi bi-star-fill text-warning"></i>
-                                        <span class="fw-bold fs-5"><?= number_format($r['voto'], 1) ?></span>
-                                        <span class="text-muted small">/10</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <?php endforeach; ?>
-            </div>
-    </main>
-
-    <?php require_once(__DIR__ . '/../../includes/footer.php'); ?>
-
-    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
-```
-
-## File: includes/movie_obj.php
-```php
-<?php
-/**
- * Rappresenta un film e si occupa di normalizzare i dati grezzi provenienti
- * dall'API TMDB o da MongoDB in un formato strutturato e uniforme.
- */
-class movieObj
-{
-    private string $titolo;
-    private string $titolo_orig;
-    private string $trama;
-    private ?string $poster_path;
-    private float $voto;
-    private $durata;
-    private $anno;
-    private array $generi;
-    private array $cast;
-    private ?string $trailer_key;
-    private string $paese;
-    private array $registi;
-
-    
-    /**
-     * Popola le proprietà del film a partire da un array grezzo (TMDB o MongoDB).
-     * Applica valori di fallback per i campi mancanti e limita il cast ai primi 12 attori.
-     *
-     * @param array $data Array associativo con i dati del film (struttura TMDB).
-     */
-    public function __construct(array $data)
-    {
-        $this->titolo = $data['title'] ?? 'Titolo non disponibile';
-        $this->titolo_orig = $data['original_title'] ?? '';
-
-        $this->trama = !empty($data['overview']) ? $data['overview'] : 'Nessuna trama disponibile';        
-        $this->poster_path = !empty($data['poster_path']) ? $data['poster_path'] : null;
-
-        $this->voto = (float)($data['vote_average'] ?? 0);
-        $this->trailer_key = $data['videos']['results'][0]['key'] ?? null;
-
-        $this->durata = $data['runtime'] ?? 'N/A';
-        $this->anno = !empty($data['release_date']) ? substr($data['release_date'], 0, 4) : 'N/A';
-
-        $this->generi = $data['genres'] ?? [];
-        $this->paese = $data['production_countries'][0]['name'] ?? 'Nessun paese';
-        
-        $this->cast = array_slice($data['credits']['cast'] ?? [], 0, 12);
-        $this->registi = $this->searchDirectors($data);
-    }
-
-
-    /**
-     * Filtra il crew del film per estrarre solo i membri con job === 'Director'.
-     * Reindizza l'array risultante per rimuovere i gap numerici lasciati da array_filter.
-     *
-     * @param array $data Array grezzo del film contenente la chiave 'credits.crew'.
-     * @return array Array dei registi con i loro dati TMDB.
-     */
-    private function searchDirectors(array $data): array
-    {
-        $crew = $data['credits']['crew'] ?? [];
-
-        $directors = array_filter($crew, function ($persona) {
-            return ($persona['job'] ?? '') === 'Director';
-        });
-
-        return array_values($directors);
-    }
-
-
-    /**
-     * Converte un array di risultati di ricerca TMDB in un formato semplificato
-     * adatto alla visualizzazione nelle liste (id, titolo, anno, URL poster thumbnail).
-     *
-     * @param array $movies Array di film nel formato restituito dall'endpoint /search/movie di TMDB.
-     * @return array Array semplificato con id, titolo, anno e URL poster (w92).
-     */
-    public static function search(array $movies): array
-    {
-        $moviesList = [];
-        foreach ($movies as $movie) {
-            $moviesList[] = [
-                'id' => $movie['id'],
-                'titolo' => $movie['title'] ?? 'Titolo non disponibile.',
-                'anno'   => !empty($movie['release_date']) ? substr($movie['release_date'], 0, 4) : null,
-                'poster' => !empty($movie['poster_path']) ? 'https://image.tmdb.org/t/p/w92' . $movie['poster_path'] : null
-            ];
-        }
-        return $moviesList;
-    }
-
-
-    /**
-     * Serializza tutte le proprietà del film in un array associativo.
-     * Utile per passare i dati alle view senza esporre l'oggetto direttamente.
-     *
-     * @return array Array associativo con tutti i campi del film (titolo, trama, cast, ecc.).
-     */
-    public function toArray(): array
-    {
-        return [
-            'titolo' => $this->titolo,
-            'titolo_orig' => $this->titolo_orig,
-            'trama' => $this->trama,
-            'poster_path' => $this->poster_path,
-            'voto' => $this->voto,
-            'durata' => $this->durata,
-            'anno' => $this->anno,
-            'generi' => $this->generi,
-            'paese' => $this->paese,
-            'cast' => $this->cast,
-            'registi' => $this->registi,
-            'trailer_key' => $this->trailer_key
-        ];
-    }
-}
-```
-
-## File: includes/user_obj.php
-```php
-<?php
-/**
- * Rappresenta un utente del sistema e raggruppa tutte le operazioni CRUD
- * relative agli account e alle sessioni di accesso.
- */
-class userObj {
-    private string $username;
-    private ?string $password;
-    private ?string $nome;
-    private ?string $cognome;
-    private ?string $email;
-    private ?int $id_profilo;
-    private ?int $attivo;
-    private PDO $db;
-
-
-    /**
-     * Inizializza l'oggetto utente con i dati forniti.
-     * La password, se presente, viene subito sottoposta a hashing con PASSWORD_DEFAULT.
-     *
-     * @param PDO         $db          Connessione al database MariaDB.
-     * @param string      $username    Nome utente univoco.
-     * @param string|null $password    Password in chiaro (verrà hashata).
-     * @param string|null $nome        Nome anagrafico.
-     * @param string|null $cognome     Cognome anagrafico.
-     * @param string|null $email       Indirizzo email.
-     * @param int|null    $attivo      Flag di attivazione account (1 = attivo, 0 = disabilitato).
-     * @param int|null    $id_profilo  Identificativo del ruolo (es. 1 = admin, 2 = utente).
-     */
-    public function __construct(PDO $db, string $username, ?string $password = null, ?string $nome = null, ?string $cognome = null,
-                            ?string $email = null, ?int $attivo = null, ?int $id_profilo = null) {
-        $this->db           = $db;
-        $this->username     = $username;
-        $this->password     = $password ? password_hash($password, PASSWORD_DEFAULT) : null;
-        $this->nome         = $nome;
-        $this->cognome      = $cognome;
-        $this->email        = $email;
-        $this->attivo       = $attivo;
-        $this->id_profilo   = $id_profilo;
-    }
-
-
-    /**
-     * Inserisce un nuovo utente nel database con la data di registrazione corrente.
-     * Se il campo `attivo` non è specificato nel costruttore, viene impostato a 1 (attivo).
-     *
-     * @return bool True se l'inserimento è andato a buon fine, false altrimenti.
-     * @note Interagisce con la tabella MariaDB: `utenti`.
-     */
-    public function create() {
-        $sql = "INSERT INTO utenti 
-                    (username, password, nome, cognome, email, attivo, id_profilo, data_registrazione)
-                VALUES 
-                    (:username, :password, :nome, :cognome, :email, :attivo, :id_profilo, :data_registrazione)";
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
-            ':username'           => $this->username,
-            ':password'           => $this->password,
-            ':nome'               => $this->nome,
-            ':cognome'            => $this->cognome,
-            ':email'              => $this->email,
-            ':attivo'             => $this->attivo ?? 1,
-            ':id_profilo'         => $this->id_profilo,
-            ':data_registrazione' => date('Y-m-d H:i:s')
-        ]);
-    }
-
-
-    /**
-     * Cerca e restituisce il record completo dell'utente corrispondente all'username
-     * impostato nel costruttore.
-     *
-     * @return array|false Array associativo con i dati dell'utente, o false se non trovato.
-     * @note Interagisce con la tabella MariaDB: `utenti`.
-     */
-    public function findByUsername() {
-        $sql = "SELECT id_utente, username, password, nome, cognome, email,
-                       attivo, id_profilo, data_registrazione
-                FROM utenti WHERE username = :username";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindParam(':username', $this->username);
-        $stmt->execute();
-        return $stmt->fetch();
-    }
-
-
-    /**
-     * Restituisce l'elenco completo di tutti gli utenti registrati, incluso il nome
-     * del profilo/ruolo, ordinati alfabeticamente per username.
-     *
-     * @return array Array di array associativi con i dati di ciascun utente.
-     * @note Interagisce con le tabelle MariaDB: `utenti`, `profili` (JOIN).
-     */
-    public function readAll() {
-        $sql = "SELECT u.id_utente, u.username, u.nome, u.cognome, u.email,
-                       u.attivo, p.nome_profilo
-                FROM utenti u
-                LEFT JOIN profili p ON p.id_profilo = u.id_profilo
-                ORDER BY u.username";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll();
-    }
-
-
-    /**
-     * Aggiorna i dati anagrafici, lo stato e il ruolo dell'utente identificato
-     * da `$usernameOriginale` (utile quando si consente il cambio username).
-     *
-     * @param string $usernameOriginale Username usato come chiave di ricerca nel WHERE.
-     * @return bool True se l'aggiornamento è andato a buon fine, false altrimenti.
-     * @note Interagisce con la tabella MariaDB: `utenti`.
-     */
-    public function update(string $usernameOriginale) {
-        $sql = "UPDATE utenti SET
-                    nome       = :nome,
-                    cognome    = :cognome,
-                    email      = :email,
-                    attivo     = :attivo,
-                    id_profilo = :id_profilo
-                WHERE username = :username";
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
-            ':nome'       => $this->nome,
-            ':cognome'    => $this->cognome,
-            ':email'      => $this->email,
-            ':attivo'     => $this->attivo,
-            ':id_profilo' => $this->id_profilo,
-            ':username'   => $usernameOriginale
-        ]);
-    }
-
-
-    /**
-     * Cambia la password dell'utente dopo aver verificato che quella attuale sia corretta.
-     * Restituisce un array con la chiave 'ok' (bool) e, in caso di errore, 'errore' (string).
-     *
-     * @param string $passwordAttuale Password corrente in chiaro per la verifica.
-     * @param string $nuovaPassword   Nuova password in chiaro che verrà hashata.
-     * @return array{ok: bool, errore?: string} Esito dell'operazione.
-     * @note Interagisce con la tabella MariaDB: `utenti`.
-     */
-    public function changePassword(string $passwordAttuale, string $nuovaPassword) {
-        $utente = $this->findByUsername();
-
-        if (!$utente) {
-            return ['ok' => false, 'errore' => 'Utente non trovato'];
-        }
-
-        if (!password_verify($passwordAttuale, $utente['password'])) {
-            return ['ok' => false, 'errore' => 'Password attuale non corretta'];
-        }
-
-        $hash = password_hash($nuovaPassword, PASSWORD_DEFAULT);
-        $sql  = "UPDATE utenti SET password = :password WHERE username = :username";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':password' => $hash, ':username' => $this->username]);
-
-        return ['ok' => true];
-    }
-
-
-    /**
-     * Elimina definitivamente l'utente dal database tramite il suo username.
-     *
-     * @return bool True se la riga è stata eliminata con successo, false altrimenti.
-     * @note Interagisce con la tabella MariaDB: `utenti`.
-     */
-    public function delete() {
-        $sql  = "DELETE FROM utenti WHERE username = :username";
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([':username' => $this->username]);
-    }
-
-
-    /**
-     * Registra l'accesso dell'utente creando un nuovo record di sessione con
-     * la data e l'ora di login.
-     *
-     * @param string $value       Data e ora del login nel formato 'Y-m-d H:i:s'.
-     * @param string $id_sessione ID di sessione PHP corrente.
-     * @param int    $id_utente   ID numerico dell'utente che ha effettuato il login.
-     * @return bool True se il record è stato inserito, false altrimenti.
-     * @note Interagisce con la tabella MariaDB: `sessioni`.
-     */
-    public function createDataLogin(string $value, string $id_sessione, int $id_utente) {
-        $sql = "INSERT INTO sessioni (id_sessione, id_utente, data_login)
-                VALUES (:id_s, :id_u, :data_login)";
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
-            ':id_s'       => $id_sessione,
-            ':id_u'       => $id_utente,
-            ':data_login' => $value
-        ]);
-    }
-
-
-    /**
-     * Registra la data e l'ora di logout aggiornando il record di sessione
-     * corrispondente all'ID di sessione fornito.
-     *
-     * @param string $value       Data e ora del logout nel formato 'Y-m-d H:i:s'.
-     * @param string $id_sessione ID di sessione PHP da aggiornare.
-     * @return bool True se l'aggiornamento è andato a buon fine, false altrimenti.
-     * @note Interagisce con la tabella MariaDB: `sessioni`.
-     */
-    public function setDataLogout(string $value, string $id_sessione) {
-        $sql = "UPDATE sessioni SET data_logout = :value WHERE id_sessione = :id_s";
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
-            ':value' => $value, 
-            ':id_s'  => $id_sessione
-        ]);
-    }
-
-    
-    /**
-     * Restituisce le ultime N sessioni di accesso al sito, ordinate dalla più recente,
-     * con username, data di login e data di logout di ciascun accesso.
-     *
-     * @param int $num Numero massimo di righe da restituire.
-     * @return array Array di array associativi con i dettagli delle sessioni.
-     * @note Interagisce con le tabelle MariaDB: `sessioni`, `utenti` (JOIN).
-     */
-    public function readAccess(int $num) {
-        $sql = "SELECT u.username, u.nome, u.cognome, s.data_login, s.data_logout
-                FROM sessioni s
-                JOIN utenti u ON u.id_utente = s.id_utente
-                ORDER BY s.data_login DESC
-                LIMIT :num";
-        $stmt = $this->db->prepare($sql);
-        $num  = (int)$num;
-        $stmt->bindParam(':num', $num, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll();
-    }
-}
-```
-
 ## File: actions/logout.php
 ```php
 <?php
-/**
- * Gestisce il processo di logout: registra la data/ora di uscita nel DB
- * e invalida la sessione.
- * Al termine reindirizza l'utente alla home con il parametro ?logout=success.
- *
- * @note Interagisce con la tabella MariaDB: `sessioni` (tramite userObj::setDataLogout).
- */
+// Esegue il logout dell'utente, aggiorna la sessione nel DB e termina la sessione.
 require_once(__DIR__ . '/../config/config.php');
 require_once(__DIR__ . '/../config/connection.php');
 require_once(__DIR__ . '/../includes/user_obj.php');
@@ -2209,422 +2133,331 @@ try {
 }
 ```
 
-## File: pages/admin/dashboard.php
+## File: includes/footer.php
 ```php
 <?php
-/**
- * Dashboard amministrativa (riservata al profilo admin, id_profilo = 1).
- * Raccoglie e mostra quattro contatori statistici: numero di film nel catalogo
- * MongoDB, numero di utenti registrati, numero totale di sessioni e numero di
- * notifiche non lette. Fornisce link rapidi alle sezioni di gestione.
- *
- * @note Interagisce con la collezione MongoDB: `films` (countDocuments).
- * @note Interagisce con le tabelle MariaDB: `utenti`, `sessioni`, `notifiche`.
- */
+$currentPage = basename($_SERVER['SCRIPT_NAME']);
+
+$adminPages = ['add_film.php', 'dashboard.php', 'sessions.php', 'users.php', 'edit_user.php', 'notifications.php', 'films.php', 'film_db.php'];
+
+$isAdminPage = in_array($currentPage, $adminPages);
+?>
+
+<footer class="border-top px-3 px-lg-4 py-3">
+    <div class="container-fluid d-flex align-items-center justify-content-between flex-wrap gap-2">
+
+        <!-- Brand + copyright -->
+        <div class="d-flex align-items-center gap-2">
+            <span lass="fw-bold text-dark">Cinevobis</span>
+            <span class="text-secondary small">
+                © <?= date("Y") ?>
+                <?= $isAdminPage ? '— Area admin' : '' ?>
+            </span>
+        </div>
+
+        <!-- Link -->
+        <nav class="d-flex align-items-center gap-1" aria-label="Footer">
+            <?php if ($isAdminPage): ?>
+                <a href="/" class="btn btn-sm btn-link text-secondary text-decoration-none p-1 px-2" style="font-size: 0.75rem;">
+                    Torna al sito
+                </a>
+            <?php else: ?>
+                <a href="/pages/public/terms.php" class="btn btn-sm btn-link text-secondary text-decoration-none p-1 px-2" style="font-size: 0.75rem;">Termini di servizio</a>
+                <span class="text-secondary" style="font-size: 0.75rem;">·</span>
+                <a href="/pages/public/privacy.php" class="btn btn-sm btn-link text-secondary text-decoration-none p-1 px-2" style="font-size: 0.75rem;">Privacy</a>
+                <span class="text-secondary" style="font-size: 0.75rem;">·</span>
+                <a href="/actions/contact.php" class="btn btn-sm btn-link text-secondary text-decoration-none p-1 px-2" style="font-size: 0.75rem;">Contattaci</a>
+            <?php endif; ?>
+        </nav>
+
+    </div>
+</footer>
+```
+
+## File: includes/user_obj.php
+```php
+<?php
+// Rappresenta un utente e raggruppa le operazioni CRUD sugli account, le sessioni
+// e le liste personali (preferiti, watchlist, watched, recensioni).
+class userObj {
+    private string $username;
+    private ?string $password;
+    private ?string $nome;
+    private ?string $cognome;
+    private ?string $email;
+    private ?int $id_profilo;
+    private ?int $attivo;
+    private PDO $db;
+
+    // Costruttore della classe: inizializza le proprietà dell'oggetto utente.
+    // Se viene passata una password, ne genera automaticamente l'hash.
+    public function __construct(PDO $db, string $username, ?string $password = null, ?string $nome = null, ?string $cognome = null,
+                            ?string $email = null, ?int $attivo = null, ?int $id_profilo = null) {
+        $this->db           = $db;
+        $this->username     = $username;
+        $this->password     = $password ? password_hash($password, PASSWORD_DEFAULT) : null;
+        $this->nome         = $nome;
+        $this->cognome      = $cognome;
+        $this->email        = $email;
+        $this->attivo       = $attivo;
+        $this->id_profilo   = $id_profilo;
+    }
+
+    // -------------------------------------------------------------------------
+    // CRUD UTENTI
+    // -------------------------------------------------------------------------
+
+    // Crea un nuovo record utente nel database utilizzando i dati attualmente impostati nell'oggetto.
+    public function create() {
+        $sql = "INSERT INTO utenti 
+                    (username, password, nome, cognome, email, attivo, id_profilo, data_registrazione)
+                VALUES 
+                    (:username, :password, :nome, :cognome, :email, :attivo, :id_profilo, :data_registrazione)";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            ':username'           => $this->username,
+            ':password'           => $this->password,
+            ':nome'               => $this->nome,
+            ':cognome'            => $this->cognome,
+            ':email'              => $this->email,
+            ':attivo'             => $this->attivo ?? 1,
+            ':id_profilo'         => $this->id_profilo,
+            ':data_registrazione' => date('Y-m-d H:i:s')
+        ]);
+    }
+
+    // Cerca e restituisce tutti i dati di un singolo utente filtrando per il suo username.
+    public function findByUsername() {
+        $sql = "SELECT id_utente, username, password, nome, cognome, email,
+                       attivo, id_profilo, data_registrazione
+                FROM utenti WHERE username = :username";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':username', $this->username);
+        $stmt->execute();
+        return $stmt->fetch();
+    }
+
+    // Recupera la lista di tutti gli utenti registrati, includendo anche il nome del loro profilo (es. Admin, User).
+    public function readAll() {
+        $sql = "SELECT u.id_utente, u.username, u.nome, u.cognome, u.email,
+                       u.attivo, p.nome_profilo
+                FROM utenti u
+                LEFT JOIN profili p ON p.id_profilo = u.id_profilo
+                ORDER BY u.username";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // Aggiorna le informazioni anagrafiche, lo stato e il profilo di un utente esistente.
+    public function update(string $usernameOriginale) {
+        $sql = "UPDATE utenti SET
+                    nome       = :nome,
+                    cognome    = :cognome,
+                    email      = :email,
+                    attivo     = :attivo,
+                    id_profilo = :id_profilo
+                WHERE username = :username";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            ':nome'       => $this->nome,
+            ':cognome'    => $this->cognome,
+            ':email'      => $this->email,
+            ':attivo'     => $this->attivo,
+            ':id_profilo' => $this->id_profilo,
+            ':username'   => $usernameOriginale
+        ]);
+    }
+
+    // Modifica la password dell'utente previa verifica che la password attuale inserita sia corretta.
+    public function changePassword(string $passwordAttuale, string $nuovaPassword) {
+        $utente = $this->findByUsername();
+
+        if (!$utente) {
+            return ['ok' => false, 'errore' => 'Utente non trovato'];
+        }
+
+        if (!password_verify($passwordAttuale, $utente['password'])) {
+            return ['ok' => false, 'errore' => 'Password attuale non corretta'];
+        }
+
+        $hash = password_hash($nuovaPassword, PASSWORD_DEFAULT);
+        $sql  = "UPDATE utenti SET password = :password WHERE username = :username";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':password' => $hash, ':username' => $this->username]);
+
+        return ['ok' => true];
+    }
+
+    // Rimuove definitivamente l'utente dal database.
+    public function delete() {
+        $sql  = "DELETE FROM utenti WHERE username = :username";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([':username' => $this->username]);
+    }
+
+    // -------------------------------------------------------------------------
+    // SESSIONI
+    // -------------------------------------------------------------------------
+
+    // Registra un nuovo evento di login, salvando l'ID specifico della sessione, l'utente associato e la data d'ingresso.
+    public function createDataLogin(string $value, string $id_sessione, int $id_utente) {
+        $sql = "INSERT INTO sessioni (id_sessione, id_utente, data_login)
+                VALUES (:id_s, :id_u, :data_login)";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            ':id_s'       => $id_sessione,
+            ':id_u'       => $id_utente,
+            ':data_login' => $value
+        ]);
+    }
+
+    // Registra un evento di logout, aggiornando la riga della sessione esistente con la data di uscita.
+    public function setDataLogout(string $value, string $id_sessione) {
+        $sql = "UPDATE sessioni SET data_logout = :value WHERE id_sessione = :id_s";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            ':value' => $value,
+            ':id_s'  => $id_sessione
+        ]);
+    }
+
+    // Ottiene l'elenco degli ultimi accessi (login/logout) degli utenti, limitando il numero di risultati restituiti a $num.
+    public function readAccess(int $num) {
+        $sql = "SELECT u.username, u.nome, u.cognome, s.data_login, s.data_logout
+                FROM sessioni s
+                JOIN utenti u ON u.id_utente = s.id_utente
+                ORDER BY s.data_login DESC
+                LIMIT :num";
+        $stmt = $this->db->prepare($sql);
+        $num  = (int)$num;
+        $stmt->bindParam(':num', $num, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // -------------------------------------------------------------------------
+    // LISTE FILM (preferiti, watchlist, watched)
+    // -------------------------------------------------------------------------
+
+    // Metodo interno condiviso: aggiunge un film a una lista (tabella) per l'utente.
+    private function addToList(string $tabella, int $tmdb_id, int $id_utente): void {
+        $sql  = "INSERT INTO {$tabella} (tmdb_id, id_utente, data_aggiunto) VALUES (:tmdb_id, :id_utente, :data_aggiunto)";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':tmdb_id'      => $tmdb_id,
+            ':id_utente'    => $id_utente,
+            ':data_aggiunto' => date('Y-m-d H:i:s')
+        ]);
+    }
+
+    // Metodo interno condiviso: rimuove un film da una lista (tabella) per l'utente.
+    private function removeFromList(string $tabella, int $tmdb_id, int $id_utente): void {
+        $sql  = "DELETE FROM {$tabella} WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':id_utente' => $id_utente, ':tmdb_id' => $tmdb_id]);
+    }
+
+    // Metodo interno condiviso: verifica se un film è già presente in una lista (tabella) per l'utente.
+    private function isInList(string $tabella, int $tmdb_id, int $id_utente): bool {
+        $sql  = "SELECT 1 FROM {$tabella} WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':id_utente' => $id_utente, ':tmdb_id' => $tmdb_id]);
+        return (bool) $stmt->fetchColumn();
+    }
+
+    // Aggiunge il film ai preferiti dell'utente.
+    public function addFavorite(int $tmdb_id, int $id_utente): void {
+        $this->addToList('preferiti', $tmdb_id, $id_utente);
+    }
+
+    // Rimuove il film dai preferiti dell'utente.
+    public function removeFavorite(int $tmdb_id, int $id_utente): void {
+        $this->removeFromList('preferiti', $tmdb_id, $id_utente);
+    }
+
+    // Restituisce true se il film è tra i preferiti dell'utente.
+    public function isFavorite(int $tmdb_id, int $id_utente): bool {
+        return $this->isInList('preferiti', $tmdb_id, $id_utente);
+    }
+
+    // Aggiunge il film alla watchlist dell'utente.
+    public function addWatchlist(int $tmdb_id, int $id_utente): void {
+        $this->addToList('watchlist', $tmdb_id, $id_utente);
+    }
+
+    // Rimuove il film dalla watchlist dell'utente.
+    public function removeWatchlist(int $tmdb_id, int $id_utente): void {
+        $this->removeFromList('watchlist', $tmdb_id, $id_utente);
+    }
+
+    // Restituisce true se il film è nella watchlist dell'utente.
+    public function isInWatchlist(int $tmdb_id, int $id_utente): bool {
+        return $this->isInList('watchlist', $tmdb_id, $id_utente);
+    }
+
+    // Aggiunge il film alla lista "visti" dell'utente.
+    public function addWatched(int $tmdb_id, int $id_utente): void {
+        $this->addToList('watched', $tmdb_id, $id_utente);
+    }
+
+    // Rimuove il film dalla lista "visti" dell'utente.
+    public function removeWatched(int $tmdb_id, int $id_utente): void {
+        $this->removeFromList('watched', $tmdb_id, $id_utente);
+    }
+
+    // Restituisce true se il film è nella lista "visti" dell'utente.
+    public function isWatched(int $tmdb_id, int $id_utente): bool {
+        return $this->isInList('watched', $tmdb_id, $id_utente);
+    }
+
+    // -------------------------------------------------------------------------
+    // RECENSIONI
+    // -------------------------------------------------------------------------
+
+    // Restituisce true se l'utente ha già scritto una recensione per il film.
+    public function hasReview(int $tmdb_id, int $id_utente): bool {
+        $sql  = "SELECT 1 FROM recensioni WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':id_utente' => $id_utente, ':tmdb_id' => $tmdb_id]);
+        return (bool) $stmt->fetchColumn();
+    }
+
+    // Conta il numero totale di recensioni della community per un dato film.
+    public function countReviews(int $tmdb_id): int {
+        $sql  = "SELECT COUNT(*) FROM recensioni WHERE tmdb_id = :tmdb_id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':tmdb_id' => $tmdb_id]);
+        return (int) $stmt->fetchColumn();
+    }
+}
+?>
+```
+
+## File: pages/user/review.php
+```php
+<?php
+// Pagina per scrivere o modificare una recensione dell'utente.
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
-require_once(__DIR__ . '/../../includes/header_logic.php');
-require_once(__DIR__ . '/../../vendor/autoload.php');
 
-use MongoDB\Client;
+// Controllo autenticazione + tmdb_id
+$username = $_SESSION['username'] ?? '';
+$tmdb_id = $_GET['tmdb_id'] ?? null;
 
-
-// Controllo autenticazione
-$username   = $_SESSION['username']   ?? '';
-$id_profilo = $_SESSION['id_profilo'] ?? 0;
-
-if (!$username || $id_profilo != 1) {
+if (!$username && !$tmdb_id) {
     header("Location: /index.php");
     exit();
 }
 
 
 // Dichiarazione variabili
-$totaleFilm = 0;
-$totaleUtenti = 0;
-$totaleSessioni = 0;
-$totaleNotifiche = 0;
-
-
-// Connessione a MongoDB
-try {
-    $mongoClient = new Client("mongodb://localhost:27017");
-    $db = $mongoClient->selectDatabase('cinevobis');
-    $collection = $db->selectCollection('films');
-
-    // Conteggio documenti
-    $totaleFilm = $collection->countDocuments([]);
-} catch (Exception $e) {
-    error_log("Errore MongoDB: " . $e->getMessage());
-}
-
-
-// Conteggio utenti
-try {
-    $sql = "SELECT COUNT(*) FROM utenti";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute();
-
-    $totaleUtenti = $stmt->fetchColumn();
-} catch (PDOException $e) {
-    error_log("Errore DB: " . $e->getMessage());
-}
-
-
-// Conteggio sessioni
-try {
-    $sql = "SELECT COUNT(*) FROM sessioni";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute();
-
-    $totaleSessioni = $stmt->fetchColumn();
-} catch (PDOException $e) {
-    error_log("Errore DB: " . $e->getMessage());
-}
-
-
-// Conteggio notifiche
-try {
-    $sql = "SELECT COUNT(*) FROM notifiche WHERE letta = 0";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute();
-
-    $totaleNotifiche = $stmt->fetchColumn();
-} catch (PDOException $e) {
-    error_log("Errore DB: " . $e->getMessage());
-}
-?>
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin - Cinevobis</title>
-    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <style>
-        /* 1. Gestione Hover (Bootstrap non ha utility per transform) */
-        .hover-card {
-            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-        }
-        .hover-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important; /* Equivale a shadow-md */
-            border-color: var(--accent, #0d6efd) !important;
-        }
-        
-        /* 2. Micro-rifiniture non presenti in Bootstrap */
-        .min-h-280 { min-height: 280px; }
-        .letter-spacing-sm { letter-spacing: 0.5px; }
-    </style>
-</head>
-<body class="d-flex flex-column min-vh-100 bg-light">
-    <?php require_once(__DIR__ . '/../../includes/header.php'); ?>
-
-    <main class="container flex-grow-1 py-5">
-
-        <div class="row mb-4">
-            <div class="col-12 text-center text-sm-start">
-                <h1 class="fw-bold h3 mt-1">
-                    Dashboard <span class="text-muted fw-normal">| Benvenuto <?= htmlspecialchars($username) ?></span>
-                </h1>
-            </div>
-        </div>
-
-        <div class="row g-3 mb-5">
-            <div class="col-6 col-md-3">
-                <div class="card border-0 shadow-sm bg-white border-start border-4 h-100 d-flex flex-column justify-content-center p-3">
-                    <div class="text-muted fw-bold text-uppercase mb-1 letter-spacing-sm" style="font-size: 0.75rem;">Film</div>
-                    <div class="fw-bold text-dark fs-3"><?= number_format($totaleFilm, 0, ',', '.') ?></div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="card border-0 shadow-sm bg-white border-start border-4 h-100 d-flex flex-column justify-content-center p-3">
-                    <div class="text-muted fw-bold text-uppercase mb-1 letter-spacing-sm" style="font-size: 0.75rem;">Utenti</div>
-                    <div class="fw-bold text-dark fs-3"><?= number_format($totaleUtenti, 0, ',', '.') ?></div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="card border-0 shadow-sm bg-white border-start border-4 h-100 d-flex flex-column justify-content-center p-3">
-                    <div class="text-muted fw-bold text-uppercase mb-1 letter-spacing-sm" style="font-size: 0.75rem;">Sessioni</div>
-                    <div class="fw-bold text-dark fs-3"><?= number_format($totaleSessioni, 0, ',', '.') ?></div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="card border-0 shadow-sm bg-white border-start border-4 h-100 d-flex flex-column justify-content-center p-3">
-                    <div class="text-muted fw-bold text-uppercase mb-1 letter-spacing-sm" style="font-size: 0.75rem;">Messaggi</div>
-                    <div class="fw-bold text-dark fs-3"><?= number_format($totaleNotifiche, 0, ',', '.') ?></div>
-                </div>
-            </div>
-        </div>
-
-        <h2 class="h6 fw-bold text-uppercase text-muted mb-4">Gestione Sistema</h2>
-
-        <div class="row g-4">
-            <div class="col-12 col-md-6 col-lg-3">
-                <a href="films.php" class="card hover-card min-h-280 text-decoration-none bg-white text-center d-flex flex-column align-items-center justify-content-center py-5 px-4 border rounded">
-                    <div class="text-warning mb-3 display-3 lh-1"><i class="bi bi-collection-play-fill"></i></div>
-                    <h3 class="fs-4 fw-bold text-dark mb-2">Archivio Film</h3>
-                    <p class="text-muted fs-6 mb-0">Gestisci il catalogo multimediale e i film</p>
-                </a>
-            </div>
-            <div class="col-12 col-md-6 col-lg-3">
-                <a href="users.php" class="card hover-card min-h-280 text-decoration-none bg-white text-center d-flex flex-column align-items-center justify-content-center py-5 px-4 border rounded">
-                    <div class="text-success mb-3 display-3 lh-1"><i class="bi bi-person-lines-fill"></i></div>
-                    <h3 class="fs-4 fw-bold text-dark mb-2">Utenti</h3>
-                    <p class="text-muted fs-6 mb-0">Amministra gli account e i ruoli utenti</p>
-                </a>
-            </div>
-            <div class="col-12 col-md-6 col-lg-3">
-                <a href="sessions.php" class="card hover-card min-h-280 text-decoration-none bg-white text-center d-flex flex-column align-items-center justify-content-center py-5 px-4 border rounded">
-                    <div class="text-primary mb-3 display-3 lh-1"><i class="bi bi-shield-lock-fill"></i></div>
-                    <h3 class="fs-4 fw-bold text-dark mb-2">Log Accessi</h3>
-                    <p class="text-muted fs-6 mb-0">Monitora la sicurezza e le sessioni attive</p>
-                </a>
-            </div>
-            <div class="col-12 col-md-6 col-lg-3">
-                <a href="notifications.php" class="card hover-card min-h-280 text-decoration-none bg-white text-center d-flex flex-column align-items-center justify-content-center py-5 px-4 border rounded">
-                    <div class="text-danger mb-3 display-3 lh-1"><i class="bi bi-chat-left-dots-fill"></i></div>
-                    <h3 class="fs-4 fw-bold text-dark mb-2">Messaggi</h3>
-                    <p class="text-muted fs-6 mb-0">Gestisci le comunicazioni degli utenti</p>
-                </a>
-            </div>
-        </div>
-
-    </main>
-
-    <?php require_once(__DIR__ . '/../../includes/footer.php'); ?>
-    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
-```
-
-## File: pages/admin/notifications.php
-```php
-<?php
-/**
- * Gestione notifiche (area admin). Mostra tutte le notifiche inviate dagli utenti
- * tramite la pagina di contatto, divise in "non lette" e "lette". Permette di
- * segnare una notifica come letta (POST con id_notifica) e di eliminare in blocco
- * tutte le notifiche già lette (POST con campo delete).
- *
- * @note Interagisce con le tabelle MariaDB: `notifiche`, `utenti` (LEFT JOIN).
- */
-require_once(__DIR__ . '/../../config/config.php');
-require_once(__DIR__ . '/../../config/connection.php');
-require_once(__DIR__ . '/../../includes/header_logic.php');
-
-// Controllo autenticazione
-$username   = $_SESSION['username']   ?? '';
-$id_profilo = $_SESSION['id_profilo'] ?? 0;
-
-if (!$username || $id_profilo != 1) {
-    header("Location: /index.php");
-    exit();
-}
-
-
-// Aggiornare notifica letta
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $id = (int) ($_POST['id_notifica'] ?? 0);
-
-    if($id > 0) {
-        try {
-            $sql = "UPDATE notifiche SET letta = 1 WHERE id_notifica = :id_n";
-            $stmt = $conn->prepare($sql);
-            $stmt->execute([':id_n' => $id]);
-
-        } catch (PDOException $e) {
-            error_log("Errore: " . $e->getMessage());
-        }
-    }
-}
-
-
-$notifiche = "";
-
-try {
-    $sql = "SELECT * 
-            FROM notifiche n
-            LEFT JOIN utenti u ON n.id_utente = u.id_utente
-            ORDER BY n.data_invio DESC";
-             
-    $stmt = $conn->prepare($sql);
-    $stmt->execute();
-
-    $notifiche = $stmt->fetchAll();
-
-} catch (PDOException $e) {
-    error_log("Errore: " . $e->getMessage());
-}
-
-
-if (isset($_POST['delete'])) {
-    try {
-        $sql = "DELETE FROM notifiche WHERE letta = 1";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
-
-        header("Location: /pages/admin/notifications.php");
-        exit();
-
-    } catch (PDOException $e) {
-        error_log("Errore: " . $e->getMessage());
-    }
-}
-?>
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notifiche - Cinevobis</title>
-    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="/assets/css/style.css">
-</head>
-<body class="d-flex flex-column min-vh-100">
-
-    <?php require_once(__DIR__ . '/../../includes/header.php'); ?>
-
-    <div class="container mt-4 mb-5 pb-5 flex-grow-1">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="fs-4 fw-bold mb-0">Messaggi</h1>
-        </div>
-
-        <?php
-        $lette = [];
-        $nonLette = [];
-
-        foreach ($notifiche as $n) {
-            if ($n['letta']) 
-                $lette[] = $n;
-            else 
-                $nonLette[] = $n;        
-        }
-        ?>
-
-        <?php if (empty($notifiche)): ?>
-            <div class="text-center text-muted py-5">
-                <p class="mb-0">Nessun messaggio disponibile</p>
-            </div>
-        <?php else: ?>
-
-            <h6 class="text-uppercase text-muted fw-semibold small mb-3">Non letti</h6>
-            <?php if (empty($nonLette)): ?>
-                <p class="text-muted small mb-4">Nessun messaggio da leggere</p>
-            <?php else: ?>
-                <div class="d-flex flex-column gap-3 mb-5">
-                    <?php foreach ($nonLette as $notifica): ?>
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-body px-4 py-3">
-                                <div class="d-flex justify-content-between align-items-start gap-3">
-                                    <div class="d-flex flex-column gap-1 flex-grow-1">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <span class="fw-semibold"><?= htmlspecialchars($notifica['titolo'] ?? '—') ?></span>
-                                            <span class="text-muted small">·</span>
-                                            <span class="text-muted small"><?= htmlspecialchars($notifica['username'] ?? 'Sconosciuto') ?></span>
-                                        </div>
-                                        <p class="mb-0 text-muted small"><?= nl2br(htmlspecialchars($notifica['descrizione'] ?? '')) ?></p>
-                                    </div>
-                                    <div class="d-flex align-items-center gap-2 mt-1 text-nowrap">
-                                        <span class="badge bg-light text-muted fw-normal border small">
-                                            <?= htmlspecialchars($notifica['data_invio'] ?? '') ?>
-                                        </span>
-                                        <form method="POST">
-                                            <input type="hidden" name="id_notifica" value="<?= $notifica['id_notifica'] ?>">
-                                            <button type="submit" class="btn btn-sm btn-outline-secondary" title="Segna come letta">&#10003;</button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            <?php endif; ?>
-
-            <h6 class="text-uppercase text-muted fw-semibold small mb-3">Letti</h6>
-
-            <form method="POST" class="mb-3">
-                <button type="submit" name="delete" class="btn btn-outline-danger btn-sm px-3 d-flex align-items-center gap-2">
-                    <i class="bi bi-trash3"></i>
-                </button>
-            </form>
-
-            <?php if (empty($lette)): ?>
-                <p class="text-muted small">Nessuna notifica letta</p>
-            <?php else: ?>
-                <div class="d-flex flex-column gap-3">
-                    <?php foreach ($lette as $notifica): ?>
-                        <div class="card border-0 shadow-sm opacity-50">
-                            <div class="card-body px-4 py-3">
-                                <div class="d-flex justify-content-between align-items-start gap-3">
-                                    <div class="d-flex flex-column gap-1 flex-grow-1">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <span class="fw-semibold text-muted"><?= htmlspecialchars($notifica['titolo'] ?? '—') ?></span>
-                                            <span class="text-muted small">·</span>
-                                            <span class="text-muted small"><?= htmlspecialchars($notifica['username'] ?? 'Sconosciuto')?></span>
-                                        </div>
-                                        <p class="mb-0 text-muted small"><?= nl2br(htmlspecialchars($notifica['descrizione'] ?? '')) ?></p>
-                                    </div>
-                                    <span class="badge bg-light text-muted fw-normal border small mt-1 text-nowrap">
-                                        <?= htmlspecialchars($notifica['data_invio'] ?? '') ?>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            <?php endif; ?>
-
-        <?php endif; ?>
-    </div>
-
-    <?php require_once(__DIR__ . '/../../includes/footer.php'); ?>
-
-    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/assets/js/script.js"></script>
-</body>
-</html>
-```
-
-## File: pages/user/review.php
-```php
-<?php
-/**
- * Pagina di scrittura/modifica recensione (riservata agli utenti autenticati).
- * Riceve il TMDB ID del film tramite GET e carica l'eventuale recensione
- * già scritta dall'utente. Gestisce tre azioni POST:
- * - write_review: inserisce o aggiorna la recensione e segna automaticamente
- *   il film come "watched" se non lo era già.
- * - delete_review: elimina la recensione e reindirizza alla pagina del film.
- * Il form mostra il titolo dinamico "Scrivi" o "Modifica" in base allo stato.
- *
- * @note Interagisce con le tabelle MariaDB: `recensioni`, `watched`.
- */
-require_once(__DIR__ . '/../../config/config.php');
-require_once(__DIR__ . '/../../config/connection.php');
-
-$id_utente = $_SESSION['id_utente'] ?? null;
-$username = $_SESSION['username']  ?? null;
-
-// Autenticazione
-if (!$id_utente) {
-    header("Location: /index.php");
-    exit();
-}
-
-$tmdb_id = $_GET['tmdb_id'] ?? null;
-
-if (!$tmdb_id) {
-    header("Location: /index.php");
-    exit();
-}
-
 $errore = '';
 $messaggio = '';
 $recensione_esistente = null;
+
+// id utente dalla sessione
+$id_utente = $_SESSION['id_utente'] ?? null;
 
 
 // Recupera la recensione esistente (se c'è)
@@ -2840,58 +2673,272 @@ if (isset($_POST['delete_review'])) {
 </html>
 ```
 
-## File: includes/footer.php
+## File: assets/js/script.js
+```javascript
+document.addEventListener("DOMContentLoaded", function() {
+    
+    // --- 1. SALVATAGGIO PROVENIENZA (Login/Signup/Profile) ---
+    const paginaAttuale = window.location.pathname;
+    const provenienza = document.referrer;
+    
+    // Raggruppiamo le pagine che condividono questa logica
+    const pagineTracciate = ['login.php', 'signup.php', 'change_password.php', 'profile.php', 'contact.php'];
+
+    // Controlliamo se siamo in una di queste pagine
+    const isPaginaTracciata = pagineTracciate.some(pagina => paginaAttuale.includes(pagina));
+
+    if (isPaginaTracciata) {
+        // Controlliamo se arriviamo da una delle altre pagine tracciate
+        const arrivoDaPaginaInterna = pagineTracciate.some(pagina => provenienza.includes(pagina));
+
+        // Sovrascriviamo l'URL di origine SOLO se arriviamo da una pagina esterna a questo gruppo
+        if (!arrivoDaPaginaInterna) {
+            sessionStorage.setItem('origin_url', provenienza !== "" ? provenienza : '/index.php');
+        }
+    }
+
+    // --- 2. MOSTRA/NASCONDI PASSWORD ---
+    const iconePassword = document.querySelectorAll('.toggle-icon');
+    
+    iconePassword.forEach(function(icona) {
+        icona.addEventListener('click', function() {
+
+            const inputId = this.getAttribute('data-target');
+            const inputField = document.getElementById(inputId);
+
+            if (inputField.type === 'password') {
+                inputField.type = 'text';
+                this.classList.replace('bi-eye', 'bi-eye-slash');
+            } else {
+                inputField.type = 'password';
+                this.classList.replace('bi-eye-slash', 'bi-eye');
+            }
+        });
+    });
+
+    // --- 3. GESTIONE TRAILER (MODAL) ---
+    const trailerModal = document.getElementById('trailerModal');
+    const container = document.querySelector('#trailerModal .ratio'); 
+
+    if (trailerModal && container) {
+        const iframeOriginale = container.querySelector('iframe');
+        
+        // Aggiungi questo controllo di sicurezza
+        if (iframeOriginale) {
+            const videoUrlBase = iframeOriginale.getAttribute('data-src');
+            const classiIframe = iframeOriginale.className;
+
+            const iframeHTML = `<iframe src="${videoUrlBase}" class="${classiIframe}" allowfullscreen></iframe>`;
+            container.innerHTML = '';
+
+            trailerModal.addEventListener('show.bs.modal', function() {
+                container.innerHTML = iframeHTML;
+            });
+
+            trailerModal.addEventListener('hidden.bs.modal', function() {
+                container.innerHTML = '';
+            });
+        }
+    }
+});
+
+// --- 4. FUNZIONE PER TORNARE INDIETRO ---
+function closeAndRedirect() {
+    const destinazione = sessionStorage.getItem('origin_url');
+    sessionStorage.removeItem('origin_url');
+    window.location.href = destinazione || '/index.php';
+}
+```
+
+## File: pages/admin/dashboard.php
 ```php
 <?php
-$currentPage = basename($_SERVER['SCRIPT_NAME']);
+// Dashboard admin che mostra le statistiche del sito:
+// film in MongoDB, utenti, sessioni e notifiche non lette.
+require_once(__DIR__ . '/../../config/config.php');
+require_once(__DIR__ . '/../../config/connection.php');
+require_once(__DIR__ . '/../../includes/header_logic.php');
+require_once(__DIR__ . '/../../vendor/autoload.php');
 
-$adminPages = ['add_film.php', 'dashboard.php', 'sessions.php', 'users.php', 'edit_user.php', 'notifications.php', 'films.php', 'film_db.php'];
+use MongoDB\Client;
 
-$isAdminPage = in_array($currentPage, $adminPages);
+
+// Controllo autenticazione
+$username   = $_SESSION['username']   ?? '';
+$id_profilo = $_SESSION['id_profilo'] ?? 0;
+
+if (!$username || $id_profilo != 1) {
+    header("Location: /index.php");
+    exit();
+}
+
+
+// Dichiarazione variabili
+$totaleFilm = 0;
+$totaleUtenti = 0;
+$totaleSessioni = 0;
+$totaleNotifiche = 0;
+
+
+// Connessione a MongoDB
+try {
+    $mongoClient = new Client("mongodb://localhost:27017");
+    $db = $mongoClient->selectDatabase('cinevobis');
+    $collection = $db->selectCollection('films');
+
+    // Conteggio documenti
+    $totaleFilm = $collection->countDocuments([]);
+} catch (Exception $e) {
+    error_log("Errore MongoDB: " . $e->getMessage());
+}
+
+
+// Conteggio utenti
+try {
+    $sql = "SELECT COUNT(*) FROM utenti";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+
+    $totaleUtenti = $stmt->fetchColumn();
+} catch (PDOException $e) {
+    error_log("Errore DB: " . $e->getMessage());
+}
+
+
+// Conteggio sessioni
+try {
+    $sql = "SELECT COUNT(*) FROM sessioni WHERE data_logout IS NULL";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+
+    $totaleSessioni = $stmt->fetchColumn();
+} catch (PDOException $e) {
+    error_log("Errore DB: " . $e->getMessage());
+}
+
+
+// Conteggio notifiche
+try {
+    $sql = "SELECT COUNT(*) FROM notifiche WHERE letta = 0";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+
+    $totaleNotifiche = $stmt->fetchColumn();
+} catch (PDOException $e) {
+    error_log("Errore DB: " . $e->getMessage());
+}
 ?>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - Cinevobis</title>
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <style>
+        /* 1. Gestione Hover (Bootstrap non ha utility per transform) */
+        .hover-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+        .hover-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important; /* Equivale a shadow-md */
+            border-color: var(--accent, #0d6efd) !important;
+        }
+        
+        /* 2. Micro-rifiniture non presenti in Bootstrap */
+        .min-h-280 { min-height: 280px; }
+        .letter-spacing-sm { letter-spacing: 0.5px; }
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100 bg-light">
+    <?php require_once(__DIR__ . '/../../includes/header.php'); ?>
 
-<footer class="border-top px-3 px-lg-4 py-3">
-    <div class="container-fluid d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <main class="container flex-grow-1 py-5">
 
-        <!-- Brand + copyright -->
-        <div class="d-flex align-items-center gap-2">
-            <span lass="fw-bold text-dark">Cinevobis</span>
-            <span class="text-secondary small">
-                © <?= date("Y") ?>
-                <?= $isAdminPage ? '— Area admin' : '' ?>
-            </span>
+        <div class="row mb-4">
+            <div class="col-12 text-center text-sm-start">
+                <h1 class="fw-bold h3 mt-1">
+                    Dashboard <span class="text-muted fw-normal">| Benvenuto <?= htmlspecialchars($username) ?></span>
+                </h1>
+            </div>
         </div>
 
-        <!-- Link -->
-        <nav class="d-flex align-items-center gap-1" aria-label="Footer">
-            <?php if ($isAdminPage): ?>
-                <a href="/" class="btn btn-sm btn-link text-secondary text-decoration-none p-1 px-2" style="font-size: 0.75rem;">
-                    Torna al sito
-                </a>
-            <?php else: ?>
-                <a href="/pages/public/terms.php" class="btn btn-sm btn-link text-secondary text-decoration-none p-1 px-2" style="font-size: 0.75rem;">Termini di servizio</a>
-                <span class="text-secondary" style="font-size: 0.75rem;">·</span>
-                <a href="/pages/public/privacy.php" class="btn btn-sm btn-link text-secondary text-decoration-none p-1 px-2" style="font-size: 0.75rem;">Privacy</a>
-                <span class="text-secondary" style="font-size: 0.75rem;">·</span>
-                <a href="/actions/contact.php" class="btn btn-sm btn-link text-secondary text-decoration-none p-1 px-2" style="font-size: 0.75rem;">Contattaci</a>
-            <?php endif; ?>
-        </nav>
+        <div class="row g-3 mb-5">
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm bg-white border-start border-4 h-100 d-flex flex-column justify-content-center p-3">
+                    <div class="text-muted fw-bold text-uppercase mb-1 letter-spacing-sm" style="font-size: 0.75rem;">Film</div>
+                    <div class="fw-bold text-dark fs-3"><?= number_format($totaleFilm, 0, ',', '.') ?></div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm bg-white border-start border-4 h-100 d-flex flex-column justify-content-center p-3">
+                    <div class="text-muted fw-bold text-uppercase mb-1 letter-spacing-sm" style="font-size: 0.75rem;">Utenti</div>
+                    <div class="fw-bold text-dark fs-3"><?= number_format($totaleUtenti, 0, ',', '.') ?></div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm bg-white border-start border-4 h-100 d-flex flex-column justify-content-center p-3">
+                    <div class="text-muted fw-bold text-uppercase mb-1 letter-spacing-sm" style="font-size: 0.75rem;">Sessioni Attive</div>
+                    <div class="fw-bold text-dark fs-3"><?= number_format($totaleSessioni, 0, ',', '.') ?></div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm bg-white border-start border-4 h-100 d-flex flex-column justify-content-center p-3">
+                    <div class="text-muted fw-bold text-uppercase mb-1 letter-spacing-sm" style="font-size: 0.75rem;">Messaggi</div>
+                    <div class="fw-bold text-dark fs-3"><?= number_format($totaleNotifiche, 0, ',', '.') ?></div>
+                </div>
+            </div>
+        </div>
 
-    </div>
-</footer>
+        <h2 class="h6 fw-bold text-uppercase text-muted mb-4">Gestione Sistema</h2>
+
+        <div class="row g-4">
+            <div class="col-12 col-md-6 col-lg-3">
+                <a href="films.php" class="card hover-card min-h-280 text-decoration-none bg-white text-center d-flex flex-column align-items-center justify-content-center py-5 px-4 border rounded">
+                    <div class="text-warning mb-3 display-3 lh-1"><i class="bi bi-collection-play-fill"></i></div>
+                    <h3 class="fs-4 fw-bold text-dark mb-2">Archivio Film</h3>
+                    <p class="text-muted fs-6 mb-0">Gestisci il catalogo multimediale e i film</p>
+                </a>
+            </div>
+            <div class="col-12 col-md-6 col-lg-3">
+                <a href="users.php" class="card hover-card min-h-280 text-decoration-none bg-white text-center d-flex flex-column align-items-center justify-content-center py-5 px-4 border rounded">
+                    <div class="text-success mb-3 display-3 lh-1"><i class="bi bi-person-lines-fill"></i></div>
+                    <h3 class="fs-4 fw-bold text-dark mb-2">Utenti</h3>
+                    <p class="text-muted fs-6 mb-0">Amministra gli account e i ruoli utenti</p>
+                </a>
+            </div>
+            <div class="col-12 col-md-6 col-lg-3">
+                <a href="sessions.php" class="card hover-card min-h-280 text-decoration-none bg-white text-center d-flex flex-column align-items-center justify-content-center py-5 px-4 border rounded">
+                    <div class="text-primary mb-3 display-3 lh-1"><i class="bi bi-shield-lock-fill"></i></div>
+                    <h3 class="fs-4 fw-bold text-dark mb-2">Log Accessi</h3>
+                    <p class="text-muted fs-6 mb-0">Monitora la sicurezza e le sessioni attive</p>
+                </a>
+            </div>
+            <div class="col-12 col-md-6 col-lg-3">
+                <a href="notifications.php" class="card hover-card min-h-280 text-decoration-none bg-white text-center d-flex flex-column align-items-center justify-content-center py-5 px-4 border rounded">
+                    <div class="text-danger mb-3 display-3 lh-1"><i class="bi bi-chat-left-dots-fill"></i></div>
+                    <h3 class="fs-4 fw-bold text-dark mb-2">Messaggi</h3>
+                    <p class="text-muted fs-6 mb-0">Gestisci le comunicazioni degli utenti</p>
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+    <?php require_once(__DIR__ . '/../../includes/footer.php'); ?>
+    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
 ```
 
 ## File: pages/admin/films.php
 ```php
 <?php
-/**
- * Archivio film (area admin, riservata al profilo id_profilo = 1).
- * Mostra la lista completa dei film presenti in MongoDB ordinati per data
- * di ultimo aggiornamento. Permette l'eliminazione di un singolo documento
- * tramite il suo ObjectId MongoDB ricevuto via POST.
- *
- * @note Interagisce con la collezione MongoDB: `films` (find, deleteOne).
- */
+// Pagina admin per la gestione del catalogo film. Mostra i film salvati in MongoDB
+// e consente l'eliminazione di un documento tramite POST con l'ObjectId.
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');
@@ -3045,94 +3092,194 @@ if (isset($_POST['delete'])) {
 </html>
 ```
 
-## File: assets/js/script.js
-```javascript
-document.addEventListener("DOMContentLoaded", function() {
-    
-    // --- 1. SALVATAGGIO PROVENIENZA (Login/Signup/Profile) ---
-    const paginaAttuale = window.location.pathname;
-    const provenienza = document.referrer;
-    
-    // Raggruppiamo le pagine che condividono questa logica
-    const pagineTracciate = ['login.php', 'signup.php', 'change_password.php', 'profile.php', 'contact.php'];
+## File: pages/admin/notifications.php
+```php
+<?php
+// Pagina admin per gestire le notifiche inviate dagli utenti.
+require_once(__DIR__ . '/../../config/config.php');
+require_once(__DIR__ . '/../../config/connection.php');
+require_once(__DIR__ . '/../../includes/header_logic.php');
 
-    // Controlliamo se siamo in una di queste pagine
-    const isPaginaTracciata = pagineTracciate.some(pagina => paginaAttuale.includes(pagina));
+// Controllo autenticazione
+$username   = $_SESSION['username']   ?? '';
+$id_profilo = $_SESSION['id_profilo'] ?? 0;
 
-    if (isPaginaTracciata) {
-        // Controlliamo se arriviamo da una delle altre pagine tracciate
-        const arrivoDaPaginaInterna = pagineTracciate.some(pagina => provenienza.includes(pagina));
-
-        // Sovrascriviamo l'URL di origine SOLO se arriviamo da una pagina esterna a questo gruppo
-        if (!arrivoDaPaginaInterna) {
-            sessionStorage.setItem('origin_url', provenienza !== "" ? provenienza : '/index.php');
-        }
-    }
-
-    // --- 2. MOSTRA/NASCONDI PASSWORD ---
-    const iconePassword = document.querySelectorAll('.toggle-icon');
-    
-    iconePassword.forEach(function(icona) {
-        icona.addEventListener('click', function() {
-
-            const inputId = this.getAttribute('data-target');
-            const inputField = document.getElementById(inputId);
-
-            if (inputField.type === 'password') {
-                inputField.type = 'text';
-                this.classList.replace('bi-eye', 'bi-eye-slash');
-            } else {
-                inputField.type = 'password';
-                this.classList.replace('bi-eye-slash', 'bi-eye');
-            }
-        });
-    });
-
-    // --- 3. GESTIONE TRAILER (MODAL) ---
-    const trailerModal = document.getElementById('trailerModal');
-    const container = document.querySelector('#trailerModal .ratio'); 
-
-    if (trailerModal && container) {
-        const iframeOriginale = container.querySelector('iframe');
-        
-        // Aggiungi questo controllo di sicurezza
-        if (iframeOriginale) {
-            const videoUrlBase = iframeOriginale.getAttribute('data-src');
-            const classiIframe = iframeOriginale.className;
-
-            const iframeHTML = `<iframe src="${videoUrlBase}" class="${classiIframe}" allowfullscreen></iframe>`;
-            container.innerHTML = '';
-
-            trailerModal.addEventListener('show.bs.modal', function() {
-                container.innerHTML = iframeHTML;
-            });
-
-            trailerModal.addEventListener('hidden.bs.modal', function() {
-                container.innerHTML = '';
-            });
-        }
-    }
-});
-
-// --- 4. FUNZIONE PER TORNARE INDIETRO ---
-function closeAndRedirect() {
-    const destinazione = sessionStorage.getItem('origin_url');
-    sessionStorage.removeItem('origin_url');
-    window.location.href = destinazione || '/index.php';
+if (!$username || $id_profilo != 1) {
+    header("Location: /index.php");
+    exit();
 }
+
+
+// Aggiornare notifica letta
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $id = (int) ($_POST['id_notifica'] ?? 0);
+
+    if($id > 0) {
+        try {
+            $sql = "UPDATE notifiche SET letta = 1 WHERE id_notifica = :id_n";
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([':id_n' => $id]);
+
+        } catch (PDOException $e) {
+            error_log("Errore: " . $e->getMessage());
+        }
+    }
+}
+
+
+// Recupero notifiche
+$notifiche = "";
+
+try {
+    $sql = "SELECT * 
+            FROM notifiche n
+            LEFT JOIN utenti u ON n.id_utente = u.id_utente
+            ORDER BY n.data_invio DESC";
+             
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+
+    $notifiche = $stmt->fetchAll();
+
+} catch (PDOException $e) {
+    error_log("Errore: " . $e->getMessage());
+}
+
+
+// Eliminare notifiche lette
+if (isset($_POST['delete'])) {
+    try {
+        $sql = "DELETE FROM notifiche WHERE letta = 1";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+
+        header("Location: /pages/admin/notifications.php");
+        exit();
+
+    } catch (PDOException $e) {
+        error_log("Errore: " . $e->getMessage());
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifiche - Cinevobis</title>
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+    <?php require_once(__DIR__ . '/../../includes/header.php'); ?>
+
+    <div class="container mt-4 mb-5 pb-5 flex-grow-1">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="fs-4 fw-bold mb-0">Messaggi</h1>
+        </div>
+
+        <?php
+        $lette = [];
+        $nonLette = [];
+
+        foreach ($notifiche as $n) {
+            if ($n['letta']) 
+                $lette[] = $n;
+            else 
+                $nonLette[] = $n;        
+        }
+        ?>
+
+        <?php if (empty($notifiche)): ?>
+            <div class="text-center text-muted py-5">
+                <p class="mb-0">Nessun messaggio disponibile</p>
+            </div>
+        <?php else: ?>
+
+            <h6 class="text-uppercase text-muted fw-semibold small mb-3">Non letti</h6>
+            <?php if (empty($nonLette)): ?>
+                <p class="text-muted small mb-4">Nessun messaggio da leggere</p>
+            <?php else: ?>
+                <div class="d-flex flex-column gap-3 mb-5">
+                    <?php foreach ($nonLette as $notifica): ?>
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body px-4 py-3">
+                                <div class="d-flex justify-content-between align-items-start gap-3">
+                                    <div class="d-flex flex-column gap-1 flex-grow-1">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="fw-semibold"><?= htmlspecialchars($notifica['titolo'] ?? '—') ?></span>
+                                            <span class="text-muted small">·</span>
+                                            <span class="text-muted small"><?= htmlspecialchars($notifica['username'] ?? 'Sconosciuto') ?></span>
+                                        </div>
+                                        <p class="mb-0 text-muted small"><?= nl2br(htmlspecialchars($notifica['descrizione'] ?? '')) ?></p>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2 mt-1 text-nowrap">
+                                        <span class="badge bg-light text-muted fw-normal border small">
+                                            <?= htmlspecialchars($notifica['data_invio'] ?? '') ?>
+                                        </span>
+                                        <form method="POST">
+                                            <input type="hidden" name="id_notifica" value="<?= $notifica['id_notifica'] ?>">
+                                            <button type="submit" class="btn btn-sm btn-outline-secondary" title="Segna come letta">&#10003;</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+
+            <h6 class="text-uppercase text-muted fw-semibold small mb-3">Letti</h6>
+
+            <form method="POST" class="mb-3">
+                <button type="submit" name="delete" class="btn btn-outline-danger btn-sm px-3 d-flex align-items-center gap-2">
+                    <i class="bi bi-trash3"></i>
+                </button>
+            </form>
+
+            <?php if (empty($lette)): ?>
+                <p class="text-muted small">Nessuna notifica letta</p>
+            <?php else: ?>
+                <div class="d-flex flex-column gap-3">
+                    <?php foreach ($lette as $notifica): ?>
+                        <div class="card border-0 shadow-sm opacity-50">
+                            <div class="card-body px-4 py-3">
+                                <div class="d-flex justify-content-between align-items-start gap-3">
+                                    <div class="d-flex flex-column gap-1 flex-grow-1">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="fw-semibold text-muted"><?= htmlspecialchars($notifica['titolo'] ?? '—') ?></span>
+                                            <span class="text-muted small">·</span>
+                                            <span class="text-muted small"><?= htmlspecialchars($notifica['username'] ?? 'Sconosciuto')?></span>
+                                        </div>
+                                        <p class="mb-0 text-muted small"><?= nl2br(htmlspecialchars($notifica['descrizione'] ?? '')) ?></p>
+                                    </div>
+                                    <span class="badge bg-light text-muted fw-normal border small mt-1 text-nowrap">
+                                        <?= htmlspecialchars($notifica['data_invio'] ?? '') ?>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+
+        <?php endif; ?>
+    </div>
+
+    <?php require_once(__DIR__ . '/../../includes/footer.php'); ?>
+
+    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/script.js"></script>
+</body>
+</html>
 ```
 
 ## File: pages/public/signup.php
 ```php
 <?php
-/**
- * Pagina di registrazione. Raccoglie nome, cognome, email, username e password
- * dell'utente, crea un nuovo account tramite userObj::create con ruolo utente
- * (id_profilo = 2) e stato attivo. In caso di username duplicato, mostra
- * un messaggio di errore. Gli utenti già autenticati vengono reindirizzati alla home.
- *
- * @note Interagisce con la tabella MariaDB: `utenti` (tramite userObj::create).
- */
+// Pagina di registrazione: crea un nuovo account utente se i dati sono validi.
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');
@@ -3261,23 +3408,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ## File: pages/user/profile.php
 ```php
 <?php
-/**
- * Pagina del profilo utente (riservata agli utenti autenticati).
- * Mostra le informazioni anagrafiche dell'account, l'anno di registrazione
- * e il numero di film visti nell'anno corrente. Gestisce due azioni POST:
- * - change_password: reindirizza alla pagina di cambio password.
- * - delete_user: elimina l'account tramite userObj::delete, distrugge
- *   la sessione e reindirizza alla home.
- *
- * @note Interagisce con le tabelle MariaDB: `utenti` (tramite userObj), `watched`.
- */
+// Pagina profilo utente: mostra i dati dell'account e gestisce azioni sul profilo.
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');
 
+// Controllo autenticazione
 $username = $_SESSION['username'] ?? '';
 
-// Se non c'è l'utente in sessione
 if (!$username) {
     header("Location: /index.php");
     exit();
@@ -3445,15 +3583,7 @@ try {
 ## File: pages/public/login.php
 ```php
 <?php
-/**
- * Pagina di login. Verifica le credenziali dell'utente tramite userObj::findByUsername
- * e password_verify. Se l'autenticazione va a buon fine, rigenera l'ID di sessione
- * per prevenire la Session Fixation e popola le variabili di sessione.
- * Registra anche la data/ora di accesso tramite userObj::createDataLogin.
- * Gli utenti già autenticati vengono reindirizzati alla home.
- *
- * @note Interagisce con la tabella MariaDB: `utenti`, `sessioni` (tramite userObj).
- */
+// Pagina di login: valida credenziali, rigenera la sessione e imposta i dati utente.
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');
@@ -3466,6 +3596,7 @@ if (isset($_SESSION['username'])) {
 
 $errore = "";
 
+// Logica login
 if (isset($_POST['login'])) {
     $username = trim($_POST["username"]);
     $password = trim($_POST["password"]);
@@ -3562,212 +3693,10 @@ if (isset($_POST['login'])) {
 </html>
 ```
 
-## File: pages/admin/edit_user.php
-```php
-<?php
-/**
- * Pagina di modifica utente (area admin). Riceve lo username tramite GET,
- * carica i dati correnti dell'utente e permette all'admin di aggiornare
- * nome, cognome, email e stato attivo tramite userObj::update, oppure di
- * eliminare definitivamente l'account tramite userObj::delete.
- *
- * @note Interagisce con la tabella MariaDB: `utenti` (tramite userObj::update e userObj::delete).
- */
-require_once(__DIR__ . '/../../config/config.php');
-require_once(__DIR__ . '/../../config/connection.php');
-require_once(__DIR__ . '/../../includes/user_obj.php');
-require_once(__DIR__ . '/../../includes/header_logic.php');
-
-$username = $_GET['username'] ?? '';
-
-if (!$username) {
-    header("Location: admin_area.php");
-    exit();
-}
-
-$errore = '';
-$messaggio = '';
-
-// Carichiamo i dati attuali dell'utente
-$user = new userObj($conn, $username);
-$utente = $user->findByUsername();
-
-if (!$utente) {
-    header("Location: admin_area.php");
-    exit();
-}
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['save'])) {
-        $nome = trim($_POST['nome'] ?? '');
-        $cognome = trim($_POST['cognome'] ?? '');
-        $email = trim($_POST['email'] ?? '');
-        $attivo = isset($_POST['attivo']) ? (int) $_POST['attivo'] : 0;
-
-        if (!$nome || !$cognome || !$email) {
-            $errore = "Nome, cognome ed email sono obbligatori";
-        } else {
-            try {
-                $userUpdate = new userObj(
-                    $conn,
-                    $username,
-                    null,
-                    $nome,
-                    $cognome,
-                    $email,
-                    $attivo,
-                    $utente['id_profilo']
-                );
-
-                $userUpdate->update($username);
-                $messaggio = "Utente aggiornato con successo";
-
-                // Ricarichiamo i dati aggiornati
-                $utente = $userUpdate->findByUsername();
-            } catch (PDOException $e) {
-                $errore = "Errore durante l'aggiornamento";
-                error_log("Errore update utente: " . $e->getMessage());
-            }
-        }
-    }
-
-    if (isset($_POST['delete_user'])) {
-        try {
-            $user->delete();
-            header("Location: users.php?msg=eliminato");
-            exit();
-        } catch (PDOException $e) {
-            $errore = "Errore durante l'eliminazione";
-            error_log("Errore delete utente: " . $e->getMessage());
-        }
-    }
-}
-?>
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modifica utente - Cinevobis</title>
-    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/assets/css/style.css">
-</head>
-<body>
-
-    <div class="container-fluid vh-100 d-flex justify-content-center align-items-center">
-        <div style="max-width: 450px; width: 100%;">
-
-            <a href="users.php"
-                class="btn-close position-absolute top-0 start-0 m-4"
-                aria-label="Chiudi">
-            </a>
-
-            <h1 class="display-6 fw-bolder mb-2 text-center">Modifica utente</h1>
-            <p class="text-secondary mb-5 text-center">Aggiorna i dati dell'account</p>
-
-            <?php if ($errore): ?>
-                <div class="alert alert-danger border-0 small py-2 mb-4">
-                    <?= htmlspecialchars($errore) ?>
-                </div>
-            <?php endif; ?>
-
-            <?php if ($messaggio): ?>
-                <div class="alert alert-success border-0 small py-2 mb-4">
-                    <?= htmlspecialchars($messaggio) ?>
-                </div>
-            <?php endif; ?>
-
-            <form method="POST">
-                <input type="hidden" name="username" value="<?= htmlspecialchars($username) ?>">
-
-                <div class="row g-3 mb-3">
-                    <div class="col-md-6">
-                        <input type="text"
-                            name="nome"
-                            class="form-control bg-light border-light py-3"
-                            placeholder="Nome"
-                            value="<?= htmlspecialchars($utente['nome'] ?? '') ?>"
-                            required>
-                    </div>
-                    <div class="col-md-6">
-                        <input type="text"
-                            name="cognome"
-                            class="form-control bg-light border-light py-3"
-                            placeholder="Cognome"
-                            value="<?= htmlspecialchars($utente['cognome'] ?? '') ?>"
-                            required>
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <input type="email"
-                        name="email"
-                        class="form-control bg-light border-light py-3"
-                        placeholder="Email"
-                        value="<?= htmlspecialchars($utente['email'] ?? '') ?>"
-                        required>
-                </div>
-
-                <div class="mb-3">
-                    <input type="text"
-                        class="form-control bg-light border-light py-3 text-muted"
-                        value="<?= htmlspecialchars($utente['username'] ?? '') ?>"
-                        disabled 
-                        style="cursor: not-allowed;">
-                </div>
-
-                <div class="mb-4">
-                    <label class="form-label fw-semibold mb-2">Attivo</label>
-                    <div class="d-flex gap-4">
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="attivo" value="1"
-                                <?= (int)($utente['attivo'] ?? 0) === 1 ? 'checked' : '' ?>>
-                            <label class="form-check-label">Sì</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="attivo" value="0"
-                                <?= (int)($utente['attivo'] ?? 0) === 0 ? 'checked' : '' ?>>
-                            <label class="form-check-label">No</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="d-flex gap-3 mt-4">
-                    <button type="submit"
-                            name="save"
-                            class="btn btn-dark btn-lg flex-fill py-3 fw-bold">
-                        Salva modifiche
-                    </button>
-                </div>
-
-                <div class="d-flex gap-3 mt-4">
-                    <button type="submit"
-                            name="delete_user"
-                            class="btn btn-outline-danger btn-lg flex-fill py-3 fw-bold"
-                            onclick="return confirm('Sei sicuro?');">
-                        Elimina utente
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-</body>
-</html>
-```
-
 ## File: pages/user/watched.php
 ```php
 <?php
-/**
- * Pagina dei film visti ("Watched"), riservata agli utenti autenticati.
- * Recupera da MariaDB i TMDB ID dei film segnati come visti dall'utente,
- * poi interroga MongoDB per ottenere titolo, poster e anno. I risultati
- * sono ordinati per voto medio decrescente e presentati in griglia.
- *
- * @note Interagisce con la tabella MariaDB: `watched`.
- * @note Interagisce con la collezione MongoDB: `films` (query con operatore $in).
- */
+// Pagina dei film visti dall'utente, con i dati recuperati da MongoDB.
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/functions.php');
 require_once(__DIR__ . '/../../config/connection.php');
@@ -3919,16 +3848,7 @@ if (!empty($ids)) {
 ## File: pages/user/watchlist.php
 ```php
 <?php
-/**
- * Pagina della watchlist personale (riservata agli utenti autenticati).
- * Recupera da MariaDB i TMDB ID dei film che l'utente intende guardare,
- * poi interroga MongoDB con l'operatore $in per ottenere titolo, poster e
- * anno di ciascun film. I risultati sono ordinati per voto medio decrescente
- * e presentati in una griglia di card cliccabili.
- *
- * @note Interagisce con la tabella MariaDB: `watchlist`.
- * @note Interagisce con la collezione MongoDB: `films` (query con operatore $in).
- */
+// Pagina della watchlist personale, con i film da guardare dell'utente.
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/functions.php');
 require_once(__DIR__ . '/../../config/connection.php');
@@ -4077,152 +3997,206 @@ if (!empty($ids)) {
 </html>
 ```
 
-## File: pages/public/search.php
+## File: pages/admin/edit_user.php
 ```php
 <?php
-/**
- * Pagina di ricerca film. Riceve il termine di ricerca tramite GET (?search=...),
- * interroga l'API TMDB sull'endpoint /search/movie e ordina i risultati per popolarità
- * decrescente con un bubble sort manuale. I risultati vengono normalizzati tramite
- * movieObj::search() e visualizzati come lista di card cliccabili.
- */
+// Pagina admin per modificare o eliminare un utente esistente.
 require_once(__DIR__ . '/../../config/config.php');
-require_once(__DIR__ . '/../../config/functions.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');
-require_once(__DIR__ . '/../../includes/movie_obj.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');
-require_once(__DIR__ . '/../../vendor/autoload.php');
 
-use Dotenv\Dotenv;
-use Kiwilan\Tmdb\Tmdb;
+// Controllo autenticazione
+$username = $_SESSION['username']   ?? '';
+$id_profilo = $_SESSION['id_profilo'] ?? 0;
 
-$dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
-$dotenv->load();
-
-$tmdb = Tmdb::client($_ENV['API_KEY']);
-
-$errore = "";
-$moviesList = [];
-$searched = isset($_GET['search']) ? trim($_GET['search']) : '';
+if (!$username || $id_profilo != 1) {
+    header("Location: /index.php");
+    exit();
+}
 
 
-if ($searched !== '') {
-    $raw = $tmdb->raw()->url('/search/movie', [
-        'query' => $searched,
-        'language' => 'it-IT'
-    ]);
+$errore = '';
+$messaggio = '';
 
-    $results = [];
+$username_utente = isset($_GET['username']) ? $_GET['username'] : null;
 
-    if ($raw !== null) {
-        $body = $raw->getBody();
+// Carichiamo i dati attuali dell'utente
+if (!empty($username_utente)) {
+    $user = new userObj($conn, $username_utente);
+    $utente = $user->findByUsername();
 
-        if (isset($body['results'])) {
-            $results = $body['results'];
+    if (empty($utente)) 
+        $errore = "Nessun utente trovato";
+} else {
+    $errore = "Nessun utente trovato";
+}
+
+
+// Modifica dati utente
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['save'])) {
+        $nome = trim($_POST['nome'] ?? '');
+        $cognome = trim($_POST['cognome'] ?? '');
+        $email = trim($_POST['email'] ?? '');
+        $attivo = isset($_POST['attivo']) ? 1 : 0;
+
+        if (!$nome || !$cognome || !$email) {
+            $errore = "Nome, cognome ed email sono obbligatori";
+        } else {
+            try {
+                $userUpdate = new userObj(
+                    $conn,
+                    $username_utente,
+                    null,
+                    $nome,
+                    $cognome,
+                    $email,
+                    $attivo,
+                    $utente['id_profilo']
+                );
+
+                $userUpdate->update($username_utente);
+                $messaggio = "Utente aggiornato con successo";
+
+                // Ricarichiamo i dati aggiornati
+                $utente = $userUpdate->findByUsername();
+            } catch (PDOException $e) {
+                $errore = "Errore durante l'aggiornamento";
+                error_log("Errore update utente: " . $e->getMessage());
+            }
         }
     }
 
-    $n = count($results);
-
-    $results = order_of_popularity($n, $results);
-
-    if (empty($results)) 
-        $errore = "Nessun risultato trovato per: " . htmlspecialchars($searched);
-    else 
-        $moviesList = movieObj::search($results);
+    // Elimazione utente
+    if (isset($_POST['delete_user'])) {
+        try {
+            $user->delete();
+            header("Location: users.php?msg=eliminato");
+            exit();
+        } catch (PDOException $e) {
+            $errore = "Errore durante l'eliminazione";
+            error_log("Errore delete utente: " . $e->getMessage());
+        }
+    }
 }
 ?>
 <!DOCTYPE html>
 <html lang="it">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cerca Film - Cinevobis</title>
+    <title>Modifica utente - Cinevobis</title>
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="/assets/css/style.css">
 </head>
+<body>
 
-<body class="d-flex flex-column min-vh-100">
+    <div class="container-fluid vh-100 d-flex justify-content-center align-items-center">
+        <div style="max-width: 450px; width: 100%;">
 
-    <?php require_once(__DIR__ . '/../../includes/header.php'); ?>
+            <a href="users.php"
+                class="btn-close position-absolute top-0 start-0 m-4"
+                aria-label="Chiudi">
+            </a>
 
-    <main class="container mt-5 mb-5 flex-grow-1 d-flex flex-column align-items-center">
-
-        <div class="w-100" style="max-width: 650px;">
+            <h1 class="display-6 fw-bolder mb-2 text-center">Modifica utente</h1>
+            <p class="text-secondary mb-5 text-center">Aggiorna i dati dell'account</p>
 
             <?php if ($errore): ?>
-                <div class="alert alert-warning text-center shadow-sm rounded-3 border-0">
-                    <i class="bi bi-info-circle me-2"></i> <?= $errore ?>
+                <div class="alert alert-danger border-0 small py-2 mb-4">
+                    <?= htmlspecialchars($errore) ?>
                 </div>
             <?php endif; ?>
 
-            <?php if (!empty($moviesList)): ?>
-                <h5 class="text-muted mb-3 fw-normal">Risultati della ricerca</h5>
-                <div class="d-flex flex-column gap-3">
-
-                    <?php foreach ($moviesList as $movie): ?>
-                        <a href="film.php?tmdb_id=<?= urlencode($movie['id']) ?>" class="text-decoration-none">
-                            <div class="card border-0 shadow-sm rounded-3 card-hover bg-white search-result-card">
-                                <div class="card-body px-4 py-3 d-flex align-items-center gap-3">
-
-                                    <?php if ($movie['poster']): ?>
-                                        <img src="<?= htmlspecialchars($movie['poster']) ?>"
-                                            alt="Poster <?= htmlspecialchars($movie['titolo']) ?>"
-                                            class="rounded-2 flex-shrink-0"
-                                            style="width: 48px; height: 72px; object-fit: cover;">
-                                    <?php else: ?>
-                                        <div class="rounded-2 flex-shrink-0 bg-secondary d-flex align-items-center justify-content-center"
-                                            style="width: 48px; height: 72px;">
-                                            <i class="bi bi-film text-white fs-5"></i>
-                                        </div>
-                                    <?php endif; ?>
-
-                                    <div class="flex-grow-1 overflow-hidden">
-                                        <span class="fs-6 text-dark fw-medium d-block text-truncate">
-                                            <?= htmlspecialchars($movie['titolo']) ?>
-                                        </span>
-                                        <?php if ($movie['anno']): ?>
-                                            <small class="text-muted"><?= htmlspecialchars($movie['anno']) ?></small>
-                                        <?php endif; ?>
-                                    </div>
-
-                                    <i class="bi bi-chevron-right text-muted flex-shrink-0"></i>
-                                </div>
-                            </div>
-                        </a>
-                    <?php endforeach; ?>
-
+            <?php if ($messaggio): ?>
+                <div class="alert alert-success border-0 small py-2 mb-4">
+                    <?= htmlspecialchars($messaggio) ?>
                 </div>
             <?php endif; ?>
 
+             <?php if ($errore === ''): ?>
+                <form method="POST">
+                    <input type="hidden" name="username" value="<?= htmlspecialchars($username) ?>">
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <input type="text"
+                                name="nome"
+                                class="form-control bg-light border-light py-3"
+                                placeholder="Nome"
+                                value="<?= htmlspecialchars($utente['nome'] ?? '') ?>"
+                                required>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text"
+                                name="cognome"
+                                class="form-control bg-light border-light py-3"
+                                placeholder="Cognome"
+                                value="<?= htmlspecialchars($utente['cognome'] ?? '') ?>"
+                                required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <input type="email"
+                            name="email"
+                            class="form-control bg-light border-light py-3"
+                            placeholder="Email"
+                            value="<?= htmlspecialchars($utente['email'] ?? '') ?>"
+                            required>
+                    </div>
+
+                    <div class="mb-4">
+                        <input type="text"
+                            class="form-control bg-light border-light py-3 text-muted"
+                            value="<?= htmlspecialchars($utente['username'] ?? '') ?>"
+                            disabled 
+                            style="cursor: not-allowed;">
+                    </div>
+
+                   <div class="mb-4">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" 
+                                type="checkbox" 
+                                name="attivo" 
+                                value="1"
+                                <?= (isset($utente['attivo']) && $utente['attivo'] == 1) ? 'checked' : '' ?>>
+                            <label class="form-check-label fw-semibold" for="attivo">
+                                Attivo
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-3 mt-4">
+                        <button type="submit"
+                                name="save"
+                                class="btn btn-dark btn-lg flex-fill py-3 fw-bold">
+                            Salva modifiche
+                        </button>
+                    </div>
+
+                    <div class="d-flex gap-3 mt-4">
+                        <button type="submit"
+                                name="delete_user"
+                                class="btn btn-outline-danger btn-lg flex-fill py-3 fw-bold"
+                                onclick="return confirm('Sei sicuro?');">
+                            Elimina utente
+                        </button>
+                    </div>
+                <?php endif; ?>
+            </form>
         </div>
-    </main>
+    </div>
 
-    <?php require_once(__DIR__ . '/../../includes/footer.php'); ?>
-
-    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/assets/js/script.js"></script>
 </body>
-
 </html>
 ```
 
 ## File: pages/user/favorites.php
 ```php
 <?php
-/**
- * Pagina dei film preferiti (riservata agli utenti autenticati).
- * Recupera da MariaDB i TMDB ID dei film preferiti dell'utente loggato,
- * poi interroga MongoDB per ottenere titolo, poster e anno di ciascun film.
- * I risultati vengono ordinati per voto medio decrescente e presentati
- * in una griglia di card cliccabili.
- *
- * @note Interagisce con la tabella MariaDB: `preferiti`.
- * @note Interagisce con la collezione MongoDB: `films` (query con operatore $in).
- */
+// Pagina preferiti: mostra i film che l'utente ha salvato come preferiti.
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/functions.php');
 require_once(__DIR__ . '/../../config/connection.php');
@@ -4371,19 +4345,275 @@ if (!empty($ids)) {
 </html>
 ```
 
+## File: pages/admin/users.php
+```php
+<?php
+// Pagina admin per la lista degli utenti registrati.
+require_once(__DIR__ . '/../../config/config.php');
+require_once(__DIR__ . '/../../config/connection.php');
+require_once(__DIR__ . '/../../includes/user_obj.php');
+require_once(__DIR__ . '/../../includes/header_logic.php');
+
+// Controllo autenticazione
+$username   = $_SESSION['username'] ?? '';
+$id_profilo = $_SESSION['id_profilo'] ?? 0;
+
+if (!$username || $id_profilo != 1) {
+    header("Location: /index.php");
+    exit();
+}
+
+$user = new userObj($conn, $username);
+$utenti = $user->readAll();
+?>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione utenti - Cinevobis</title>
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+    <?php require_once(__DIR__ . '/../../includes/header.php'); ?>
+
+    <div class="container mt-4 mb-5 pb-5 flex-grow-1">
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="fs-3 fw-bold mb-0">Utenti</h1>
+            </div>
+        
+        <div class="card shadow-sm border-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4 py-3 text-uppercase text-muted small fw-bold border-bottom-0" scope="col">Utente</th>
+                            <th class="py-3 text-uppercase text-muted small fw-bold border-bottom-0" scope="col">Email</th>
+                            <th class="py-3 text-uppercase text-muted small fw-bold border-bottom-0" scope="col">Profilo</th>
+                            <th class="text-center py-3 text-uppercase text-muted small fw-bold border-bottom-0" scope="col">Stato</th>
+                            <th class="text-end pe-4 py-3 text-uppercase text-muted small fw-bold border-bottom-0" scope="col">Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody class="border-top-0">
+                        <?php foreach ($utenti as $utente): ?>
+                            <tr>
+                                <td class="ps-4 py-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3" 
+                                             style="width: 42px; height: 42px; background-color: var(--bg-muted); color: var(--accent);">
+                                            <i class="bi bi-person-fill fs-5"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark mb-0"><?= htmlspecialchars($utente['username']) ?></div>
+                                            <div class="small text-muted">
+                                                <?= htmlspecialchars(trim(($utente['nome'] ?? '') . ' ' . ($utente['cognome'] ?? ''))) ?: '<span class="fst-italic">Nessun nome</span>' ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                
+                                <td class="py-3 text-secondary">
+                                    <?= htmlspecialchars($utente['email'] ?? 'N/D') ?>
+                                </td>
+                                
+                                <td class="py-3">
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 rounded-pill px-3 py-2 fw-normal">
+                                        <i class="bi bi-shield-check me-1"></i> <?= htmlspecialchars($utente['nome_profilo'] ?? 'N/D') ?>
+                                    </span>
+                                </td>
+                                
+                                <td class="text-center py-3">
+                                    <?php if ($utente['attivo']): ?>
+                                        <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-2 fw-normal">
+                                            <i class="bi bi-check2-circle me-1"></i> Attivo
+                                        </span>
+                                    <?php else: ?>
+                                        <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 rounded-pill px-3 py-2 fw-normal">
+                                            <i class="bi bi-x-circle me-1"></i> Inattivo
+                                        </span>
+                                    <?php endif; ?>
+                                </td>
+                                
+                                <td class="text-end pe-4 py-3">
+                                    <a href="edit_user.php?username=<?= urlencode($utente['username']) ?>" 
+                                       class="btn btn-sm btn-outline-secondary rounded-pill px-3 d-inline-flex align-items-center">
+                                        <i class="bi bi-pencil-square me-2"></i> Modifica
+                                    </a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                        
+                        <?php if (empty($utenti)): ?>
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">
+                                    <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                                    Nessun utente trovato nel database.
+                                </td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div> 
+    
+    <?php require_once(__DIR__ . '/../../includes/footer.php'); ?>
+
+    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/script.js"></script>
+</body>
+</html>
+```
+
+## File: pages/public/search.php
+```php
+<?php
+// Pagina di ricerca film: interroga l'API TMDB e mostra i risultati all'utente.
+require_once(__DIR__ . '/../../config/config.php');
+require_once(__DIR__ . '/../../config/functions.php');
+require_once(__DIR__ . '/../../config/connection.php');
+require_once(__DIR__ . '/../../includes/user_obj.php');
+require_once(__DIR__ . '/../../includes/movie_obj.php');
+require_once(__DIR__ . '/../../includes/header_logic.php');
+require_once(__DIR__ . '/../../vendor/autoload.php');
+
+use Dotenv\Dotenv;
+use Kiwilan\Tmdb\Tmdb;
+
+$dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
+$dotenv->load();
+
+$tmdb = Tmdb::client($_ENV['API_KEY']);
+
+$errore = "";
+$moviesList = [];
+$results = []; // Inizializziamo sempre l'array per evitare "Undefined variable"
+$searched = isset($_GET['search']) ? trim($_GET['search']) : '';
+$api_failed = false;
+
+if ($searched !== '') {
+    try {
+        $raw = $tmdb->raw()->url('/search/movie', [
+            'query' => $searched,
+            'language' => 'it-IT'
+        ]);
+
+        if ($raw !== null) {
+            $body = $raw->getBody();
+
+            if (isset($body['results']) && is_array($body['results'])) {
+                $results = $body['results'];
+                // Ordiniamo i risultati direttamente qui
+                $results = order_of_popularity(count($results), $results);
+            } else {
+                $api_failed = true; 
+            }
+        } else {
+            $api_failed = true;
+        }
+    } catch (Exception $e) {
+        // Logghiamo l'errore e segnaliamo il fallimento dell'API
+        error_log("Errore connessione con TMDB: " . $e->getMessage());
+        $api_failed = true;
+    }
+    
+    // Gestione unificata degli stati finali (Errori API, Nessun risultato, Successo)
+    if ($api_failed) {
+        $errore = "Si è verificato un errore temporaneo nella ricerca dei film. Riprova più tardi.";
+        
+    } elseif (empty($results)) {
+        
+        $errore = "Nessun risultato trovato per: " . htmlspecialchars($searched);
+    } else {
+        $moviesList = movieObj::search($results);
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cerca Film - Cinevobis</title>
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+    <?php require_once(__DIR__ . '/../../includes/header.php'); ?>
+
+    <main class="container mt-5 mb-5 flex-grow-1 d-flex flex-column align-items-center">
+
+        <div class="w-100" style="max-width: 650px;">
+
+            <?php if ($errore): ?>
+                <div class="alert alert-info shadow-sm rounded-4 border-0">
+                    <i class="bi bi-info-circle me-2"></i><?= htmlspecialchars($errore) ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if (!empty($moviesList)): ?>
+                <h5 class="text-muted mb-3 fw-normal">Risultati della ricerca</h5>
+                <div class="d-flex flex-column gap-3">
+
+                    <?php foreach ($moviesList as $movie): ?>
+                        <a href="film.php?tmdb_id=<?= urlencode($movie['id']) ?>" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm rounded-3 card-hover bg-white search-result-card">
+                                <div class="card-body px-4 py-3 d-flex align-items-center gap-3">
+
+                                    <?php if ($movie['poster']): ?>
+                                        <img src="<?= htmlspecialchars($movie['poster']) ?>"
+                                            alt="Poster <?= htmlspecialchars($movie['titolo']) ?>"
+                                            class="rounded-2 flex-shrink-0"
+                                            style="width: 48px; height: 72px; object-fit: cover;">
+                                    <?php else: ?>
+                                        <div class="rounded-2 flex-shrink-0 bg-secondary d-flex align-items-center justify-content-center"
+                                            style="width: 48px; height: 72px;">
+                                            <i class="bi bi-film text-white fs-5"></i>
+                                        </div>
+                                    <?php endif; ?>
+
+                                    <div class="flex-grow-1 overflow-hidden">
+                                        <span class="fs-6 text-dark fw-medium d-block text-truncate">
+                                            <?= htmlspecialchars($movie['titolo']) ?>
+                                        </span>
+                                        <?php if ($movie['anno']): ?>
+                                            <small class="text-muted"><?= htmlspecialchars($movie['anno']) ?></small>
+                                        <?php endif; ?>
+                                    </div>
+
+                                    <i class="bi bi-chevron-right text-muted flex-shrink-0"></i>
+                                </div>
+                            </div>
+                        </a>
+                    <?php endforeach; ?>
+
+                </div>
+            <?php endif; ?>
+
+        </div>
+    </main>
+
+    <?php require_once(__DIR__ . '/../../includes/footer.php'); ?>
+
+    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/script.js"></script>
+</body>
+
+</html>
+```
+
 ## File: pages/user/reviews.php
 ```php
 <?php
-/**
- * Pagina delle recensioni personali (riservata agli utenti autenticati).
- * Recupera da MariaDB i TMDB ID e i dati (voto, commento) di tutti i film
- * recensiti dall'utente loggato, poi interroga MongoDB per ottenere poster
- * e titolo di ciascun film. I risultati vengono presentati come card con
- * il commento e il voto dell'utente.
- *
- * @note Interagisce con la tabella MariaDB: `recensioni`.
- * @note Interagisce con la collezione MongoDB: `films` (query con operatore $in).
- */
+// Elenca le recensioni personali dell'utente con i dettagli dei film.
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/functions.php');
 require_once(__DIR__ . '/../../config/connection.php');
@@ -4399,6 +4629,7 @@ if (!$username) {
     header("Location: /index.php");
     exit();
 }
+
 
 // Estrazione tmdb_id + dati recensione
 $recensioni_map = [];
@@ -4548,9 +4779,7 @@ if (!empty($ids)) {
                 foreach ($films as $film):
                     $id = (int) ($film['id'] ?? 0);
                     $titolo = $film['title'] ?? 'Titolo non disponibile';
-                    $poster = !empty($film['poster_path'])
-                        ? "https://image.tmdb.org/t/p/w500" . $film['poster_path']
-                        : "https://via.placeholder.com/500x750?text=No+Poster";
+                    $poster = !empty($film['poster_path']) ? "https://image.tmdb.org/t/p/w500" . $film['poster_path'] : "https://via.placeholder.com/500x750?text=No+Poster";
                     $rec = $recensioni_map[$id] ?? [];
                     $voto = isset($rec['voto']) ? (float) $rec['voto'] : null;
                     $commento = $rec['commento'] ?? '';
@@ -4602,148 +4831,11 @@ if (!empty($ids)) {
 </html>
 ```
 
-## File: pages/admin/users.php
-```php
-<?php
-/**
- * Pagina di gestione utenti (area admin). Recupera e mostra in tabella
- * tutti gli utenti registrati con username, nome, cognome, email, ruolo
- * e stato attivo/inattivo. Ogni riga include un link alla pagina di modifica
- * individuale (edit_user.php). Riservata agli utenti con id_profilo = 1.
- *
- * @note Interagisce con le tabelle MariaDB: `utenti`, `profili` (tramite userObj::readAll).
- */
-require_once(__DIR__ . '/../../config/config.php');
-require_once(__DIR__ . '/../../config/connection.php');
-require_once(__DIR__ . '/../../includes/user_obj.php');
-require_once(__DIR__ . '/../../includes/header_logic.php');
-
-// Controllo autenticazione
-$username   = $_SESSION['username'] ?? '';
-$id_profilo = $_SESSION['id_profilo'] ?? 0;
-
-if (!$username || $id_profilo != 1) {
-    header("Location: /index.php");
-    exit();
-}
-
-$user = new userObj($conn, $username);
-$utenti = $user->readAll();
-?>
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestione utenti - Cinevobis</title>
-    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="/assets/css/style.css">
-</head>
-<body class="d-flex flex-column min-vh-100">
-
-    <?php require_once(__DIR__ . '/../../includes/header.php'); ?>
-
-    <div class="container mt-4 mb-5 pb-5 flex-grow-1">
-        
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="fs-3 fw-bold mb-0">Utenti</h1>
-            </div>
-        
-        <div class="card shadow-sm border-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th class="ps-4 py-3 text-uppercase text-muted small fw-bold border-bottom-0" scope="col">Utente</th>
-                            <th class="py-3 text-uppercase text-muted small fw-bold border-bottom-0" scope="col">Email</th>
-                            <th class="py-3 text-uppercase text-muted small fw-bold border-bottom-0" scope="col">Profilo</th>
-                            <th class="text-center py-3 text-uppercase text-muted small fw-bold border-bottom-0" scope="col">Stato</th>
-                            <th class="text-end pe-4 py-3 text-uppercase text-muted small fw-bold border-bottom-0" scope="col">Azioni</th>
-                        </tr>
-                    </thead>
-                    <tbody class="border-top-0">
-                        <?php foreach ($utenti as $utente): ?>
-                            <tr>
-                                <td class="ps-4 py-3">
-                                    <div class="d-flex align-items-center">
-                                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3" 
-                                             style="width: 42px; height: 42px; background-color: var(--bg-muted); color: var(--accent);">
-                                            <i class="bi bi-person-fill fs-5"></i>
-                                        </div>
-                                        <div>
-                                            <div class="fw-bold text-dark mb-0"><?= htmlspecialchars($utente['username']) ?></div>
-                                            <div class="small text-muted">
-                                                <?= htmlspecialchars(trim(($utente['nome'] ?? '') . ' ' . ($utente['cognome'] ?? ''))) ?: '<span class="fst-italic">Nessun nome</span>' ?>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                
-                                <td class="py-3 text-secondary">
-                                    <?= htmlspecialchars($utente['email'] ?? 'N/D') ?>
-                                </td>
-                                
-                                <td class="py-3">
-                                    <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 rounded-pill px-3 py-2 fw-normal">
-                                        <i class="bi bi-shield-check me-1"></i> <?= htmlspecialchars($utente['nome_profilo'] ?? 'N/D') ?>
-                                    </span>
-                                </td>
-                                
-                                <td class="text-center py-3">
-                                    <?php if ($utente['attivo']): ?>
-                                        <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-2 fw-normal">
-                                            <i class="bi bi-check2-circle me-1"></i> Attivo
-                                        </span>
-                                    <?php else: ?>
-                                        <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 rounded-pill px-3 py-2 fw-normal">
-                                            <i class="bi bi-x-circle me-1"></i> Inattivo
-                                        </span>
-                                    <?php endif; ?>
-                                </td>
-                                
-                                <td class="text-end pe-4 py-3">
-                                    <a href="edit_user.php?username=<?= urlencode($utente['username']) ?>" 
-                                       class="btn btn-sm btn-outline-secondary rounded-pill px-3 d-inline-flex align-items-center">
-                                        <i class="bi bi-pencil-square me-2"></i> Modifica
-                                    </a>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                        
-                        <?php if (empty($utenti)): ?>
-                            <tr>
-                                <td colspan="5" class="text-center py-5 text-muted">
-                                    <i class="bi bi-inbox fs-2 d-block mb-2"></i>
-                                    Nessun utente trovato nel database.
-                                </td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div> 
-    
-    <?php require_once(__DIR__ . '/../../includes/footer.php'); ?>
-
-    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/assets/js/script.js"></script>
-</body>
-</html>
-```
-
 ## File: actions/change_password.php
 ```php
 <?php
-/**
- * Gestisce il cambio password dell'utente autenticato: verifica la password
- * attuale, controlla la corrispondenza tra la nuova password e la conferma,
- * quindi aggiorna il record tramite userObj::changePassword.
- * Richiede una sessione attiva; in caso contrario reindirizza alla home.
- *
- * @note Interagisce con la tabella MariaDB: `utenti` (tramite userObj::changePassword).
- */
+// Gestisce il cambio password per l'utente autenticato.
+// Verifica password attuale e aggiorna il record tramite userObj.
 require_once(__DIR__ . '/../config/config.php');
 require_once(__DIR__ . '/../config/connection.php');
 require_once(__DIR__ . '/../includes/user_obj.php');
@@ -4765,10 +4857,13 @@ if (isset($_POST['cambia_password'])) {
 
     if (!$password_attuale || !$nuova_password || !$conferma) {
         $errore = "Compila tutti i campi";
+
     } elseif ($nuova_password !== $conferma) {
         $errore = "Le nuove password non coincidono";
+
     } elseif ($password_attuale === $nuova_password) {
         $errore = "La nuova password deve essere diversa dalla attuale";
+        
     } else {
         try {
             $user = new userObj($conn, $username);
@@ -4865,14 +4960,7 @@ if (isset($_POST['cambia_password'])) {
 ## File: pages/admin/sessions.php
 ```php
 <?php
-/**
- * Pagina di gestione sessioni (area admin). Mostra le ultime N sessioni di
- * accesso al sito con username, data di login e data di logout. Il numero
- * di righe da visualizzare è configurabile tramite il parametro GET ?righe=N
- * (default: 15). Utilizza userObj::readAccess per la query.
- *
- * @note Interagisce con le tabelle MariaDB: `sessioni`, `utenti` (tramite userObj::readAccess).
- */
+// Pagina admin che mostra le ultime sessioni di accesso al sito.
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');
@@ -5023,6 +5111,11 @@ $sessioni = $user->readAccess($righe);
     --radius-md: 12px;
     --radius-lg: 16px;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.alert-info {
+    background-color: var(--accent);
+    color: var(--bg);
 }
 
 body {
@@ -5285,7 +5378,7 @@ $isAdminPage = in_array($currentPage, $adminPages);
                             <i class="bi bi-house me-2"></i>Home</a></li>
                         <li><a class="dropdown-item py-2 small" href="/actions/contact.php">
                             <i class="bi bi-envelope me-2"></i>Contattaci</a></li>
-                        <li><a class="dropdown-item py-2 small" href="/pages/user/notice_board.php">
+                        <li><a class="dropdown-item py-2 small" href="/pages/public/notice_board.php">
                             <i class="bi bi-layout-text-sidebar-reverse me-2"></i>Bacheca</a></li>
                     <?php endif; ?>
 
@@ -5315,14 +5408,8 @@ $isAdminPage = in_array($currentPage, $adminPages);
 ## File: index.php
 ```php
 <?php
-/**
- * Homepage di Cinevobis. Recupera da MongoDB due liste di film:
- * - "Film in evidenza": gli ultimi 12 film aggiunti al catalogo (ordinati per data).
- * - "Migliori film": i 6 film con il voto medio più alto, da cui viene estratto
- *   il "Film della settimana" usando il numero della settimana ISO come seed deterministico.
- *
- * @note Interagisce con la collezione MongoDB: `films` (database: `cinevobis`).
- */
+// Home page Cinevobis: mostra film in evidenza e migliori film.
+// Recupera i dati da MongoDB dalla collezione `films` del database `cinevobis`.
 require_once(__DIR__ . '/config/config.php');
 require_once(__DIR__ . '/config/connection.php');
 require_once(__DIR__ . '/includes/header_logic.php');
@@ -5332,13 +5419,12 @@ use MongoDB\Client;
 
 $nome = $_SESSION['nome'] ?? '';
 
-
-// DIchiarazione variabili
+// Prepara gli array di dati che verranno popolati dal database.
 $collection = [];
 $cursor = [];
 
 try {
-    // Connessione a MongoDB
+    // Connessione a MongoDB locale e selezione della collezione film.
     $mongoClient = new Client("mongodb://localhost:27017");
     $db = $mongoClient->selectDatabase('cinevobis');
     $collection = $db->selectCollection('films');
@@ -5347,19 +5433,19 @@ try {
     error_log("Errore MongoDB: " . $e->getMessage());
 }
 
-
-// I Film in evidenza
+// Film in evidenza: ultimi film aggiunti.
 $recommendedFilms = [];
 
 try {
     $cursor = $collection->find([], [
-        'limit' => 12,
+        'limit' => 6,
         'sort' => ['release_date' => -1],
         'typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']
     ]);
 
     $recommendedFilms = iterator_to_array($cursor);
 
+    // Prende i migliori film ordinati per voto medio.
     $cursor = $collection->find([], [
         'limit' => 6,
         'sort' => ['vote_average' => -1],
@@ -5370,18 +5456,16 @@ try {
     error_log("Errore: " . $e->getMessage());
 }
 
-
-// I migliori Film
+// Mappa i risultati dei migliori film e sceglie il film della settimana.
 $topFilms = [];
 $film = [];
 
 try {
     $topFilms = iterator_to_array($cursor);
     
-    // Film della settimana: cambia ogni lunedì usando il numero della settimana come seed
-    $weekSeed = (int)date('oW');  // anno ISO + numero settimana
-    $index = $weekSeed % count($topFilms);
-    $film = $topFilms[$index] ?? null;
+    // srand((int)date('oW'));
+    srand(10);
+    $film = $topFilms[array_rand($topFilms)] ?? null;
 
 } catch (Exception $e) {
     error_log("Errore: " . $e->getMessage());
@@ -5403,8 +5487,8 @@ try {
 
     <main class="container mt-5 mb-5 flex-grow-1">
         <div class="container">
-            <?php if(isset($nome)): ?>
-                <h1 class="fw-bold mb-4">Benvenuto <?= htmlspecialchars($nome) ?></h1>
+            <?php if($nome != ''): ?>
+                <h1 class="fw-bold mb-4">Benvenuto, <?= htmlspecialchars($nome) ?></h1>
             <?php else: ?>
                 <h1 class="fw-bold mb-4">Benvenuto</h1>
             <?php endif; ?>
@@ -5471,8 +5555,50 @@ try {
             </div>
             <?php endif; ?>
 
+
+           <div class="d-flex justify-content-between align-items-center mb-4 mt-5">
+                <h3 class="fw-bold m-0">Esplora</h3>
+            </div>
+
+           <div class="row g-4">
+                <div class="col-12 col-md-6">
+                    <a href="/pages/public/genres.php" class="text-decoration-none d-block h-100">
+                        <div class="card transition-hover h-100">
+                            <div class="card-body d-flex align-items-center justify-content-between p-4">
+                                <div class="d-flex align-items-center gap-3">
+                                    <i class="bi bi-grid-fill fs-2" style="color: var(--accent);"></i>
+                                    <div>
+                                        <div class="fw-bold" style="font-size: 1rem;">Generi</div>
+                                        <div class="text-muted" style="font-size: 0.85rem;">Esplora il catalogo per categoria</div>
+                                    </div>
+                                </div>
+                                <i class="bi bi-arrow-right text-muted"></i>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <a href="/pages/public/notice_board.php" class="text-decoration-none d-block h-100">
+                        <div class="card transition-hover h-100">
+                            <div class="card-body d-flex align-items-center justify-content-between p-4">
+                                <div class="d-flex align-items-center gap-3">
+                                    <i class="bi bi-journal-text fs-2 text-warning"></i>
+                                    <div>
+                                        <div class="fw-bold" style="font-size: 1rem;">Bacheca</div>
+                                        <div class="text-muted" style="font-size: 0.85rem;">Le ultime recensioni della community</div>
+                                    </div>
+                                </div>
+                                <i class="bi bi-arrow-right text-muted"></i>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
             <div class="d-flex justify-content-between align-items-center mb-4 mt-5">
                 <h3 class="fw-bold m-0">I Film in evidenza</h3>
+                <a href="/pages/public/recommended_films.php" class="text-decoration-none fw-semibold" style="color: var(--accent);">Vedi tutti <i class="bi bi-arrow-right"></i></a>
             </div>
 
             <?php if (empty($recommendedFilms)): ?>
@@ -5508,6 +5634,7 @@ try {
 
             <div class="d-flex justify-content-between align-items-center mb-4 mt-5">
                 <h3 class="fw-bold m-0">I migliori Film</h3>
+                <a href="/pages/public/top_films.php" class="text-decoration-none fw-semibold" style="color: var(--accent);">Vedi tutti <i class="bi bi-arrow-right"></i></a>
             </div>
 
             <?php if (empty($topFilms)): ?>
@@ -5541,6 +5668,64 @@ try {
                 </div>
             <?php endif; ?>
 
+            <hr class="my-5 border-0" style="border-top: 0.5px solid var(--bs-border-color) !important;">
+
+            <div class="mt-5 mb-5 py-lg-4">
+                <div class="row g-4 g-lg-5 align-items-center">
+
+                    <div class="col-12 col-lg-6">
+                        <p class="text-uppercase text-muted fw-bold mb-3 d-flex align-items-center" style="font-size: 0.75rem; letter-spacing: 0.1em;">
+                            <span class="me-3 rounded-pill" style="width: 30px; height: 2px; background-color: currentColor;"></span>
+                            Il progetto
+                        </p>
+                        
+                        <h2 class="fw-bolder mb-3" style="font-size: clamp(1.75rem, 3.5vw, 2.25rem); line-height: 1.2;">
+                            Perché nasce Cinevobis?
+                        </h2>
+                        
+                        <p class="text-secondary mb-4" style="line-height: 1.8; font-size: 1.05rem;">
+                            Cinevobis nasce per chi ama i film, concedendo la possibilità di condividere
+                            la propria passione con gli altri. Il nome deriva da
+                            <strong class="text-dark">cine</strong>, inteso come cinema, e
+                            <strong class="text-dark">vobis</strong>, dal latino <em>per voi</em>.
+                        </p>
+                        
+                        <blockquote class="mb-0 p-4 rounded-4 bg-light border-start border-4" style="border-color: var(--bs-gray-400) !important;">
+                            <p class="fst-italic text-dark mb-2" style="font-size: 0.95rem; line-height: 1.6;">
+                                "I film non ti dicono cosa pensare. Ti insegnano come sentire."
+                            </p>
+                            <cite class="text-muted fw-semibold" style="font-size: 0.8rem; letter-spacing: 0.05em;">— Roger Ebert</cite>
+                        </blockquote>
+                    </div>
+
+                    <div class="col-12 col-lg-6">
+                        <div class="row g-3 g-md-4">
+                            <?php
+                            $features = [
+                                ['icon' => 'bi-heart-fill',    'titolo' => 'Preferiti',  'desc' => 'I film che ami nel tuo catalogo personale.', 'color' => '#dc3646'],
+                                ['icon' => 'bi-pen-fill',      'titolo' => 'Recensioni', 'desc' => 'Scrivi, vota e condividi il tuo pensiero.', 'color' => 'var(--text)'],
+                                ['icon' => 'bi-eye-fill',      'titolo' => 'Watched',    'desc' => 'Lo storico di tutto ciò che hai già visto.', 'color' => '#1b8855'],
+                                ['icon' => 'bi-bookmark-fill', 'titolo' => 'Watchlist',  'desc' => 'I titoli che non vuoi assolutamente perderti.', 'color' => '#267bfd'],
+                            ];
+                            foreach ($features as $f): ?>
+                            <div class="col-12 col-sm-6">
+                                <div class="p-4 rounded-4 h-100 transition-hover" 
+                                    style="background-color: var(--bg-muted); border: 1px solid var(--border);">
+                                    
+                                    <i class="bi <?= $f['icon'] ?> mb-3 d-block" style="font-size: 1.8rem; color: <?= $f['color'] ?>;"></i>
+                                    <h5 class="fw-bold text-dark mb-2" style="font-size: 1.05rem;"><?= $f['titolo'] ?></h5>
+                                    <p class="text-muted mb-0" style="font-size: 0.85rem; line-height: 1.6;">
+                                        <?= $f['desc'] ?>
+                                    </p>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
         </div>
     </main>
 
@@ -5554,15 +5739,8 @@ try {
 ## File: pages/public/film.php
 ```php
 <?php
-/**
- * Pagina di dettaglio film (pubblica). Recupera i dati del film dall'API TMDB,
- * li salva in MongoDB alla prima visita e li aggiorna se sono più vecchi di 30 giorni.
- * Per gli utenti autenticati gestisce le azioni POST per aggiungere/rimuovere il film
- * da Preferiti, Watchlist e Watched, e verifica se l'utente ha già scritto una recensione.
- *
- * @note Interagisce con la collezione MongoDB: `films` (insert/update/find).
- * @note Interagisce con le tabelle MariaDB: `preferiti`, `watchlist`, `watched`, `recensioni`.
- */
+// Pagina pubblica di dettaglio film: recupera dati TMDB, salva/aggiorna MongoDB
+// e gestisce le azioni utente su preferiti, watchlist e watched.
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');
@@ -5583,27 +5761,25 @@ $tmdb = Tmdb::client($_ENV['API_KEY']);
 // Dichiarazione variabili
 $movie_api = null;
 $movie_db = null;
-$collection = [];
 $errore = "";
 
 $movie_id = $_GET['tmdb_id'] ?? null;
-
+$collection = [];
 
 // Connessione a MongoDB
 try {
     $mongoClient = new Client("mongodb://localhost:27017");
-    $db = $mongoClient->selectDatabase('cinevobis');
-    $collection = $db->selectCollection('films');
-    
-} catch(Exception $e) {
-    error_log("Errore: " . $e->getMessage());
+    $db          = $mongoClient->selectDatabase('cinevobis');
+    $collection  = $db->selectCollection('films');
+} catch (Exception $e) {
+    error_log("Errore MongoDB: " . $e->getMessage());
 }
 
 
 // 1. Recupero film da TMDB
 if (!empty($movie_id)) {
     $results = $tmdb->raw()->url("/movie/{$movie_id}", [
-        'language' => 'it-IT',
+        'language'           => 'it-IT',
         'append_to_response' => 'credits,videos'
     ]);
 
@@ -5622,51 +5798,41 @@ if (!empty($movie_id)) {
 
 // 2. Controllo/inserimento o aggiornamento in MongoDB
 if (!empty($movie_api)) {
+    $now              = time();
+    $aMonthInSeconds  = 30 * 24 * 60 * 60;
 
-    $now = time();
-    $aMonthInSeconds = 30 * 24 * 60 * 60; // 30 giorni
-
-    
-    // Cercare il film nel DB
     $movie_db = $collection->findOne(
         ['id' => (int)$movie_id],
         ['typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']]
     );
 
-
-    // Se non esiste lo si inserisci
     if ($movie_db === null) {
-        $movie_api['last_updated'] = new \MongoDB\BSON\UTCDateTime();  // Timestamp attuale in secondi
+        $movie_api['last_updated'] = new \MongoDB\BSON\UTCDateTime();
         $collection->insertOne($movie_api);
         $movie_db = $movie_api;
     } else {
-        // Se esiste si recupera il timestamp 
-        $lastUpdateSeconds = isset($movie_db['last_updated']) ? $movie_db['last_updated']->toDateTime()->getTimestamp() : 0;
+        $lastUpdateSeconds = isset($movie_db['last_updated'])
+            ? $movie_db['last_updated']->toDateTime()->getTimestamp()
+            : 0;
 
-        // Se è passato un mese si aggiorna il film
         if (($now - $lastUpdateSeconds) > $aMonthInSeconds) {
             $movie_api['last_updated'] = new \MongoDB\BSON\UTCDateTime();
-
-            $collection->updateOne(
-                ['id' => $movie_id],
-                ['$set' => $movie_api]
-            );
-
-            $movie_db = $movie_api;  // Usare i dati fresci per la visualizzazione
+            $collection->updateOne(['id' => $movie_id], ['$set' => $movie_api]);
+            $movie_db = $movie_api;
         }
     }
 }
 
 
-// 3. Estrazione dati
-$titolo = $trama = $poster_path = $trailerKey = $paese = '';
-$voto = 0;
+// 3. Estrazione dati dal film
+$titolo = $titolo_orig = $trama = $poster_path = $trailerKey = $paese = '';
+$voto   = 0;
 $durata = $anno = '';
 $generi = $cast = $registi = [];
 
 if ($movie_db) {
     $movieObj = new movieObj($movie_db);
-    $data = $movieObj->toArray();
+    $data     = $movieObj->toArray();
 
     $titolo = $data['titolo'];
     $titolo_orig = $data['titolo_orig'];
@@ -5688,233 +5854,55 @@ if ($movie_db) {
 }
 
 
-// Dichiarazione variabili
-$tmdb_id = $movie_db['id'];
-$id_utente = $_SESSION['id_utente'];
+// 4. Gestione liste utente tramite userObj
+$tmdb_id   = $movie_db['id'] ?? null;
+$id_utente = $_SESSION['id_utente'] ?? null;
 
 $is_favorite = false;
 $is_review = false;
 $is_watchlist = false;
 $is_watched = false;
 
+if ($tmdb_id !== null && $id_utente !== null) {
+    $userObj = new userObj($conn, $_SESSION['username']);
 
-// Verifica condizioni per preferiti
-if ($tmdb_id != null && $id_utente != null) {
-
-    // Aggiungere il film alla lista preferiti
-    if (isset($_POST['favorite'])) {
-        try {
-            $sql = "INSERT INTO preferiti (tmdb_id, id_utente, data_aggiunto) VALUES
-                    (:tmdb_id, :id_utente, :data_aggiunto)";
-
-            $stmt = $conn->prepare($sql);
-            $stmt->execute([
-                'tmdb_id' => $tmdb_id,
-                'id_utente' => $id_utente,
-                'data_aggiunto' => date('Y-m-d H:i:s')
-            ]);
-
-        } catch (PDOException $e) {
-            error_log("Errore nel DB: " . $e->getMessage());
-            $errore = "Errore nell'aggiunta alla lista preferiti";
-        }
-    }
-
-    // Elimina dalla lista preferiti
-    if (isset($_POST['delete_favorite'])) {
-        try {
-            $sql = "DELETE FROM preferiti WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
-
-            $stmt = $conn->prepare($sql);
-            $stmt->execute([
-                ':id_utente' => $id_utente,
-                ':tmdb_id' => $tmdb_id
-            ]);
-
-        } catch (PDOException $e) {
-            error_log("Errore nel DB: " . $e->getMessage());
-            $errore = "Errore nella rimozione dalla lista preferiti";
-        }
-    }
-
-    // Controllo se l'utente ha aggiunto il film ai preferiti (DOPO aver gestito il POST)
     try {
-        $sql = "SELECT * FROM preferiti WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
+        // Gestione POST preferiti
+        if (isset($_POST['favorite'])) $userObj->addFavorite((int)$tmdb_id, $id_utente);
+        if (isset($_POST['delete_favorite'])) $userObj->removeFavorite((int)$tmdb_id, $id_utente);
 
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([
-            ':id_utente' => $id_utente,
-            ':tmdb_id' => $tmdb_id
-        ]);
+        // Gestione POST watchlist
+        if (isset($_POST['watchlist'])) $userObj->addWatchlist((int)$tmdb_id, $id_utente);
+        if (isset($_POST['delete_watchlist'])) $userObj->removeWatchlist((int)$tmdb_id, $id_utente);
 
-        $results = $stmt->fetchColumn();
-        
-        if (!empty($results)) 
-            $is_favorite = true;
+        // Gestione POST watched
+        if (isset($_POST['watched'])) $userObj->addWatched((int)$tmdb_id, $id_utente);
+        if (isset($_POST['delete_watched'])) $userObj->removeWatched((int)$tmdb_id, $id_utente);
+
+        // Stato corrente (DOPO aver gestito i POST)
+        $is_favorite = $userObj->isFavorite((int)$tmdb_id, $id_utente);
+        $is_watchlist = $userObj->isInWatchlist((int)$tmdb_id, $id_utente);
+        $is_watched = $userObj->isWatched((int)$tmdb_id, $id_utente);
+        $is_review = $userObj->hasReview((int)$tmdb_id, $id_utente);
+
+        // Se ha una recensione, il film è implicitamente "visto"
+        if ($is_review) $is_watched = true;
 
     } catch (PDOException $e) {
         error_log("Errore nel DB: " . $e->getMessage());
+        $errore = "Errore nell'aggiornamento delle liste";
     }
 }
 
-
-// Verifica condizioni per watchlist
-if ($tmdb_id != null && $id_utente != null) {
-
-    // Aggiungere il film alla lista watchlist
-    if (isset($_POST['watchlist'])) {
-        try {
-            $sql = "INSERT INTO watchlist (tmdb_id, id_utente, data_aggiunto) VALUES
-                    (:tmdb_id, :id_utente, :data_aggiunto)";
-
-            $stmt = $conn->prepare($sql);
-            $stmt->execute([
-                'tmdb_id' => $tmdb_id,
-                'id_utente' => $id_utente,
-                'data_aggiunto' => date('Y-m-d H:i:s')
-            ]);
-
-        } catch (PDOException $e) {
-            error_log("Errore nel DB: " . $e->getMessage());
-            $errore = "Errore nell'aggiunta alla lista watchlist";
-        }
-    }
-
-    // Elimina dalla lista watchlist
-    if (isset($_POST['delete_watchlist'])) {
-        try {
-            $sql = "DELETE FROM watchlist WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
-
-            $stmt = $conn->prepare($sql);
-            $stmt->execute([
-                ':id_utente' => $id_utente,
-                ':tmdb_id' => $tmdb_id
-            ]);
-
-        } catch (PDOException $e) {
-            error_log("Errore nel DB: " . $e->getMessage());
-            $errore = "Errore nella rimozione dalla lista watchlist";
-        }
-    }
-
-    // Controllo se l'utente ha aggiunto il film ai watchlist (DOPO aver gestito il POST)
-    try {
-        $sql = "SELECT * FROM watchlist WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
-
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([
-            ':id_utente' => $id_utente,
-            ':tmdb_id' => $tmdb_id
-        ]);
-
-        $results = $stmt->fetchColumn();
-
-        if (!empty($results)) 
-            $is_watchlist = true;
-
-    } catch (PDOException $e) {
-        error_log("Errore nel DB: " . $e->getMessage());
-    }
-}
-
-
-// Verifica condizioni per watched
-if ($tmdb_id != null && $id_utente != null) {
-
-    // Aggiungere il film alla lista watched
-    if (isset($_POST['watched'])) {
-        try {
-            $sql = "INSERT INTO watched (tmdb_id, id_utente, data_aggiunto) VALUES
-                    (:tmdb_id, :id_utente, :data_aggiunto)";
-
-            $stmt = $conn->prepare($sql);
-            $stmt->execute([
-                'tmdb_id' => $tmdb_id,
-                'id_utente' => $id_utente,
-                'data_aggiunto' => date('Y-m-d H:i:s')
-            ]);
-
-        } catch (PDOException $e) {
-            error_log("Errore nel DB: " . $e->getMessage());
-            $errore = "Errore nell'aggiunta alla lista watched";
-        }
-    }
-
-    // Elimina dalla lista watched
-    if (isset($_POST['delete_watched'])) {
-        try {
-            $sql = "DELETE FROM watched WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
-
-            $stmt = $conn->prepare($sql);
-            $stmt->execute([
-                ':id_utente' => $id_utente,
-                ':tmdb_id' => $tmdb_id
-            ]);
-
-        } catch (PDOException $e) {
-            error_log("Errore nel DB: " . $e->getMessage());
-            $errore = "Errore nella rimozione dalla lista watched";
-        }
-    }
-
-    // Controllo se l'utente ha aggiunto il film ai watched (DOPO aver gestito il POST)
-    try {
-        $sql = "SELECT * FROM watched WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
-
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([
-            ':id_utente' => $id_utente,
-            ':tmdb_id' => $tmdb_id
-        ]);
-
-        $results = $stmt->fetchColumn();
-
-        if (!empty($results)) 
-            $is_watched = true;
-
-    } catch (PDOException $e) {
-        error_log("Errore nel DB: " . $e->getMessage());
-    }
-}
-
-
-// Controlla se l'utente ha già recensito il film
-if ($tmdb_id != null && $id_utente != null) {
-    try {
-        $sql = "SELECT * FROM recensioni WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
-
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([
-            ':id_utente' => $id_utente, 
-            ':tmdb_id' => $tmdb_id
-        ]);
-        
-        $results = $stmt->fetchColumn();
-        
-        if (!empty($results)) {
-            $is_review = true;
-            $is_watched = true;
-        }
-
-    } catch (PDOException $e) {
-        error_log("Errore nel DB: " . $e->getMessage());
-    }
-}
-
-// Contiamo le recensioni degli altri utenti
+// Conteggio recensioni della community
 $recensioni_altri = 0;
-try {   
-    $sql = "SELECT COUNT(*)
-            FROM recensioni r
-            WHERE tmdb_id = :tmdb_id";
-
-    $stmt = $conn->prepare($sql);
-    $stmt->execute([':tmdb_id' => $movie_id]);
-
-    $recensioni_altri = $stmt->fetchColumn();
-
-} catch (PDOException $e) {
-    error_log("Errore nel DB: " . $e->getMessage());
+if ($tmdb_id !== null) {
+    try {
+        $userObj          = $userObj ?? new userObj($conn, '');
+        $recensioni_altri = $userObj->countReviews((int)$tmdb_id);
+    } catch (PDOException $e) {
+        error_log("Errore nel DB: " . $e->getMessage());
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -5926,7 +5914,6 @@ try {
     
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
-    
     <link rel="stylesheet" href="/assets/css/style.css">
     
     <style>
@@ -5951,7 +5938,7 @@ try {
 
                         <div class="row g-5 mb-5">
                             <div class="col-md-4">
-                                <?php if($poster_path): ?>
+                                <?php if ($poster_path): ?>
                                     <img src="https://image.tmdb.org/t/p/w500<?= $poster_path ?>" 
                                          class="img-fluid rounded-4 shadow-md w-100" 
                                          alt="Poster di <?= htmlspecialchars($titolo) ?>">
@@ -5975,7 +5962,7 @@ try {
                                         </button>
                                     </div>
                                 <?php endif; ?>
-                            </div> 
+                            </div>
 
                             <div class="col-md-8">
                                 <h1 class="fw-bold display-5 mb-2" style="color: var(--text);"><?= htmlspecialchars($titolo) ?></h1>
@@ -5988,10 +5975,10 @@ try {
                                     <div class="mb-4">
                                         <small class="text-uppercase fw-bold d-block mb-1" style="letter-spacing: 1px; color: var(--text-muted);">Regia</small>
                                         <p class="fs-5 fw-medium mb-0" style="color: var(--text);">
-                                            <?php 
-                                            $registi_links = array_map(function($regista) {
+                                            <?php
+                                            $registi_links = array_map(function ($regista) {
                                                 $name = htmlspecialchars($regista['name']);
-                                                $id = urlencode($regista['id']);
+                                                $id   = urlencode($regista['id']);
                                                 return "<a href='https://www.themoviedb.org/person/$id' class='text-decoration-none' style='color: var(--accent); transition: color 0.2s;' onmouseover='this.style.color=\"var(--accent-hover)\"' onmouseout='this.style.color=\"var(--accent)\"'>$name</a>";
                                             }, $registi);
                                             echo implode(', ', $registi_links);
@@ -6012,7 +5999,7 @@ try {
                                     <?php endforeach; ?>
                                 </div>
 
-                                <?php if($_SESSION['username']): ?>
+                                <?php if (isset($_SESSION['username'])): ?>
                                     <form method="POST" class="d-flex flex-wrap gap-2 mb-4 pb-4 border-bottom">
                                         
                                         <button class="btn <?= $is_favorite ? 'btn-danger' : 'btn-outline-secondary' ?> btn-sm rounded-pill px-3" name="<?= $is_favorite ? 'delete_favorite' : 'favorite' ?>">
@@ -6024,7 +6011,7 @@ try {
                                         </button>
 
                                         <button class="btn <?= $is_watched ? 'btn-success' : 'btn-outline-secondary' ?> btn-sm rounded-pill px-3" name="<?= $is_watched ? 'delete_watched' : 'watched' ?>">
-                                            <i class="bi bi-eye-fill me-1"></i> <?= $is_watched ? 'Rimuovi' : 'Visto' ?>
+                                            <i class="bi bi-eye-fill me-1"></i> <?= $is_watched ? 'Rimuovi' : 'Watched' ?>
                                         </button>
 
                                         <a href="/pages/user/review.php?tmdb_id=<?= urlencode($tmdb_id) ?>" class="btn btn-dark btn-sm rounded-pill px-3">
@@ -6046,8 +6033,8 @@ try {
                                     </div>
                                     <p class="text-justify lh-lg fs-6 mb-4" style="color: var(--text-muted);"><?= nl2br(htmlspecialchars($trama)) ?></p>
                                     
-                                    <?php if($recensioni_altri > 0): ?>
-                                        <a href="/pages/public/users_reviews.php?tmdb_id=<?= urlencode($tmdb_id) ?>" class="text-decoration-none fw-bold" style="color: var(--accent);">
+                                    <?php if ($recensioni_altri > 0): ?>
+                                        <a href="/pages/public/community_reviews.php?tmdb_id=<?= urlencode($tmdb_id) ?>" class="text-decoration-none fw-bold" style="color: var(--accent);">
                                             <i class="bi bi-chat-left-text-fill me-1"></i> Leggi le recensioni della community
                                         </a>
                                     <?php endif; ?>
@@ -6073,22 +6060,15 @@ try {
                         <div>
                             <h4 class="fw-bold mb-4" style="color: var(--text);">Cast Principale</h4>
                             <div class="row g-3">
-                                <?php 
-                                foreach ($cast as $actor):
-                                    // 1. Estrazione dati con valori di default
-                                    $nome = $actor['name'] ?? 'Attore Sconosciuto';
-                                    $ruolo = $actor['character'] ?? 'Personaggio non specificato';
-                                    $idTMDB = $actor['id'] ?? '';
-                                    
-                                    // 2. Logica per l'immagine del profilo
-                                    $path = $actor['profile_path'] ?? null;
-                                    if ($path) {
-                                        $fotoUrl = "https://image.tmdb.org/t/p/w185" . $path;
-                                    } else {
-                                        $fotoUrl = "https://ui-avatars.com/api/?name=" . urlencode($nome) . "&background=f1f5f9&color=64748b";
-                                    }
+                                <?php foreach ($cast as $actor):
+                                    $nome   = $actor['name']      ?? 'Attore Sconosciuto';
+                                    $ruolo  = $actor['character'] ?? 'Personaggio non specificato';
+                                    $idTMDB = $actor['id']        ?? '';
+                                    $path   = $actor['profile_path'] ?? null;
+                                    $fotoUrl = $path
+                                        ? "https://image.tmdb.org/t/p/w185" . $path
+                                        : "https://ui-avatars.com/api/?name=" . urlencode($nome) . "&background=f1f5f9&color=64748b";
                                 ?>
-
                                 <div class="col-12 col-sm-6 col-lg-4">
                                     <a href="https://www.themoviedb.org/person/<?= $idTMDB ?>" class="text-decoration-none d-block" target="_blank">
                                         <div class="d-flex align-items-center p-2 rounded-3 transition-hover" 
@@ -6108,12 +6088,10 @@ try {
                                                     <?= htmlspecialchars($ruolo) ?>
                                                 </p>
                                             </div>
-
                                         </div>
                                     </a>
                                 </div>
-
-                                <?php endforeach; // Fine del ciclo ?>
+                                <?php endforeach; ?>
                             </div>
                         </div>
 

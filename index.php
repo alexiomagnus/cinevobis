@@ -261,19 +261,60 @@ try {
 
             <hr class="my-5 border-0" style="border-top: 0.5px solid var(--bs-border-color) !important;">
 
-            <div class="mt-5 mb-4">
-                <h2 class="fw-bold mb-3" style="font-size: clamp(1.4rem, 3vw, 2rem); max-width: 520px;">
-                    Perché nasce?
-                </h2>
-                <p class="text-muted mb-4" style="max-width: 480px; line-height: 1.7;">
-                    Cinevobis nasce per chi ama i film, concedendo la possibilità di condividere la vostra passione con gli altri.
-                    Il nome deriva da <em>cine</em> inteso come cinema e <em>vobis</em> dal latino per voi.
-                </p>
+            <div class="mt-5 mb-5 py-lg-4">
+                <div class="row g-4 g-lg-5 align-items-center">
 
-                <blockquote class="border-start border-2 ps-3 mb-4" style="border-color: var(--bs-border-color) !important;">
-                    <p class="fst-italic mb-2">"I film non ti dicono cosa pensare. Ti insegnano come sentire."</p>
-                    <p class="text-muted small">— Roger Ebert</p>
-                </blockquote>
+                    <div class="col-12 col-lg-6">
+                        <p class="text-uppercase text-muted fw-bold mb-3 d-flex align-items-center" style="font-size: 0.75rem; letter-spacing: 0.1em;">
+                            <span class="me-3 rounded-pill" style="width: 30px; height: 2px; background-color: currentColor;"></span>
+                            Il progetto
+                        </p>
+                        
+                        <h2 class="fw-bolder mb-3" style="font-size: clamp(1.75rem, 3.5vw, 2.25rem); line-height: 1.2;">
+                            Perché nasce Cinevobis?
+                        </h2>
+                        
+                        <p class="text-secondary mb-4" style="line-height: 1.8; font-size: 1.05rem;">
+                            Cinevobis nasce per chi ama i film, concedendo la possibilità di condividere
+                            la propria passione con gli altri. Il nome deriva da
+                            <strong class="text-dark">cine</strong>, inteso come cinema, e
+                            <strong class="text-dark">vobis</strong>, dal latino <em>per voi</em>.
+                        </p>
+                        
+                        <blockquote class="mb-0 p-4 rounded-4 bg-light border-start border-4" style="border-color: var(--bs-gray-400) !important;">
+                            <p class="fst-italic text-dark mb-2" style="font-size: 0.95rem; line-height: 1.6;">
+                                "I film non ti dicono cosa pensare. Ti insegnano come sentire."
+                            </p>
+                            <cite class="text-muted fw-semibold" style="font-size: 0.8rem; letter-spacing: 0.05em;">— Roger Ebert</cite>
+                        </blockquote>
+                    </div>
+
+                    <div class="col-12 col-lg-6">
+                        <div class="row g-3 g-md-4">
+                            <?php
+                            $features = [
+                                ['icon' => 'bi-heart-fill',    'titolo' => 'Preferiti',  'desc' => 'I film che ami nel tuo catalogo personale.', 'color' => '#dc3646'],
+                                ['icon' => 'bi-pen-fill',      'titolo' => 'Recensioni', 'desc' => 'Scrivi, vota e condividi il tuo pensiero.', 'color' => 'var(--text)'],
+                                ['icon' => 'bi-eye-fill',      'titolo' => 'Watched',    'desc' => 'Lo storico di tutto ciò che hai già visto.', 'color' => '#1b8855'],
+                                ['icon' => 'bi-bookmark-fill', 'titolo' => 'Watchlist',  'desc' => 'I titoli che non vuoi assolutamente perderti.', 'color' => '#267bfd'],
+                            ];
+                            foreach ($features as $f): ?>
+                            <div class="col-12 col-sm-6">
+                                <div class="p-4 rounded-4 h-100 transition-hover" 
+                                    style="background-color: var(--bg-muted); border: 1px solid var(--border);">
+                                    
+                                    <i class="bi <?= $f['icon'] ?> mb-3 d-block" style="font-size: 1.8rem; color: <?= $f['color'] ?>;"></i>
+                                    <h5 class="fw-bold text-dark mb-2" style="font-size: 1.05rem;"><?= $f['titolo'] ?></h5>
+                                    <p class="text-muted mb-0" style="font-size: 0.85rem; line-height: 1.6;">
+                                        <?= $f['desc'] ?>
+                                    </p>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+
+                </div>
             </div>
 
         </div>
