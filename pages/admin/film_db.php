@@ -22,18 +22,18 @@ if (!$username || $id_profilo != 1) {
 
 // Dichiarazione variabili
 $movie_db = null;
-$errore = "";
+$data     = [];
+$errore   = "";
 
 $movie_id = $_GET['tmdb_id'] ?? null;
 
 if (empty($movie_id)) {
     $errore = "Nessun film selezionato";
 } else {
-    // Connessione a MongoDB e recupero diretto
     try {
         $mongoClient = new Client("mongodb://localhost:27017");
-        $db = $mongoClient->selectDatabase('cinevobis');
-        $collection = $db->selectCollection('films');
+        $db          = $mongoClient->selectDatabase('cinevobis');
+        $collection  = $db->selectCollection('films');
 
         $movie_db = $collection->findOne(
             ['id' => (int)$movie_id],
@@ -42,6 +42,8 @@ if (empty($movie_id)) {
 
         if ($movie_db === null) {
             $errore = "Film non trovato nel database";
+        } else {
+            $data = (new movieObj($movie_db))->toArray();
         }
 
     } catch (Exception $e) {
@@ -49,58 +51,21 @@ if (empty($movie_id)) {
         $errore = "Errore di connessione al database";
     }
 }
-
-// 3. Estrazione dati
-$titolo = $trama = $poster_path = $trailerKey = $paese = '';
-$voto = 0;
-$durata = $anno = '';
-$generi = $cast = $registi = [];
-
-if ($movie_db) {
-    $movieObj = new movieObj($movie_db);
-    $data = $movieObj->toArray();
-
-    $titolo = $data['titolo'];
-    $titolo_orig = $data['titolo_orig'];
-
-    $trama = $data['trama'];
-    $poster_path = $data['poster_path'];
-
-    $voto = $data['voto'];
-    $trailerKey = $data['trailer_key'];
-
-    $durata = $data['durata'];
-    $anno = $data['anno'];
-
-    $generi = $data['generi'];
-    $paese = $data['paese'];
-
-    $cast = $data['cast'];
-    $registi = $data['registi'];
-}
 ?>
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $movie_db ? htmlspecialchars($titolo) : 'Film' ?> - Cinevobis</title>
+    <title><?= $movie_db ? htmlspecialchars($data['titolo']) : 'Film' ?> - Cinevobis</title>
     
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
-    
     <link rel="stylesheet" href="/assets/css/style.css">
     
     <style>
-        .cast-avatar {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-        }
-
-        .text-justify { 
-            text-align: justify; 
-        }
+        .cast-avatar { width: 60px; height: 60px; object-fit: cover; }
+        .text-justify { text-align: justify; }
     </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
@@ -114,8 +79,8 @@ if ($movie_db) {
 
                         <div class="row g-5 mb-5">
                             <div class="col-md-4">
-                                <?php if($poster_path): ?>
-                                    <img src="https://image.tmdb.org/t/p/w500<?= $poster_path ?>" 
+                                <?php if ($data['poster_path']): ?>
+                                    <img src="https://image.tmdb.org/t/p/w500<?= $data['poster_path'] ?>" 
                                          class="img-fluid rounded-4 shadow-md w-100" 
                                          alt="Poster">
                                 <?php else: ?>
@@ -128,7 +93,7 @@ if ($movie_db) {
                                     </div>
                                 <?php endif; ?>
 
-                                <?php if ($trailerKey): ?>
+                                <?php if ($data['trailer_key']): ?>
                                     <div class="mt-4">
                                         <button type="button"
                                             class="btn btn-dark w-100 py-2 d-flex align-items-center justify-content-center"
@@ -141,23 +106,22 @@ if ($movie_db) {
                             </div>
 
                             <div class="col-md-8">
-                                <h1 class="fw-bold display-5 mb-3" style="color: var(--text);"><?= htmlspecialchars($titolo) ?></h1>
+                                <h1 class="fw-bold display-5 mb-3" style="color: var(--text);"><?= htmlspecialchars($data['titolo']) ?></h1>
 
-                                <?php if (!empty($titolo_orig) && strcasecmp(trim($titolo_orig), trim($titolo)) !== 0): ?>
-                                    <p class="fs-5 mb-4" style="color: var(--text-muted);"><?= htmlspecialchars($titolo_orig) ?></p>
+                                <?php if (!empty($data['titolo_orig']) && strcasecmp(trim($data['titolo_orig']), trim($data['titolo'])) !== 0): ?>
+                                    <p class="fs-5 mb-4" style="color: var(--text-muted);"><?= htmlspecialchars($data['titolo_orig']) ?></p>
                                 <?php endif; ?>
 
-                                <?php if (!empty($registi)): ?>
+                                <?php if (!empty($data['registi'])): ?>
                                     <div class="mb-4">
                                         <small class="text-uppercase fw-bold d-block mb-1" style="letter-spacing: 1px; color: var(--text-muted);">Regia</small>
                                         <p class="fs-5 fw-medium mb-0" style="color: var(--text);">
-                                            <?php 
-                                            $registi_links = [];
-                                            foreach ($registi as $regista) {
+                                            <?php
+                                            $registi_links = array_map(function ($regista) {
                                                 $name = htmlspecialchars($regista['name']);
-                                                $id = urlencode($regista['id']);
-                                                $registi_links[] = "<a href='https://www.themoviedb.org/person/$id' class='text-decoration-none' style='color: var(--accent); transition: color 0.2s;' onmouseover='this.style.color=\"var(--accent-hover)\"' onmouseout='this.style.color=\"var(--accent)\"'>$name</a>";
-                                            }
+                                                $id   = urlencode($regista['id']);
+                                                return "<a href='https://www.themoviedb.org/person/$id' class='text-decoration-none' style='color: var(--accent); transition: color 0.2s;' onmouseover='this.style.color=\"var(--accent-hover)\"' onmouseout='this.style.color=\"var(--accent)\"'>$name</a>";
+                                            }, $data['registi']);
                                             echo implode(', ', $registi_links);
                                             ?>
                                         </p>
@@ -165,7 +129,7 @@ if ($movie_db) {
                                 <?php endif; ?>
 
                                 <div class="d-flex flex-wrap gap-2 mb-4">
-                                    <?php foreach ($generi as $genre): ?>
+                                    <?php foreach ($data['generi'] as $genre): ?>
                                         <span class="badge px-3 py-2" 
                                               style="background-color: var(--bg-muted); color: var(--text); border: 1px solid var(--border);">
                                             <?= htmlspecialchars($genre['name']) ?>
@@ -179,12 +143,12 @@ if ($movie_db) {
                                         <div class="d-flex align-items-center fs-4 fw-bold">
                                             <i class="bi bi-star-fill text-warning me-2"></i>
                                             <span>
-                                                <?= number_format($voto, 1) ?>
+                                                <?= number_format($data['voto'], 1) ?>
                                                 <small style="color: var(--text-muted);" class="fw-normal fs-6">/ 10</small>
                                             </span>
                                         </div>
                                     </div>
-                                    <p class="text-justify lh-lg fs-6 mb-4" style="color: var(--text-muted);"><?= nl2br(htmlspecialchars($trama)) ?></p>
+                                    <p class="text-justify lh-lg fs-6 mb-4" style="color: var(--text-muted);"><?= nl2br(htmlspecialchars($data['trama'])) ?></p>
                                 </div>
                             </div>
                         </div>
@@ -192,23 +156,25 @@ if ($movie_db) {
                         <div class="row text-center py-4 rounded-4 mb-5 mx-0" style="background-color: var(--bg-muted); border: 1px solid var(--border);">
                             <div class="col-4 border-end" style="border-color: var(--border) !important;">
                                 <div class="small text-uppercase fw-bold" style="color: var(--text-muted);">Durata</div>
-                                <div class="fw-bold fs-5" style="color: var(--text);"><?= $durata ?> min</div>
+                                <div class="fw-bold fs-5" style="color: var(--text);"><?= $data['durata'] ?> min</div>
                             </div>
                             <div class="col-4 border-end" style="border-color: var(--border) !important;">
                                 <div class="small text-uppercase fw-bold" style="color: var(--text-muted);">Anno</div>
-                                <div class="fw-bold fs-5" style="color: var(--text);"><?= $anno ?></div>
+                                <div class="fw-bold fs-5" style="color: var(--text);"><?= $data['anno'] ?></div>
                             </div>
                             <div class="col-4">
                                 <div class="small text-uppercase fw-bold" style="color: var(--text-muted);">Paese</div>
-                                <div class="fw-bold fs-5" style="color: var(--text);"><?= $paese ?></div>
+                                <div class="fw-bold fs-5" style="color: var(--text);"><?= $data['paese'] ?></div>
                             </div>
                         </div>
 
                         <div class="mt-2">
                             <h4 class="fw-bold mb-4" style="color: var(--text);">Cast Principale</h4>
                             <div class="row g-3">
-                                <?php foreach ($cast as $actor):
-                                    $profile = $actor['profile_path'] ? "https://image.tmdb.org/t/p/w185" . $actor['profile_path'] : "https://ui-avatars.com/api/?name=" . urlencode($actor['name']) . "&background=f1f5f9&color=64748b";
+                                <?php foreach ($data['cast'] as $actor):
+                                    $profile = $actor['profile_path']
+                                        ? "https://image.tmdb.org/t/p/w185" . $actor['profile_path']
+                                        : "https://ui-avatars.com/api/?name=" . urlencode($actor['name']) . "&background=f1f5f9&color=64748b";
                                 ?>
                                     <div class="col-12 col-sm-6 col-lg-4">
                                         <a href="https://www.themoviedb.org/person/<?= $actor['id'] ?>"
@@ -238,7 +204,7 @@ if ($movie_db) {
                 </div>
             </div>
 
-            <?php if ($trailerKey): ?>
+            <?php if ($data['trailer_key']): ?>
             <div class="modal fade" id="trailerModal" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-xl modal-dialog-centered">
                     <div class="modal-content bg-transparent border-0">
@@ -248,7 +214,7 @@ if ($movie_db) {
                         <div class="modal-body p-0">
                             <div class="ratio ratio-16x9 shadow-lg rounded-4 overflow-hidden" style="background: #000;">
                                 <iframe id="trailerVideo"
-                                    data-src="https://www.youtube.com/embed/<?= $trailerKey ?>?rel=0&autoplay=1"
+                                    data-src="https://www.youtube.com/embed/<?= $data['trailer_key'] ?>?rel=0&autoplay=1"
                                     allow="autoplay; encrypted-media"
                                     allowfullscreen>
                                 </iframe>

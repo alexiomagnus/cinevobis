@@ -21,27 +21,25 @@ $tmdb = Tmdb::client($_ENV['API_KEY']);
 // Dichiarazione variabili
 $movie_api = null;
 $movie_db = null;
-$collection = [];
 $errore = "";
 
 $movie_id = $_GET['tmdb_id'] ?? null;
-
+$collection = [];
 
 // Connessione a MongoDB
 try {
     $mongoClient = new Client("mongodb://localhost:27017");
-    $db = $mongoClient->selectDatabase('cinevobis');
-    $collection = $db->selectCollection('films');
-    
-} catch(Exception $e) {
-    error_log("Errore: " . $e->getMessage());
+    $db          = $mongoClient->selectDatabase('cinevobis');
+    $collection  = $db->selectCollection('films');
+} catch (Exception $e) {
+    error_log("Errore MongoDB: " . $e->getMessage());
 }
 
 
 // 1. Recupero film da TMDB
 if (!empty($movie_id)) {
     $results = $tmdb->raw()->url("/movie/{$movie_id}", [
-        'language' => 'it-IT',
+        'language'           => 'it-IT',
         'append_to_response' => 'credits,videos'
     ]);
 
@@ -60,300 +58,106 @@ if (!empty($movie_id)) {
 
 // 2. Controllo/inserimento o aggiornamento in MongoDB
 if (!empty($movie_api)) {
+    $now              = time();
+    $aMonthInSeconds  = 30 * 24 * 60 * 60;
 
-    $now = time();
-    $aMonthInSeconds = 30 * 24 * 60 * 60; // 30 giorni
-
-    
-    // Cercare il film nel DB
     $movie_db = $collection->findOne(
         ['id' => (int)$movie_id],
         ['typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']]
     );
 
-
-    // Se non esiste lo si inserisci
     if ($movie_db === null) {
-        $movie_api['last_updated'] = new \MongoDB\BSON\UTCDateTime();  // Timestamp attuale in secondi
+        $movie_api['last_updated'] = new \MongoDB\BSON\UTCDateTime();
         $collection->insertOne($movie_api);
         $movie_db = $movie_api;
     } else {
-        // Se esiste si recupera il timestamp 
-        $lastUpdateSeconds = isset($movie_db['last_updated']) ? $movie_db['last_updated']->toDateTime()->getTimestamp() : 0;
+        $lastUpdateSeconds = isset($movie_db['last_updated'])
+            ? $movie_db['last_updated']->toDateTime()->getTimestamp()
+            : 0;
 
-        // Se è passato un mese si aggiorna il film
         if (($now - $lastUpdateSeconds) > $aMonthInSeconds) {
             $movie_api['last_updated'] = new \MongoDB\BSON\UTCDateTime();
-
-            $collection->updateOne(
-                ['id' => $movie_id],
-                ['$set' => $movie_api]
-            );
-
-            $movie_db = $movie_api;  // Usare i dati fresci per la visualizzazione
+            $collection->updateOne(['id' => $movie_id], ['$set' => $movie_api]);
+            $movie_db = $movie_api;
         }
     }
 }
 
 
-// 3. Estrazione dati
-$titolo = $trama = $poster_path = $trailerKey = $paese = '';
-$voto = 0;
+// 3. Estrazione dati dal film
+$titolo = $titolo_orig = $trama = $poster_path = $trailerKey = $paese = '';
+$voto   = 0;
 $durata = $anno = '';
 $generi = $cast = $registi = [];
 
 if ($movie_db) {
     $movieObj = new movieObj($movie_db);
-    $data = $movieObj->toArray();
+    $data     = $movieObj->toArray();
 
-    $titolo = $data['titolo'];
+    $titolo      = $data['titolo'];
     $titolo_orig = $data['titolo_orig'];
-
-    $trama = $data['trama'];
+    $trama       = $data['trama'];
     $poster_path = $data['poster_path'];
-
-    $voto = $data['voto'];
-    $trailerKey = $data['trailer_key'];
-
-    $durata = $data['durata'];
-    $anno = $data['anno'];
-
-    $generi = $data['generi'];
-    $paese = $data['paese'];
-
-    $cast = $data['cast'];
-    $registi = $data['registi'];
+    $voto        = $data['voto'];
+    $trailerKey  = $data['trailer_key'];
+    $durata      = $data['durata'];
+    $anno        = $data['anno'];
+    $generi      = $data['generi'];
+    $paese       = $data['paese'];
+    $cast        = $data['cast'];
+    $registi     = $data['registi'];
 }
 
 
-// Dichiarazione variabili
-$tmdb_id = $movie_db['id'];
-$id_utente = $_SESSION['id_utente'];
+// 4. Gestione liste utente tramite userObj
+$tmdb_id   = $movie_db['id'] ?? null;
+$id_utente = $_SESSION['id_utente'] ?? null;
 
-$is_favorite = false;
-$is_review = false;
+$is_favorite  = false;
+$is_review    = false;
 $is_watchlist = false;
-$is_watched = false;
+$is_watched   = false;
 
+if ($tmdb_id !== null && $id_utente !== null) {
+    $userObj = new userObj($conn, $_SESSION['username']);
 
-// Verifica condizioni per preferiti
-if ($tmdb_id != null && $id_utente != null) {
-
-    // Aggiungere il film alla lista preferiti
-    if (isset($_POST['favorite'])) {
-        try {
-            $sql = "INSERT INTO preferiti (tmdb_id, id_utente, data_aggiunto) VALUES
-                    (:tmdb_id, :id_utente, :data_aggiunto)";
-
-            $stmt = $conn->prepare($sql);
-            $stmt->execute([
-                'tmdb_id' => $tmdb_id,
-                'id_utente' => $id_utente,
-                'data_aggiunto' => date('Y-m-d H:i:s')
-            ]);
-
-        } catch (PDOException $e) {
-            error_log("Errore nel DB: " . $e->getMessage());
-            $errore = "Errore nell'aggiunta alla lista preferiti";
-        }
-    }
-
-    // Elimina dalla lista preferiti
-    if (isset($_POST['delete_favorite'])) {
-        try {
-            $sql = "DELETE FROM preferiti WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
-
-            $stmt = $conn->prepare($sql);
-            $stmt->execute([
-                ':id_utente' => $id_utente,
-                ':tmdb_id' => $tmdb_id
-            ]);
-
-        } catch (PDOException $e) {
-            error_log("Errore nel DB: " . $e->getMessage());
-            $errore = "Errore nella rimozione dalla lista preferiti";
-        }
-    }
-
-    // Controllo se l'utente ha aggiunto il film ai preferiti (DOPO aver gestito il POST)
     try {
-        $sql = "SELECT * FROM preferiti WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
+        // Gestione POST preferiti
+        if (isset($_POST['favorite'])) $userObj->addFavorite((int)$tmdb_id, $id_utente);
+        if (isset($_POST['delete_favorite'])) $userObj->removeFavorite((int)$tmdb_id, $id_utente);
 
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([
-            ':id_utente' => $id_utente,
-            ':tmdb_id' => $tmdb_id
-        ]);
+        // Gestione POST watchlist
+        if (isset($_POST['watchlist'])) $userObj->addWatchlist((int)$tmdb_id, $id_utente);
+        if (isset($_POST['delete_watchlist'])) $userObj->removeWatchlist((int)$tmdb_id, $id_utente);
 
-        $results = $stmt->fetchColumn();
-        
-        if (!empty($results)) 
-            $is_favorite = true;
+        // Gestione POST watched
+        if (isset($_POST['watched'])) $userObj->addWatched((int)$tmdb_id, $id_utente);
+        if (isset($_POST['delete_watched'])) $userObj->removeWatched((int)$tmdb_id, $id_utente);
+
+        // Stato corrente (DOPO aver gestito i POST)
+        $is_favorite = $userObj->isFavorite((int)$tmdb_id, $id_utente);
+        $is_watchlist = $userObj->isInWatchlist((int)$tmdb_id, $id_utente);
+        $is_watched = $userObj->isWatched((int)$tmdb_id, $id_utente);
+        $is_review = $userObj->hasReview((int)$tmdb_id, $id_utente);
+
+        // Se ha una recensione, il film è implicitamente "visto"
+        if ($is_review) $is_watched = true;
 
     } catch (PDOException $e) {
         error_log("Errore nel DB: " . $e->getMessage());
+        $errore = "Errore nell'aggiornamento delle liste";
     }
 }
 
-
-// Verifica condizioni per watchlist
-if ($tmdb_id != null && $id_utente != null) {
-
-    // Aggiungere il film alla lista watchlist
-    if (isset($_POST['watchlist'])) {
-        try {
-            $sql = "INSERT INTO watchlist (tmdb_id, id_utente, data_aggiunto) VALUES
-                    (:tmdb_id, :id_utente, :data_aggiunto)";
-
-            $stmt = $conn->prepare($sql);
-            $stmt->execute([
-                'tmdb_id' => $tmdb_id,
-                'id_utente' => $id_utente,
-                'data_aggiunto' => date('Y-m-d H:i:s')
-            ]);
-
-        } catch (PDOException $e) {
-            error_log("Errore nel DB: " . $e->getMessage());
-            $errore = "Errore nell'aggiunta alla lista watchlist";
-        }
-    }
-
-    // Elimina dalla lista watchlist
-    if (isset($_POST['delete_watchlist'])) {
-        try {
-            $sql = "DELETE FROM watchlist WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
-
-            $stmt = $conn->prepare($sql);
-            $stmt->execute([
-                ':id_utente' => $id_utente,
-                ':tmdb_id' => $tmdb_id
-            ]);
-
-        } catch (PDOException $e) {
-            error_log("Errore nel DB: " . $e->getMessage());
-            $errore = "Errore nella rimozione dalla lista watchlist";
-        }
-    }
-
-    // Controllo se l'utente ha aggiunto il film ai watchlist (DOPO aver gestito il POST)
-    try {
-        $sql = "SELECT * FROM watchlist WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
-
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([
-            ':id_utente' => $id_utente,
-            ':tmdb_id' => $tmdb_id
-        ]);
-
-        $results = $stmt->fetchColumn();
-
-        if (!empty($results)) 
-            $is_watchlist = true;
-
-    } catch (PDOException $e) {
-        error_log("Errore nel DB: " . $e->getMessage());
-    }
-}
-
-
-// Verifica condizioni per watched
-if ($tmdb_id != null && $id_utente != null) {
-
-    // Aggiungere il film alla lista watched
-    if (isset($_POST['watched'])) {
-        try {
-            $sql = "INSERT INTO watched (tmdb_id, id_utente, data_aggiunto) VALUES
-                    (:tmdb_id, :id_utente, :data_aggiunto)";
-
-            $stmt = $conn->prepare($sql);
-            $stmt->execute([
-                'tmdb_id' => $tmdb_id,
-                'id_utente' => $id_utente,
-                'data_aggiunto' => date('Y-m-d H:i:s')
-            ]);
-
-        } catch (PDOException $e) {
-            error_log("Errore nel DB: " . $e->getMessage());
-            $errore = "Errore nell'aggiunta alla lista watched";
-        }
-    }
-
-    // Elimina dalla lista watched
-    if (isset($_POST['delete_watched'])) {
-        try {
-            $sql = "DELETE FROM watched WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
-
-            $stmt = $conn->prepare($sql);
-            $stmt->execute([
-                ':id_utente' => $id_utente,
-                ':tmdb_id' => $tmdb_id
-            ]);
-
-        } catch (PDOException $e) {
-            error_log("Errore nel DB: " . $e->getMessage());
-            $errore = "Errore nella rimozione dalla lista watched";
-        }
-    }
-
-    // Controllo se l'utente ha aggiunto il film ai watched (DOPO aver gestito il POST)
-    try {
-        $sql = "SELECT * FROM watched WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
-
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([
-            ':id_utente' => $id_utente,
-            ':tmdb_id' => $tmdb_id
-        ]);
-
-        $results = $stmt->fetchColumn();
-
-        if (!empty($results)) 
-            $is_watched = true;
-
-    } catch (PDOException $e) {
-        error_log("Errore nel DB: " . $e->getMessage());
-    }
-}
-
-
-// Controlla se l'utente ha già recensito il film
-if ($tmdb_id != null && $id_utente != null) {
-    try {
-        $sql = "SELECT * FROM recensioni WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
-
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([
-            ':id_utente' => $id_utente, 
-            ':tmdb_id' => $tmdb_id
-        ]);
-        
-        $results = $stmt->fetchColumn();
-        
-        if (!empty($results)) {
-            $is_review = true;
-            $is_watched = true;
-        }
-
-    } catch (PDOException $e) {
-        error_log("Errore nel DB: " . $e->getMessage());
-    }
-}
-
-
-// Contiamo le recensioni degli altri utenti
+// Conteggio recensioni della community
 $recensioni_altri = 0;
-try {   
-    $sql = "SELECT COUNT(*)
-            FROM recensioni r
-            WHERE tmdb_id = :tmdb_id";
-
-    $stmt = $conn->prepare($sql);
-    $stmt->execute([':tmdb_id' => $movie_id]);
-
-    $recensioni_altri = $stmt->fetchColumn();
-
-} catch (PDOException $e) {
-    error_log("Errore nel DB: " . $e->getMessage());
+if ($tmdb_id !== null) {
+    try {
+        $userObj          = $userObj ?? new userObj($conn, '');
+        $recensioni_altri = $userObj->countReviews((int)$tmdb_id);
+    } catch (PDOException $e) {
+        error_log("Errore nel DB: " . $e->getMessage());
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -365,7 +169,6 @@ try {
     
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
-    
     <link rel="stylesheet" href="/assets/css/style.css">
     
     <style>
@@ -390,7 +193,7 @@ try {
 
                         <div class="row g-5 mb-5">
                             <div class="col-md-4">
-                                <?php if($poster_path): ?>
+                                <?php if ($poster_path): ?>
                                     <img src="https://image.tmdb.org/t/p/w500<?= $poster_path ?>" 
                                          class="img-fluid rounded-4 shadow-md w-100" 
                                          alt="Poster di <?= htmlspecialchars($titolo) ?>">
@@ -414,7 +217,7 @@ try {
                                         </button>
                                     </div>
                                 <?php endif; ?>
-                            </div> 
+                            </div>
 
                             <div class="col-md-8">
                                 <h1 class="fw-bold display-5 mb-2" style="color: var(--text);"><?= htmlspecialchars($titolo) ?></h1>
@@ -427,10 +230,10 @@ try {
                                     <div class="mb-4">
                                         <small class="text-uppercase fw-bold d-block mb-1" style="letter-spacing: 1px; color: var(--text-muted);">Regia</small>
                                         <p class="fs-5 fw-medium mb-0" style="color: var(--text);">
-                                            <?php 
-                                            $registi_links = array_map(function($regista) {
+                                            <?php
+                                            $registi_links = array_map(function ($regista) {
                                                 $name = htmlspecialchars($regista['name']);
-                                                $id = urlencode($regista['id']);
+                                                $id   = urlencode($regista['id']);
                                                 return "<a href='https://www.themoviedb.org/person/$id' class='text-decoration-none' style='color: var(--accent); transition: color 0.2s;' onmouseover='this.style.color=\"var(--accent-hover)\"' onmouseout='this.style.color=\"var(--accent)\"'>$name</a>";
                                             }, $registi);
                                             echo implode(', ', $registi_links);
@@ -451,7 +254,7 @@ try {
                                     <?php endforeach; ?>
                                 </div>
 
-                                <?php if($_SESSION['username']): ?>
+                                <?php if ($_SESSION['username']): ?>
                                     <form method="POST" class="d-flex flex-wrap gap-2 mb-4 pb-4 border-bottom">
                                         
                                         <button class="btn <?= $is_favorite ? 'btn-danger' : 'btn-outline-secondary' ?> btn-sm rounded-pill px-3" name="<?= $is_favorite ? 'delete_favorite' : 'favorite' ?>">
@@ -463,7 +266,7 @@ try {
                                         </button>
 
                                         <button class="btn <?= $is_watched ? 'btn-success' : 'btn-outline-secondary' ?> btn-sm rounded-pill px-3" name="<?= $is_watched ? 'delete_watched' : 'watched' ?>">
-                                            <i class="bi bi-eye-fill me-1"></i> <?= $is_watched ? 'Rimuovi' : 'Visto' ?>
+                                            <i class="bi bi-eye-fill me-1"></i> <?= $is_watched ? 'Rimuovi' : 'Watched' ?>
                                         </button>
 
                                         <a href="/pages/user/review.php?tmdb_id=<?= urlencode($tmdb_id) ?>" class="btn btn-dark btn-sm rounded-pill px-3">
@@ -485,7 +288,7 @@ try {
                                     </div>
                                     <p class="text-justify lh-lg fs-6 mb-4" style="color: var(--text-muted);"><?= nl2br(htmlspecialchars($trama)) ?></p>
                                     
-                                    <?php if($recensioni_altri > 0): ?>
+                                    <?php if ($recensioni_altri > 0): ?>
                                         <a href="/pages/public/users_reviews.php?tmdb_id=<?= urlencode($tmdb_id) ?>" class="text-decoration-none fw-bold" style="color: var(--accent);">
                                             <i class="bi bi-chat-left-text-fill me-1"></i> Leggi le recensioni della community
                                         </a>
@@ -512,22 +315,15 @@ try {
                         <div>
                             <h4 class="fw-bold mb-4" style="color: var(--text);">Cast Principale</h4>
                             <div class="row g-3">
-                                <?php 
-                                foreach ($cast as $actor):
-                                    // 1. Estrazione dati con valori di default
-                                    $nome = $actor['name'] ?? 'Attore Sconosciuto';
-                                    $ruolo = $actor['character'] ?? 'Personaggio non specificato';
-                                    $idTMDB = $actor['id'] ?? '';
-                                    
-                                    // 2. Logica per l'immagine del profilo
-                                    $path = $actor['profile_path'] ?? null;
-                                    if ($path) {
-                                        $fotoUrl = "https://image.tmdb.org/t/p/w185" . $path;
-                                    } else {
-                                        $fotoUrl = "https://ui-avatars.com/api/?name=" . urlencode($nome) . "&background=f1f5f9&color=64748b";
-                                    }
+                                <?php foreach ($cast as $actor):
+                                    $nome   = $actor['name']      ?? 'Attore Sconosciuto';
+                                    $ruolo  = $actor['character'] ?? 'Personaggio non specificato';
+                                    $idTMDB = $actor['id']        ?? '';
+                                    $path   = $actor['profile_path'] ?? null;
+                                    $fotoUrl = $path
+                                        ? "https://image.tmdb.org/t/p/w185" . $path
+                                        : "https://ui-avatars.com/api/?name=" . urlencode($nome) . "&background=f1f5f9&color=64748b";
                                 ?>
-
                                 <div class="col-12 col-sm-6 col-lg-4">
                                     <a href="https://www.themoviedb.org/person/<?= $idTMDB ?>" class="text-decoration-none d-block" target="_blank">
                                         <div class="d-flex align-items-center p-2 rounded-3 transition-hover" 
@@ -547,12 +343,10 @@ try {
                                                     <?= htmlspecialchars($ruolo) ?>
                                                 </p>
                                             </div>
-
                                         </div>
                                     </a>
                                 </div>
-
-                                <?php endforeach; // Fine del ciclo ?>
+                                <?php endforeach; ?>
                             </div>
                         </div>
 
