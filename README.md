@@ -1,73 +1,103 @@
 # CineVobis
 
-**CineVobis** è una piattaforma web dedicata agli appassionati di cinema, che permette agli utenti di scoprire film, gestire le proprie liste personali e interagire con la community attraverso recensioni e valutazioni.
+**CineVobis** è una piattaforma web dedicata alla gestione e alla scoperta di contenuti cinematografici. Il sistema permette agli utenti di gestire il proprio profilo, creare liste di film e scrivere recensioni, offrendo al contempo strumenti amministrativi avanzati per la gestione del catalogo.
 
-## 🚀 Funzionalità Principali
+## Caratteristiche Principali
 
-Il progetto è suddiviso in diverse aree funzionali per soddisfare le esigenze di utenti pubblici, registrati e amministratori:
+*   **Gestione Utenti**: Registrazione, login e profili personalizzati.
+*   **Interazione Social**: Sistema di recensioni e bacheca avvisi.
+*   **Organizzazione Contenuti**: Liste personalizzate come Preferiti, Watchlist e Film già visti.
+*   **Dashboard Amministrativa**: Gestione del database dei film, monitoraggio utenti e sessioni.
 
-### 👤 Area Utente (Registrato)
-*   **Gestione Profilo:** Visualizzazione e modifica delle informazioni personali e cambio password.
-*   **Liste Personalizzate:** Gestione di una *Watchlist* (film da vedere), una lista dei film già visti (*Watched*) e dei propri *Preferiti*.
-*   **Recensioni:** Possibilità di scrivere e visualizzare recensioni sui film.
-*   **Bacheca:** Accesso a una bacheca di annunci o notifiche interne.
+## Prerequisiti
 
-### 🕵️ Funzionalità Pubbliche
-*   **Ricerca Avanzata:** Ricerca di film per titolo o per genere.
-*   **Scheda Film:** Informazioni dettagliate su ogni titolo presente nel database.
-*   **Autenticazione:** Sistema completo di Login e Signup per la creazione di nuovi account.
-*   **Pagine informative:** Termini di servizio e informativa sulla privacy.
+Per avviare correttamente il progetto in locale, assicurati di avere installato i seguenti servizi e strumenti di gestione:
 
-### ⚙️ Area Amministrativa (Dashboard)
-*   **Pannello di Controllo:** Dashboard centralizzata per il monitoraggio del sistema.
-*   **Gestione Film:** Strumenti per aggiungere, modificare o rimuovere film dal database.
-*   **Gestione Utenti:** Monitoraggio e amministrazione degli account registrati.
-*   **Monitoraggio Sessioni:** Controllo delle sessioni attive e delle notifiche di sistema.
+1.  **PHP** (Versione 7.4 o superiore).
+2.  **MariaDB**: Server per i dati relazionali (utenti, sessioni, recensioni).
+3.  **MongoDB**: Server per il catalogo film (document-oriented).
+4.  **DBeaver**: Strumento consigliato per la gestione e l'amministrazione del database MariaDB.
+5.  **MongoDB Compass**: Interfaccia grafica consigliata per la gestione e la visualizzazione delle collezioni MongoDB.
+6.  **Composer**: Per la gestione delle dipendenze PHP.
+7.  **Node.js e npm**: Per la compilazione degli asset frontend.
+8.  **Git**: Per la clonazione del repository.
 
-## 🛠️ Tecnologie Utilizzate
+## Procedura di Installazione
 
-*   **Linguaggio:** PHP (con approccio Object-Oriented, vedi `movie_obj.php` e `user_obj.php`).
-*   **Database:** SQL (configurazione presente in `config/connection.php`).
-*   **Frontend:** HTML5, CSS3 (`assets/css/style.css`) e JavaScript (`assets/js/script.js`).
-*   **Dependency Management:** Supporto per **Composer** (PHP) e **NPM** (Node.js).
+### 1. Clonazione del Repository
 
-## 💻 Come Far Funzionare il Progetto
+Apri il terminale e clona il progetto:
 
-### Prerequisiti
-*   Un server locale (come XAMPP, WAMP o MAMP) con supporto **PHP 7.4+** e **MySQL/MariaDB**.
-*   **Composer** installato (opzionale, per dipendenze PHP).
-*   **Node.js/NPM** (opzionale, per la gestione degli asset frontend).
+```bash
+git clone https://github.com/alexiomagnus/cinevobis.git
+cd CineVobis
+```
 
-### Installazione
+### 2. Configurazione dei Database
 
-1.  **Clona il repository:**
-    ```bash
-    git clone https://github.com/tuo-username/cinevobis.git
-    cd cinevobis
-    ```
+Il progetto utilizza un'architettura a database ibrido.
 
-2.  **Configura il Database:**
-    *   Crea un database SQL sul tuo server locale.
-    *   Modifica il file `config/connection.php` inserendo le tue credenziali (host, username, password, nome database).
-    *   Esegui l'importazione dello schema del database (se fornito come file `.sql`).
+#### 2.1 MariaDB (tramite DBeaver)
+1.  Installa MariaDB tramite il sito ufficiale: https://mariadb.org/
+2.  Installa Dbeaver mediante il sito ufficiale: https://dbeaver.io/download/
+2.  Apri **DBeaver** e crea una nuova connessione a MariaDB.
+3.  Crea un nuovo database denominato `cinevobis`.
+4.  Utilizza la funzione "Esegui script SQL" di DBeaver per importare il file dello schema:
+    *   File: `database/dump-cinevobis.sql`.
 
-3.  **Configurazione del sistema:**
-    *   Controlla il file `config/config.php` per eventuali costanti globali o parametri di configurazione dell'applicazione.
+#### 2.2 MongoDB (tramite MongoDB Compass)
+1.  Installa MongoDB e tramite il sito ufficiale: https://www.mongodb.com/try/download/community
+2.  Installa MongoDB Compass mediante il sito ufficiale: https://www.mongodb.com/products/tools/compass
+3.  Apri **MongoDB Compass** e connettiti alla tua istanza locale (`mongodb://localhost:27017`).
+4.  Crea un nuovo database denominato `cinevobis`.
+5.  All'interno del database `cinevobis`, crea una nuova collection denominata `films`.
 
-4.  **Installa le dipendenze:**
-    ```bash
-    composer install
-    npm install
-    ```
+### 3. Installazione delle Dipendenze
 
-5.  **Avvio:**
-    *   Sposta la cartella del progetto nella directory `htdocs` (o equivalente) del tuo server web.
-    *   Naviga su `http://localhost/cinevobis/index.php` tramite il tuo browser.
+Esegui i seguenti comandi nella root del progetto:
 
-## 📂 Struttura del Progetto
+*   **Backend**: `composer install`.
+*   **Frontend**: `npm install`.
 
-*   `/actions`: Logica per operazioni specifiche (es. logout, cambio password, contatti).
-*   `/assets`: File statici come fogli di stile (CSS) e script (JS).
-*   `/config`: File di configurazione e connessione al database.
-*   `/includes`: Logica di backend condivisa, oggetti (Movie/User) e componenti dell'interfaccia (header/footer).
-*   `/pages`: Contiene le sottocartelle per le diverse aree (`public`, `user`, `admin`).
+### 4. Configurazione dell'Ambiente (.env)
+
+Configura le connessioni ai database creando un file di ambiente nella root del progetto, evitando di modificare direttamente i file in `config/`:
+
+1.  Crea un file chiamato **`.env`**.
+2.  Inserisci i seguenti parametri adattandoli alla tua configurazione:
+
+```env
+# Configurazione MariaDB
+DB_HOST=localhost
+DB_NAME=cinevobis
+DB_USER=tuo_utente
+DB_PASS=tua_password
+
+(Se vuoi utilizzare l'utente root metti a DB_USER=root e a DB_PASS=root)
+
+# Configurazione MongoDB
+MONGO_URI=mongodb://localhost:27017
+MONGO_DB=cinevobis
+```
+
+Questi valori verranno caricati da `config/connection.php` per gestire le connessioni al sistema.
+
+### 5. Avvio del Progetto
+
+Una volta completata la configurazione, avvia il server locale di PHP all'interno della cartella cinevobis:
+
+```bash
+php -S localhost:8000
+```
+
+Punta il tuo browser all'indirizzo: `http://localhost:8000`.
+
+## Struttura delle Cartelle Principali
+
+*   `/actions`: Logica backend per operazioni come logout e cambi password.
+*   `/config`: File di configurazione di sistema e connessioni.
+*   `/database`: Dump SQL e riferimenti per le credenziali.
+*   `/includes`: Classi oggetto (User, Movie) e componenti comuni della UI.
+*   `/pages`: Interfacce divise per tipologia di utente (admin, user, public).
+
+Arrivederci.
