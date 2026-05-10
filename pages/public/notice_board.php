@@ -8,14 +8,6 @@ require_once(__DIR__ . '/../../vendor/autoload.php');
 
 use MongoDB\Client;
 
-// Controllo autenticazione
-$username = $_SESSION['username'] ?? '';
-
-if (!$username) {
-    header("Location: /index.php");
-    exit();
-}
-
 // Configurazione query
 $limit = 20;
 $ids = [];

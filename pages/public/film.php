@@ -94,18 +94,23 @@ if ($movie_db) {
     $movieObj = new movieObj($movie_db);
     $data     = $movieObj->toArray();
 
-    $titolo      = $data['titolo'];
+    $titolo = $data['titolo'];
     $titolo_orig = $data['titolo_orig'];
-    $trama       = $data['trama'];
+
+    $trama = $data['trama'];
     $poster_path = $data['poster_path'];
-    $voto        = $data['voto'];
-    $trailerKey  = $data['trailer_key'];
-    $durata      = $data['durata'];
-    $anno        = $data['anno'];
-    $generi      = $data['generi'];
-    $paese       = $data['paese'];
-    $cast        = $data['cast'];
-    $registi     = $data['registi'];
+
+    $voto = $data['voto'];
+    $trailerKey = $data['trailer_key'];
+
+    $durata = $data['durata'];
+    $anno = $data['anno'];
+
+    $generi = $data['generi'];
+    $paese = $data['paese'];
+
+    $cast = $data['cast'];
+    $registi = $data['registi'];
 }
 
 
@@ -113,10 +118,10 @@ if ($movie_db) {
 $tmdb_id   = $movie_db['id'] ?? null;
 $id_utente = $_SESSION['id_utente'] ?? null;
 
-$is_favorite  = false;
-$is_review    = false;
+$is_favorite = false;
+$is_review = false;
 $is_watchlist = false;
-$is_watched   = false;
+$is_watched = false;
 
 if ($tmdb_id !== null && $id_utente !== null) {
     $userObj = new userObj($conn, $_SESSION['username']);
@@ -254,7 +259,7 @@ if ($tmdb_id !== null) {
                                     <?php endforeach; ?>
                                 </div>
 
-                                <?php if ($_SESSION['username']): ?>
+                                <?php if (isset($_SESSION['username'])): ?>
                                     <form method="POST" class="d-flex flex-wrap gap-2 mb-4 pb-4 border-bottom">
                                         
                                         <button class="btn <?= $is_favorite ? 'btn-danger' : 'btn-outline-secondary' ?> btn-sm rounded-pill px-3" name="<?= $is_favorite ? 'delete_favorite' : 'favorite' ?>">

@@ -36,9 +36,9 @@ try {
 
     $recommendedFilms = iterator_to_array($cursor);
 
-    // Prende i migliori 6 film ordinati per voto medio.
+    // Prende i migliori 12 film ordinati per voto medio.
     $cursor = $collection->find([], [
-        'limit' => 6,
+        'limit' => 12,
         'sort' => ['vote_average' => -1],
         'typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']
     ]);
@@ -146,6 +146,47 @@ try {
                 </div>
             </div>
             <?php endif; ?>
+
+
+           <div class="d-flex justify-content-between align-items-center mb-4 mt-5">
+                <h3 class="fw-bold m-0">Esplora</h3>
+            </div>
+
+           <div class="row g-4">
+                <div class="col-12 col-md-6">
+                    <a href="/pages/public/genres.php" class="text-decoration-none d-block h-100">
+                        <div class="card transition-hover h-100">
+                            <div class="card-body d-flex align-items-center justify-content-between p-4">
+                                <div class="d-flex align-items-center gap-3">
+                                    <i class="bi bi-grid-fill fs-2" style="color: var(--accent);"></i>
+                                    <div>
+                                        <div class="fw-bold" style="font-size: 1rem;">Generi</div>
+                                        <div class="text-muted" style="font-size: 0.85rem;">Esplora il catalogo per categoria</div>
+                                    </div>
+                                </div>
+                                <i class="bi bi-arrow-right text-muted"></i>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <a href="/pages/public/notice_board.php" class="text-decoration-none d-block h-100">
+                        <div class="card transition-hover h-100">
+                            <div class="card-body d-flex align-items-center justify-content-between p-4">
+                                <div class="d-flex align-items-center gap-3">
+                                    <i class="bi bi-journal-text fs-2 text-warning"></i>
+                                    <div>
+                                        <div class="fw-bold" style="font-size: 1rem;">Bacheca</div>
+                                        <div class="text-muted" style="font-size: 0.85rem;">Le ultime recensioni della community</div>
+                                    </div>
+                                </div>
+                                <i class="bi bi-arrow-right text-muted"></i>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
 
             <div class="d-flex justify-content-between align-items-center mb-4 mt-5">
                 <h3 class="fw-bold m-0">I Film in evidenza</h3>

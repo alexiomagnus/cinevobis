@@ -74,7 +74,7 @@ $isAdminPage = in_array($currentPage, $adminPages);
                             <i class="bi bi-house me-2"></i>Home</a></li>
                         <li><a class="dropdown-item py-2 small" href="/actions/contact.php">
                             <i class="bi bi-envelope me-2"></i>Contattaci</a></li>
-                        <li><a class="dropdown-item py-2 small" href="/pages/user/notice_board.php">
+                        <li><a class="dropdown-item py-2 small" href="/pages/public/notice_board.php">
                             <i class="bi bi-layout-text-sidebar-reverse me-2"></i>Bacheca</a></li>
                     <?php endif; ?>
 
