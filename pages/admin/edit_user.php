@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $nome = trim($_POST['nome'] ?? '');
         $cognome = trim($_POST['cognome'] ?? '');
         $email = trim($_POST['email'] ?? '');
-        $attivo = isset($_POST['attivo']) ? (int) $_POST['attivo'] : 0;
+        $attivo = isset($_POST['attivo']) ? 1 : 0;
 
         if (!$nome || !$cognome || !$email) {
             $errore = "Nome, cognome ed email sono obbligatori";
@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 $userUpdate = new userObj(
                     $conn,
-                    $username,
+                    $username_utente,
                     null,
                     $nome,
                     $cognome,
@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $utente['id_profilo']
                 );
 
-                $userUpdate->update($username);
+                $userUpdate->update($username_utente);
                 $messaggio = "Utente aggiornato con successo";
 
                 // Ricarichiamo i dati aggiornati
@@ -146,7 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             required>
                     </div>
 
-                    <div class="mb-3">
+                    <div class="mb-4">
                         <input type="text"
                             class="form-control bg-light border-light py-3 text-muted"
                             value="<?= htmlspecialchars($utente['username'] ?? '') ?>"
@@ -154,19 +154,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             style="cursor: not-allowed;">
                     </div>
 
-                    <div class="mb-4">
-                        <label class="form-label fw-semibold mb-2">Attivo</label>
-                        <div class="d-flex gap-4">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="attivo" value="1"
-                                    <?= (int)($utente['attivo'] ?? 0) === 1 ? 'checked' : '' ?>>
-                                <label class="form-check-label">Sì</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="attivo" value="0"
-                                    <?= (int)($utente['attivo'] ?? 0) === 0 ? 'checked' : '' ?>>
-                                <label class="form-check-label">No</label>
-                            </div>
+                   <div class="mb-4">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" 
+                                type="checkbox" 
+                                name="attivo" 
+                                value="1"
+                                <?= (isset($utente['attivo']) && $utente['attivo'] == 1) ? 'checked' : '' ?>>
+                            <label class="form-check-label fw-semibold" for="attivo">
+                                Attivo
+                            </label>
                         </div>
                     </div>
 
