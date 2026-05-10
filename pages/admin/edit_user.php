@@ -6,7 +6,7 @@ require_once(__DIR__ . '/../../includes/user_obj.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');
 
 // Controllo autenticazione
-$username   = $_SESSION['username']   ?? '';
+$username = $_SESSION['username']   ?? '';
 $id_profilo = $_SESSION['id_profilo'] ?? 0;
 
 if (!$username || $id_profilo != 1) {
@@ -14,18 +14,25 @@ if (!$username || $id_profilo != 1) {
     exit();
 }
 
+
 $errore = '';
 $messaggio = '';
 
-// Carichiamo i dati attuali dell'utente
-$user = new userObj($conn, $username);
-$utente = $user->findByUsername();
+$username_utente = isset($_GET['username']) ? $_GET['username'] : null;
 
-if (!$utente) {
-    header("Location: admin_area.php");
-    exit();
+// Carichiamo i dati attuali dell'utente
+if (!empty($username_utente)) {
+    $user = new userObj($conn, $username_utente);
+    $utente = $user->findByUsername();
+
+    if (empty($utente)) 
+        $errore = "Nessun utente trovato";
+} else {
+    $errore = "Nessun utente trovato";
 }
 
+
+// Modifica dati utente
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['save'])) {
         $nome = trim($_POST['nome'] ?? '');
@@ -60,6 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    // Elimazione utente
     if (isset($_POST['delete_user'])) {
         try {
             $user->delete();
@@ -106,77 +114,79 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             <?php endif; ?>
 
-            <form method="POST">
-                <input type="hidden" name="username" value="<?= htmlspecialchars($username) ?>">
+             <?php if ($errore === ''): ?>
+                <form method="POST">
+                    <input type="hidden" name="username" value="<?= htmlspecialchars($username) ?>">
 
-                <div class="row g-3 mb-3">
-                    <div class="col-md-6">
-                        <input type="text"
-                            name="nome"
-                            class="form-control bg-light border-light py-3"
-                            placeholder="Nome"
-                            value="<?= htmlspecialchars($utente['nome'] ?? '') ?>"
-                            required>
-                    </div>
-                    <div class="col-md-6">
-                        <input type="text"
-                            name="cognome"
-                            class="form-control bg-light border-light py-3"
-                            placeholder="Cognome"
-                            value="<?= htmlspecialchars($utente['cognome'] ?? '') ?>"
-                            required>
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <input type="email"
-                        name="email"
-                        class="form-control bg-light border-light py-3"
-                        placeholder="Email"
-                        value="<?= htmlspecialchars($utente['email'] ?? '') ?>"
-                        required>
-                </div>
-
-                <div class="mb-3">
-                    <input type="text"
-                        class="form-control bg-light border-light py-3 text-muted"
-                        value="<?= htmlspecialchars($utente['username'] ?? '') ?>"
-                        disabled 
-                        style="cursor: not-allowed;">
-                </div>
-
-                <div class="mb-4">
-                    <label class="form-label fw-semibold mb-2">Attivo</label>
-                    <div class="d-flex gap-4">
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="attivo" value="1"
-                                <?= (int)($utente['attivo'] ?? 0) === 1 ? 'checked' : '' ?>>
-                            <label class="form-check-label">Sì</label>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <input type="text"
+                                name="nome"
+                                class="form-control bg-light border-light py-3"
+                                placeholder="Nome"
+                                value="<?= htmlspecialchars($utente['nome'] ?? '') ?>"
+                                required>
                         </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="attivo" value="0"
-                                <?= (int)($utente['attivo'] ?? 0) === 0 ? 'checked' : '' ?>>
-                            <label class="form-check-label">No</label>
+                        <div class="col-md-6">
+                            <input type="text"
+                                name="cognome"
+                                class="form-control bg-light border-light py-3"
+                                placeholder="Cognome"
+                                value="<?= htmlspecialchars($utente['cognome'] ?? '') ?>"
+                                required>
                         </div>
                     </div>
-                </div>
 
-                <div class="d-flex gap-3 mt-4">
-                    <button type="submit"
-                            name="save"
-                            class="btn btn-dark btn-lg flex-fill py-3 fw-bold">
-                        Salva modifiche
-                    </button>
-                </div>
+                    <div class="mb-3">
+                        <input type="email"
+                            name="email"
+                            class="form-control bg-light border-light py-3"
+                            placeholder="Email"
+                            value="<?= htmlspecialchars($utente['email'] ?? '') ?>"
+                            required>
+                    </div>
 
-                <div class="d-flex gap-3 mt-4">
-                    <button type="submit"
-                            name="delete_user"
-                            class="btn btn-outline-danger btn-lg flex-fill py-3 fw-bold"
-                            onclick="return confirm('Sei sicuro?');">
-                        Elimina utente
-                    </button>
-                </div>
+                    <div class="mb-3">
+                        <input type="text"
+                            class="form-control bg-light border-light py-3 text-muted"
+                            value="<?= htmlspecialchars($utente['username'] ?? '') ?>"
+                            disabled 
+                            style="cursor: not-allowed;">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold mb-2">Attivo</label>
+                        <div class="d-flex gap-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="attivo" value="1"
+                                    <?= (int)($utente['attivo'] ?? 0) === 1 ? 'checked' : '' ?>>
+                                <label class="form-check-label">Sì</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="attivo" value="0"
+                                    <?= (int)($utente['attivo'] ?? 0) === 0 ? 'checked' : '' ?>>
+                                <label class="form-check-label">No</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-3 mt-4">
+                        <button type="submit"
+                                name="save"
+                                class="btn btn-dark btn-lg flex-fill py-3 fw-bold">
+                            Salva modifiche
+                        </button>
+                    </div>
+
+                    <div class="d-flex gap-3 mt-4">
+                        <button type="submit"
+                                name="delete_user"
+                                class="btn btn-outline-danger btn-lg flex-fill py-3 fw-bold"
+                                onclick="return confirm('Sei sicuro?');">
+                            Elimina utente
+                        </button>
+                    </div>
+                <?php endif; ?>
             </form>
         </div>
     </div>

@@ -53,7 +53,7 @@ try {
 
 // Conteggio sessioni
 try {
-    $sql = "SELECT COUNT(*) FROM sessioni";
+    $sql = "SELECT COUNT(*) FROM sessioni WHERE data_logout IS NULL";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
 
@@ -127,7 +127,7 @@ try {
             </div>
             <div class="col-6 col-md-3">
                 <div class="card border-0 shadow-sm bg-white border-start border-4 h-100 d-flex flex-column justify-content-center p-3">
-                    <div class="text-muted fw-bold text-uppercase mb-1 letter-spacing-sm" style="font-size: 0.75rem;">Sessioni</div>
+                    <div class="text-muted fw-bold text-uppercase mb-1 letter-spacing-sm" style="font-size: 0.75rem;">Sessioni Attive</div>
                     <div class="fw-bold text-dark fs-3"><?= number_format($totaleSessioni, 0, ',', '.') ?></div>
                 </div>
             </div>

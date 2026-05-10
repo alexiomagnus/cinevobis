@@ -165,9 +165,7 @@ if (!empty($ids)) {
                 foreach ($films as $film):
                     $id = (int) ($film['id'] ?? 0);
                     $titolo = $film['title'] ?? 'Titolo non disponibile';
-                    $poster = !empty($film['poster_path'])
-                        ? "https://image.tmdb.org/t/p/w500" . $film['poster_path']
-                        : "https://via.placeholder.com/500x750?text=No+Poster";
+                    $poster = !empty($film['poster_path']) ? "https://image.tmdb.org/t/p/w500" . $film['poster_path'] : "https://via.placeholder.com/500x750?text=No+Poster";
                     $rec = $recensioni_map[$id] ?? [];
                     $voto = isset($rec['voto']) ? (float) $rec['voto'] : null;
                     $commento = $rec['commento'] ?? '';

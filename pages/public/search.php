@@ -81,8 +81,8 @@ if ($searched !== '') {
         <div class="w-100" style="max-width: 650px;">
 
             <?php if ($errore): ?>
-                <div class="alert alert-warning text-center shadow-sm rounded-3 border-0">
-                    <i class="bi bi-info-circle me-2"></i> <?= $errore ?>
+                <div class="alert alert-info shadow-sm rounded-4 border-0">
+                    <i class="bi bi-info-circle me-2"></i><?= htmlspecialchars($errore) ?>
                 </div>
             <?php endif; ?>
 

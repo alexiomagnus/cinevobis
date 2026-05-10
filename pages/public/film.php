@@ -289,7 +289,7 @@ if ($tmdb_id !== null) {
                                     <p class="text-justify lh-lg fs-6 mb-4" style="color: var(--text-muted);"><?= nl2br(htmlspecialchars($trama)) ?></p>
                                     
                                     <?php if ($recensioni_altri > 0): ?>
-                                        <a href="/pages/public/users_reviews.php?tmdb_id=<?= urlencode($tmdb_id) ?>" class="text-decoration-none fw-bold" style="color: var(--accent);">
+                                        <a href="/pages/public/community_reviews.php?tmdb_id=<?= urlencode($tmdb_id) ?>" class="text-decoration-none fw-bold" style="color: var(--accent);">
                                             <i class="bi bi-chat-left-text-fill me-1"></i> Leggi le recensioni della community
                                         </a>
                                     <?php endif; ?>

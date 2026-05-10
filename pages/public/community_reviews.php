@@ -68,11 +68,7 @@ try {
 
                                 <div class="card-body d-flex flex-column justify-content-between p-3">
                                     <div>
-                                        <h5 class="fw-bold mb-1 text-dark">
-                                            <?= htmlspecialchars($r['titolo']) ?>
-                                        </h5>
-                                        
-                                        <div class="small text-primary mb-2">
+                                        <div class="small mb-2" style="color: var(--accent);">
                                             <i class="bi bi-person-circle me-1"></i><?= htmlspecialchars($r['nome']) . " " . htmlspecialchars($r['cognome'])?>
                                         </div>
 
