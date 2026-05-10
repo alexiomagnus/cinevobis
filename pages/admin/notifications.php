@@ -14,6 +14,23 @@ if (!$username || $id_profilo != 1) {
 }
 
 
+// Aggiornare notifica letta
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $id = (int) ($_POST['id_notifica'] ?? 0);
+
+    if($id > 0) {
+        try {
+            $sql = "UPDATE notifiche SET letta = 1 WHERE id_notifica = :id_n";
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([':id_n' => $id]);
+
+        } catch (PDOException $e) {
+            error_log("Errore: " . $e->getMessage());
+        }
+    }
+}
+
+
 // Recupero notifiche
 $notifiche = "";
 
@@ -30,23 +47,6 @@ try {
 
 } catch (PDOException $e) {
     error_log("Errore: " . $e->getMessage());
-}
-
-
-// Aggiornare notifica letta
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $id = (int) ($_POST['id_notifica'] ?? 0);
-
-    if($id > 0) {
-        try {
-            $sql = "UPDATE notifiche SET letta = 1 WHERE id_notifica = :id_n";
-            $stmt = $conn->prepare($sql);
-            $stmt->execute([':id_n' => $id]);
-
-        } catch (PDOException $e) {
-            error_log("Errore: " . $e->getMessage());
-        }
-    }
 }
 
 
