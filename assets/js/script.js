@@ -45,24 +45,23 @@ document.addEventListener("DOMContentLoaded", function() {
 
     if (trailerModal && container) {
         const iframeOriginale = container.querySelector('iframe');
-        const videoUrlBase = iframeOriginale.getAttribute('data-src');
-        const classiIframe = iframeOriginale.className;
+        
+        // Aggiungi questo controllo di sicurezza
+        if (iframeOriginale) {
+            const videoUrlBase = iframeOriginale.getAttribute('data-src');
+            const classiIframe = iframeOriginale.className;
 
-        // Creiamo la struttura dell'iframe una volta sola, SENZA autoplay
-        const iframeHTML = `<iframe src="${videoUrlBase}" class="${classiIframe}" allowfullscreen></iframe>`;
-
-        // Svuotiamo il contenitore all'inizio
-        container.innerHTML = '';
-
-        // Quando la modale si apre: inseriamo l'iframe pulito
-        trailerModal.addEventListener('show.bs.modal', function() {
-            container.innerHTML = iframeHTML;
-        });
-
-        // Quando la modale si chiude: distruggiamo l'iframe per fermare l'audio/video
-        trailerModal.addEventListener('hidden.bs.modal', function() {
+            const iframeHTML = `<iframe src="${videoUrlBase}" class="${classiIframe}" allowfullscreen></iframe>`;
             container.innerHTML = '';
-        });
+
+            trailerModal.addEventListener('show.bs.modal', function() {
+                container.innerHTML = iframeHTML;
+            });
+
+            trailerModal.addEventListener('hidden.bs.modal', function() {
+                container.innerHTML = '';
+            });
+        }
     }
 });
 

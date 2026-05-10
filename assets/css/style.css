@@ -1,29 +1,23 @@
 :root {
-    /* Palette Colori Moderna (Slate & Indigo) */
-    --accent: #6366f1;         /* Indaco vibrante */
+    --accent: #6366f1;
     --accent-hover: #4f46e5;
     --accent-dark: #3730a3;
-    --bg: #f8fafc;             /* Grigio freddo chiarissimo per lo sfondo */
-    --bg-surface: #ffffff;     /* Bianco puro per le card */
+    --bg: #f8fafc;
+    --bg-surface: #ffffff;
     --bg-muted: #f1f5f9;
     --border: #e2e8f0;
-    --text: #0f172a;           /* Testo quasi nero, molto leggibile */
+    --text: #0f172a;
     --text-muted: #64748b;
 
-    /* Ombre fluide e stratificate */
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
     --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-    
-    /* Layout */
+
     --radius-md: 12px;
     --radius-lg: 16px;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* =====================
-   Base & Animazioni
-===================== */
 body {
     background-color: var(--bg);
     color: var(--text);
@@ -35,21 +29,18 @@ body {
 
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
-/* =====================
-   Bottoni
-===================== */
+/* Bottoni */
 .btn-dark {
     background-color: var(--text) !important;
     border-color: var(--text) !important;
-    color: #ffffff !important;
+    color: #fff !important;
     border-radius: 8px;
     font-weight: 500;
     transition: var(--transition);
 }
-
 .btn-dark:hover {
     background-color: #1e293b !important;
     transform: translateY(-1px);
@@ -63,16 +54,13 @@ body {
     color: var(--text-muted);
     transition: var(--transition);
 }
-
 .btn-outline-secondary:hover {
     background-color: var(--bg-muted);
     color: var(--text);
     border-color: var(--text-muted);
 }
 
-/* =====================
-   Navbar (Glassmorphism)
-===================== */
+/* Navbar */
 .navbar {
     background-color: rgba(255, 255, 255, 0.85) !important;
     backdrop-filter: blur(12px);
@@ -80,44 +68,27 @@ body {
     border-bottom: 1px solid var(--border) !important;
     position: sticky;
     top: 0;
-    z-index: 1050; /* sopra i dropdown Bootstrap */
+    z-index: 1050;
 }
+.navbar-brand { color: var(--text) !important; letter-spacing: -0.5px; }
 
-.navbar-brand {
-    color: var(--text) !important;
-    letter-spacing: -0.5px;
-}
-
-/* Search pill nella navbar */
-input[name="search"].form-control {
+/* Ricerca — copre sia .search-wrap che input[name="search"] */
+.search-wrap,
+input[name="search"] {
     background-color: var(--bg-muted) !important;
     border: 1px solid transparent !important;
     border-radius: 20px !important;
+    padding: 8px 16px;
+    transition: var(--transition);
 }
+.search-wrap { cursor: text; display: block; }
 
-input[name="search"].form-control:focus {
+.search-wrap:hover,
+.search-wrap:focus-within,
+input[name="search"]:focus {
     background-color: var(--bg-surface) !important;
     border-color: var(--accent) !important;
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15) !important;
-}
-
-/* =====================
-   Ricerca
-===================== */
-.search-wrap {
-    background: var(--bg-muted);
-    border: 1px solid transparent;
-    border-radius: 20px;
-    padding: 8px 16px;
-    transition: var(--transition);
-    cursor: text;
-}
-
-.search-wrap:hover,
-.search-wrap:focus-within {
-    background: var(--bg-surface);
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
 }
 
 .search-wrap input {
@@ -128,29 +99,9 @@ input[name="search"].form-control:focus {
     width: 100%;
     color: var(--text);
 }
+.search-wrap input::placeholder { color: var(--text-muted); }
 
-.search-wrap input::placeholder {
-    color: var(--text-muted);
-}
-
-/* Fix per input di ricerca base nella Navbar */
-input[name="search"] {
-    background-color: var(--bg-muted) !important;
-    border: 1px solid transparent !important;
-    border-radius: 20px !important;
-    padding: 8px 16px;
-    transition: var(--transition);
-}
-
-input[name="search"]:focus {
-    background-color: var(--bg-surface) !important;
-    border-color: var(--accent) !important;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15) !important;
-}
-
-/* =====================
-   Dropdown
-===================== */
+/* Dropdown */
 .dropdown-menu {
     border: 1px solid var(--border) !important;
     background-color: var(--bg-surface);
@@ -158,12 +109,7 @@ input[name="search"]:focus {
     box-shadow: var(--shadow-lg);
     padding: 8px 0;
 }
-
-.dropdown-item {
-    font-weight: 500;
-    transition: background-color 0.2s, color 0.2s;
-}
-
+.dropdown-item { font-weight: 500; transition: background-color 0.2s, color 0.2s; }
 .dropdown-item:hover,
 .dropdown-item:active,
 .dropdown-item.active {
@@ -171,9 +117,7 @@ input[name="search"]:focus {
     color: var(--accent) !important;
 }
 
-/* =====================
-   Card Film & Hover Effects
-===================== */
+/* Card */
 .card,
 .search-result-card {
     background-color: var(--bg-surface) !important;
@@ -183,20 +127,20 @@ input[name="search"]:focus {
     transition: var(--transition);
 }
 
-.transition-hover, .card-hover {
-    transition: var(--transition);
+/* .card-hover è un alias di .transition-hover — unificati */
+.transition-hover,
+.card-hover {
     will-change: transform, box-shadow;
+    transition: var(--transition);
 }
-
-.transition-hover:hover, .card-hover:hover {
+.transition-hover:hover,
+.card-hover:hover {
     transform: translateY(-3px);
     box-shadow: var(--shadow-md) !important;
     border-color: rgba(99, 102, 241, 0.3) !important;
 }
 
-/* =====================
-   Form
-===================== */
+/* Form */
 .form-control {
     background-color: var(--bg-surface) !important;
     border: 1px solid var(--border) !important;
@@ -205,56 +149,26 @@ input[name="search"]:focus {
     padding: 10px 14px;
     transition: var(--transition);
 }
-
-.form-control::placeholder {
-    color: var(--text-muted) !important;
-}
-
+.form-control::placeholder { color: var(--text-muted) !important; }
 .form-control:focus {
     border-color: var(--accent) !important;
     box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1) !important;
 }
 
-/* =====================
-   Footer
-===================== */
+/* Footer */
 footer {
     border-top: 1px solid var(--border) !important;
     background-color: var(--bg-surface) !important;
 }
 
-/* =====================
-   Alerts
-===================== */
-.alert {
-    border-radius: var(--radius-md);
-    border: none !important;
-    font-weight: 500;
-}
+/* Alerts */
+.alert { border-radius: var(--radius-md); border: none !important; font-weight: 500; }
+.alert-danger  { background-color: #fef2f2 !important; color: #b91c1c !important; }
+.alert-success { background-color: #f0fdf4 !important; color: #15803d !important; }
+.alert-warning { background-color: #fffbeb !important; color: #b45309 !important; }
 
-.alert-danger {
-    background-color: #fef2f2 !important;
-    color: #b91c1c !important;
-}
-
-.alert-success {
-    background-color: #f0fdf4 !important;
-    color: #15803d !important;
-}
-
-.alert-warning {
-    background-color: #fffbeb !important;
-    color: #b45309 !important;
-}
-
-/* =====================
-   Password Toggle
-===================== */
-.password-wrapper {
-    position: relative;
-    width: 100%;
-}
-
+/* Password toggle */
+.password-wrapper { position: relative; width: 100%; }
 .toggle-icon {
     position: absolute;
     right: 15px;
@@ -265,14 +179,9 @@ footer {
     z-index: 10;
     transition: color 0.2s;
 }
+.toggle-icon:hover { color: var(--text); }
 
-.toggle-icon:hover {
-    color: var(--text);
-}
-
-/* =====================
-   Placeholder Poster
-===================== */
+/* Placeholder poster */
 .card-img-top {
     background-color: var(--bg-muted);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath d='M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z'/%3E%3Cpath d='M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z'/%3E%3C/svg%3E");
@@ -280,24 +189,12 @@ footer {
     background-position: center;
 }
 
-/* =====================
-   Barra di scorrimento
-===================== */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--bg);
-}
-
+/* Scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 10px;
-  border: 2px solid var(--bg);
+    background: #cbd5e1;
+    border-radius: 10px;
+    border: 2px solid var(--bg);
 }
-
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }

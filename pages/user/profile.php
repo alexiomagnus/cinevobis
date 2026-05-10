@@ -98,10 +98,6 @@ try {
                     <?php endif; ?>
 
                     <?php if ($userData): ?>
-                        
-                        <div class="mb-5">
-                            <h1 class="display-6 fw-bolder mb-1">Profilo</h1>
-                        </div>
 
                         <div class="row g-3 mb-4">
                             <div class="col-sm-6">
