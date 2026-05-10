@@ -259,6 +259,23 @@ try {
                 </div>
             <?php endif; ?>
 
+            <hr class="my-5 border-0" style="border-top: 0.5px solid var(--bs-border-color) !important;">
+
+            <div class="mt-5 mb-4">
+                <h2 class="fw-bold mb-3" style="font-size: clamp(1.4rem, 3vw, 2rem); max-width: 520px;">
+                    Perché nasce?
+                </h2>
+                <p class="text-muted mb-4" style="max-width: 480px; line-height: 1.7;">
+                    Cinevobis nasce per chi ama i film, concedendo la possibilità di condividere la vostra passione con gli altri.
+                    Il nome deriva da <em>cine</em> inteso come cinema e <em>vobis</em> dal latino per voi.
+                </p>
+
+                <blockquote class="border-start border-2 ps-3 mb-4" style="border-color: var(--bs-border-color) !important;">
+                    <p class="fst-italic mb-2">"I film non ti dicono cosa pensare. Ti insegnano come sentire."</p>
+                    <p class="text-muted small">— Roger Ebert</p>
+                </blockquote>
+            </div>
+
         </div>
     </main>
 
