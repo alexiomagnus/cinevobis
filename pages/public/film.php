@@ -86,9 +86,7 @@ if (!empty($movie_api)) {
         $movie_db = $movie_api;
     } else {
         // Se esiste si recupera il timestamp 
-        $lastUpdateSeconds = isset($movie_db['last_updated'])
-            ? $movie_db['last_updated']->toDateTime()->getTimestamp()
-            : 0;
+        $lastUpdateSeconds = isset($movie_db['last_updated']) ? $movie_db['last_updated']->toDateTime()->getTimestamp() : 0;
 
         // Se è passato un mese si aggiorna il film
         if (($now - $lastUpdateSeconds) > $aMonthInSeconds) {

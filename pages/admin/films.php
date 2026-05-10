@@ -109,9 +109,7 @@ if (isset($_POST['delete'])) {
                 <?php foreach($cursor as $movie): 
                     $titolo = $movie['title'] ?? 'Senza titolo';
                     $anno = !empty($movie['release_date']) ? substr($movie['release_date'], 0, 4) : '';
-                    $poster = !empty($movie['poster_path'])
-                        ? "https://image.tmdb.org/t/p/w185" . $movie['poster_path']
-                        : null;
+                    $poster = !empty($movie['poster_path']) ? "https://image.tmdb.org/t/p/w185" . $movie['poster_path'] : null;
                 ?>
                 <div class="col">
                     <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden transition-hover">

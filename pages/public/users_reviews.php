@@ -66,9 +66,7 @@ try {
 
             <div class="row row-cols-1 row-cols-md-2 g-4">
                 <?php foreach ($recensioni_altri as $r): 
-                    $poster_url = !empty($r['poster'])
-                        ? "https://image.tmdb.org/t/p/w500" . $r['poster']
-                        : "https://via.placeholder.com/500x750?text=No+Poster";
+                    $poster_url = !empty($r['poster']) ? "https://image.tmdb.org/t/p/w500" . $r['poster'] : "https://via.placeholder.com/500x750?text=No+Poster";
                 ?>
                 <div class="col">
                         <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden transition-hover">

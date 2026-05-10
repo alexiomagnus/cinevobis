@@ -84,9 +84,7 @@ if (isset($_POST['write_review'])) {
                 ':voto' => (float)$voto
             ]);
 
-            $messaggio = $recensione_esistente
-                ? "Recensione aggiornata"
-                : "Recensione pubblicata";
+            $messaggio = $recensione_esistente ? "Recensione aggiornata" : "Recensione pubblicata";
 
             // Segna automaticamente come visto (watched)
             $sql_check_watched = "SELECT 1 FROM watched WHERE id_utente = :id_utente AND tmdb_id = :tmdb_id";
@@ -98,7 +96,7 @@ if (isset($_POST['write_review'])) {
 
             if (!$stmt_check_watched->fetch()) {
                 $sql_insert_watched = "INSERT INTO watched (tmdb_id, id_utente, data_aggiunto) 
-                                     VALUES (:tmdb_id, :id_utente, :data_aggiunto)";
+                                       VALUES (:tmdb_id, :id_utente, :data_aggiunto)";
                 $stmt_insert_watched = $conn->prepare($sql_insert_watched);
                 $stmt_insert_watched->execute([
                     ':tmdb_id' => $tmdb_id,
