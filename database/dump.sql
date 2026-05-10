@@ -4,16 +4,11 @@
 -- Host: localhost    Database: cinevobis
 -- ------------------------------------------------------
 -- Server version	11.8.6-MariaDB
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO,MYSQL40' */;
 /*M!100616 SET @OLD_NOTE_VERBOSITY=@@NOTE_VERBOSITY, NOTE_VERBOSITY=0 */;
 
 --
@@ -21,8 +16,6 @@
 --
 
 DROP TABLE IF EXISTS `notifiche`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `notifiche` (
   `id_notifica` int(11) NOT NULL AUTO_INCREMENT,
   `titolo` varchar(255) DEFAULT NULL,
@@ -33,8 +26,7 @@ CREATE TABLE `notifiche` (
   PRIMARY KEY (`id_notifica`),
   KEY `id_utente` (`id_utente`),
   CONSTRAINT `notifiche_ibfk_1` FOREIGN KEY (`id_utente`) REFERENCES `utenti` (`id_utente`)
-) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) TYPE=InnoDB AUTO_INCREMENT=31;
 
 --
 -- Dumping data for table `notifiche`
@@ -43,9 +35,6 @@ CREATE TABLE `notifiche` (
 SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `notifiche` WRITE;
 /*!40000 ALTER TABLE `notifiche` DISABLE KEYS */;
-INSERT INTO `notifiche` VALUES
-(28,'Richiesta di miglioramento','Salve, volevo chiedere se si potesse implementare anche una ricerca per generi','2026-05-08 19:07:47',5,1),
-(29,'Servizio di qualità','Davvero un ottimo sito, mi ci sono trovato bene','2026-05-08 19:19:19',5,0);
 /*!40000 ALTER TABLE `notifiche` ENABLE KEYS */;
 UNLOCK TABLES;
 COMMIT;
@@ -56,8 +45,6 @@ SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 --
 
 DROP TABLE IF EXISTS `preferiti`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `preferiti` (
   `id_preferito` int(11) NOT NULL AUTO_INCREMENT,
   `tmdb_id` int(11) NOT NULL,
@@ -66,8 +53,7 @@ CREATE TABLE `preferiti` (
   PRIMARY KEY (`id_preferito`),
   KEY `id_utente` (`id_utente`),
   CONSTRAINT `preferiti_ibfk_1` FOREIGN KEY (`id_utente`) REFERENCES `utenti` (`id_utente`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) TYPE=InnoDB AUTO_INCREMENT=25;
 
 --
 -- Dumping data for table `preferiti`
@@ -87,8 +73,8 @@ INSERT INTO `preferiti` VALUES
 (13,269149,4,'2026-05-08 19:26:05'),
 (14,1226863,4,'2026-05-08 19:26:55'),
 (17,155,1,'2026-05-08 22:12:52'),
-(20,129,1,'2026-05-09 18:37:49'),
-(21,129,10,'2026-05-09 18:55:02');
+(21,129,10,'2026-05-09 18:55:02'),
+(24,129,1,'2026-05-10 10:02:13');
 /*!40000 ALTER TABLE `preferiti` ENABLE KEYS */;
 UNLOCK TABLES;
 COMMIT;
@@ -99,14 +85,11 @@ SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 --
 
 DROP TABLE IF EXISTS `profili`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `profili` (
   `id_profilo` int(11) NOT NULL AUTO_INCREMENT,
   `nome_profilo` varchar(100) NOT NULL,
   PRIMARY KEY (`id_profilo`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) TYPE=InnoDB AUTO_INCREMENT=3;
 
 --
 -- Dumping data for table `profili`
@@ -128,8 +111,6 @@ SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 --
 
 DROP TABLE IF EXISTS `recensioni`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `recensioni` (
   `id_recensione` int(11) NOT NULL AUTO_INCREMENT,
   `tmdb_id` int(11) NOT NULL,
@@ -140,8 +121,7 @@ CREATE TABLE `recensioni` (
   PRIMARY KEY (`id_recensione`),
   KEY `id_utente` (`id_utente`),
   CONSTRAINT `recensioni_ibfk_1` FOREIGN KEY (`id_utente`) REFERENCES `utenti` (`id_utente`)
-) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) TYPE=InnoDB AUTO_INCREMENT=57;
 
 --
 -- Dumping data for table `recensioni`
@@ -188,8 +168,6 @@ SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 --
 
 DROP TABLE IF EXISTS `sessioni`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `sessioni` (
   `id_sessione` varchar(255) NOT NULL,
   `id_utente` int(11) NOT NULL,
@@ -198,8 +176,7 @@ CREATE TABLE `sessioni` (
   PRIMARY KEY (`id_sessione`),
   KEY `id_utente` (`id_utente`),
   CONSTRAINT `sessioni_ibfk_1` FOREIGN KEY (`id_utente`) REFERENCES `utenti` (`id_utente`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) TYPE=InnoDB;
 
 --
 -- Dumping data for table `sessioni`
@@ -261,6 +238,7 @@ INSERT INTO `sessioni` VALUES
 ('54c289a73c0da47c8a720a5a8bbe60d7',1,'2026-04-24 22:01:45',NULL),
 ('59ba8e083b31081f8af7eb04361259fc',4,'2026-05-06 14:54:10','2026-05-06 14:54:17'),
 ('5b7a24177e2e67c3fcf30df28b97e537',1,'2026-05-08 23:59:22','2026-05-09 00:01:50'),
+('5d90c365f58461b2a83fe643c3228c53',1,'2026-05-10 02:34:44','2026-05-10 02:56:48'),
 ('5ebb2490022465930f0a7db4ff277011',1,'2026-05-08 17:21:57',NULL),
 ('60840023ddf09c631efb993715d4cc80',1,'2026-05-08 21:28:18',NULL),
 ('60ec08a365332c873bfe19ec467bda1a',1,'2026-05-03 15:34:15',NULL),
@@ -277,6 +255,8 @@ INSERT INTO `sessioni` VALUES
 ('73b33b898c631f652d41cd2e22e68352',1,'2026-04-17 13:35:17','2026-04-17 13:36:11'),
 ('75b55e05146627e9ccfc9516e2170efd',1,'2026-05-04 20:25:12',NULL),
 ('7cd956bc695e9634d123917d93c2ab24',1,'2026-05-05 16:41:50',NULL),
+('8126a5e14cd8d129418bebdcb8f49f63',1,'2026-05-10 02:22:54',NULL),
+('84417979d9b5f510657c09543d9acd1e',1,'2026-05-09 23:09:59',NULL),
 ('85b348526adf4bbe32ca46dab7a8a8f2',1,'2026-05-05 08:20:37','2026-05-05 11:50:58'),
 ('864f2f4472c823b57df04e3fbb5d17ab',1,'2026-05-08 20:29:03',NULL),
 ('8728ce84b027b0afd50bf431e2d7d22a',1,'2026-03-25 19:24:57','2026-03-25 19:26:40'),
@@ -299,25 +279,31 @@ INSERT INTO `sessioni` VALUES
 ('9eda922c7ad0804f46256f75bb3b6617',1,'2026-05-07 21:42:59','2026-05-07 21:56:27'),
 ('9f34f3cc99a5de0598d983529fc72f1c',1,'2026-05-06 14:46:42','2026-05-06 14:54:02'),
 ('9f3fa601096c26b4994ecb4a3c8306a8',1,'2026-03-25 18:23:48',NULL),
+('a33a7a8a5ee34c020cfc05f01b258640',1,'2026-05-10 12:02:00',NULL),
 ('a477f9ef5225a29f395fe3fc0e596464',1,'2026-03-25 18:20:29','2026-03-25 18:22:05'),
 ('a484942aefe00b2f1b477fea3a39e24c',5,'2026-05-08 21:07:02','2026-05-08 21:19:26'),
 ('a70cd906540d07384d78ba1780eddc54',1,'2026-04-23 19:50:22','2026-04-23 20:23:47'),
+('a91fe66eb52f3ff2259539121d0b1e37',1,'2026-05-10 03:21:51','2026-05-10 04:15:53'),
 ('ab7e66cf1dc700fe16e701ca9e9f731e',1,'2026-04-24 21:50:10','2026-04-24 21:53:27'),
 ('ad303b4f901d7cca28a033851c643eb4',1,'2026-05-06 16:02:02',NULL),
 ('afc3793009a9452203ed30b9cffef280',1,'2026-05-06 17:04:03','2026-05-06 17:05:08'),
 ('afc40ab20cb2d3d161c41adf83765a2e',1,'2026-05-08 23:49:14',NULL),
+('b127d8f085b17c5793ccc56fe28494ad',1,'2026-05-10 02:17:45',NULL),
 ('b31ce4f3a7abbb66756ad127e576de58',57,'2026-05-07 13:04:40','2026-05-07 13:06:19'),
 ('b33fef4a591f0b6979622c98ae8274de',1,'2026-05-06 17:38:00',NULL),
 ('b4cdda15075c059ef6e04a17e5ba8a5f',1,'2026-05-08 19:43:54',NULL),
 ('b51a20d28c49e436beef32ab4a06d138',4,'2026-05-09 20:10:17','2026-05-09 20:10:45'),
 ('b5626e2b600011ca8d582e7d88a92eab',1,'2026-04-15 22:09:09','2026-04-15 22:10:08'),
 ('ba045843a6ca718e155b1d2f69987e40',4,'2026-05-06 21:26:28','2026-05-06 21:41:39'),
+('bc2b8ed1b06b1bac1150640f0ff16316',1,'2026-05-09 22:44:08',NULL),
 ('bc43366d58b172cff0a4336ba922093d',1,'2026-03-25 18:22:14','2026-03-25 18:22:48'),
 ('bc76cfd9f3cb5e4ab157efef871b68f9',1,'2026-03-25 23:17:10',NULL),
 ('c1ccc60484d0dbbbaf193fee97820160',4,'2026-05-06 14:44:34','2026-05-06 14:46:35'),
+('c2a3e0e673780deb9f534d6682fa68da',1,'2026-05-10 02:32:06','2026-05-10 02:34:23'),
 ('c2d3f61993676bea52b965fdab4aabaf',1,'2026-05-08 10:30:35',NULL),
 ('c2d4723f4c3c38bec23f1f6d8af0ad04',1,'2026-05-08 17:23:10','2026-05-08 17:23:41'),
 ('c4794d5e993056d70d50735b5115c9b8',13,'2026-05-08 21:20:02','2026-05-08 21:24:35'),
+('c4bda5c83001afbec67582a4c4b22b7d',1,'2026-05-10 02:56:59',NULL),
 ('c563789bdb6efd1d2bbc6a6e89c40859',1,'2026-04-23 22:25:32',NULL),
 ('c56f7c4c4e05c5c2ddc85b9b41eddd78',1,'2026-04-29 12:17:11','2026-04-29 12:57:21'),
 ('c6a4163400c261bf5506a8f288b756eb',1,'2026-05-07 14:46:28',NULL),
@@ -337,6 +323,7 @@ INSERT INTO `sessioni` VALUES
 ('de211e890f489a173ead66ef61cf8b0d',1,'2026-04-29 16:18:55','2026-04-29 16:27:56'),
 ('e2ed179a003b2c732a572b2bd1ec3a93',10,'2026-05-09 20:53:18','2026-05-09 21:04:03'),
 ('eb96335cb7140a9e3e282af7baf30085',1,'2026-05-05 11:51:07',NULL),
+('ecf7440fed422a57b68cdc76bf92f5b3',1,'2026-05-09 22:59:37',NULL),
 ('f01ae4f0ca2ee15e70c2b43592739309',1,'2026-05-07 22:13:12',NULL),
 ('f2c98e62d02ae5874cff68c3aeb49465',1,'2026-03-27 09:35:22','2026-03-27 09:35:28'),
 ('f37460f6c45627f06a209bd7b2d20159',1,'2026-05-05 23:26:36',NULL),
@@ -356,8 +343,6 @@ SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 --
 
 DROP TABLE IF EXISTS `utenti`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `utenti` (
   `id_utente` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(100) NOT NULL,
@@ -373,8 +358,7 @@ CREATE TABLE `utenti` (
   UNIQUE KEY `email` (`email`),
   KEY `id_profilo` (`id_profilo`),
   CONSTRAINT `utenti_ibfk_1` FOREIGN KEY (`id_profilo`) REFERENCES `profili` (`id_profilo`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=58 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) TYPE=InnoDB AUTO_INCREMENT=58;
 
 --
 -- Dumping data for table `utenti`
@@ -418,7 +402,7 @@ INSERT INTO `utenti` VALUES
 (41,'stephen.strange','$2y$10$4TMwlTJPm4uzHZyA20UEVeRtjQ7qNW5jeXsrfwJ4AXPg.3iLvHb9e','stephen@mail.us','Stephen','Strange',2,1,'2026-03-25 18:22:28'),
 (42,'thor.odinson','$2y$10$4TMwlTJPm4uzHZyA20UEVeRtjQ7qNW5jeXsrfwJ4AXPg.3iLvHb9e','thor@mail.no','Thor','Odinson',2,0,'2026-03-25 18:22:28'),
 (43,'loki.laufeyson','$2y$10$4TMwlTJPm4uzHZyA20UEVeRtjQ7qNW5jeXsrfwJ4AXPg.3iLvHb9e','loki@mail.no','Loki','Laufeyson',2,1,'2026-03-25 18:22:28'),
-(44,'bruce.banner','$2y$10$4TMwlTJPm4uzHZyA20UEVeRtjQ7qNW5jeXsrfwJ4AXPg.3iLvHb9e','banner@mail.us','Bruce','Banner',2,1,'2026-03-25 18:22:28'),
+(44,'bruce.banner','$2y$10$4TMwlTJPm4uzHZyA20UEVeRtjQ7qNW5jeXsrfwJ4AXPg.3iLvHb9e','banner@mail.us','Bruce','Banner',2,0,'2026-03-25 18:22:28'),
 (45,'clint.barton','$2y$10$4TMwlTJPm4uzHZyA20UEVeRtjQ7qNW5jeXsrfwJ4AXPg.3iLvHb9e','clint@mail.us','Clint','Barton',2,1,'2026-03-25 18:22:28'),
 (46,'sam.wilson','$2y$10$4TMwlTJPm4uzHZyA20UEVeRtjQ7qNW5jeXsrfwJ4AXPg.3iLvHb9e','sam@mail.us','Sam','Wilson',2,0,'2026-03-25 18:22:28'),
 (48,'scott.lang','$2y$10$4TMwlTJPm4uzHZyA20UEVeRtjQ7qNW5jeXsrfwJ4AXPg.3iLvHb9e','scott@mail.us','Scott','Lang',2,1,'2026-03-25 18:22:28'),
@@ -435,8 +419,6 @@ SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 --
 
 DROP TABLE IF EXISTS `watched`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `watched` (
   `id_watched` int(11) NOT NULL AUTO_INCREMENT,
   `tmdb_id` int(11) NOT NULL,
@@ -445,8 +427,7 @@ CREATE TABLE `watched` (
   PRIMARY KEY (`id_watched`),
   KEY `id_utente` (`id_utente`),
   CONSTRAINT `watched_ibfk_1` FOREIGN KEY (`id_utente`) REFERENCES `utenti` (`id_utente`)
-) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) TYPE=InnoDB AUTO_INCREMENT=45;
 
 --
 -- Dumping data for table `watched`
@@ -494,8 +475,6 @@ SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 --
 
 DROP TABLE IF EXISTS `watchlist`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `watchlist` (
   `id_watchlist` int(11) NOT NULL AUTO_INCREMENT,
   `tmdb_id` int(11) NOT NULL,
@@ -504,8 +483,7 @@ CREATE TABLE `watchlist` (
   PRIMARY KEY (`id_watchlist`),
   KEY `id_utente` (`id_utente`),
   CONSTRAINT `watchlist_ibfk_1` FOREIGN KEY (`id_utente`) REFERENCES `utenti` (`id_utente`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) TYPE=InnoDB AUTO_INCREMENT=23;
 
 --
 -- Dumping data for table `watchlist`
@@ -531,18 +509,11 @@ INSERT INTO `watchlist` VALUES
 UNLOCK TABLES;
 COMMIT;
 SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
-
---
--- Dumping routines for database 'cinevobis'
---
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2026-05-09 22:36:51
+-- Dump completed on 2026-05-10 12:09:15
