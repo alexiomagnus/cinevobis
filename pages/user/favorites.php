@@ -1,14 +1,5 @@
 <?php
-/**
- * Pagina dei film preferiti (riservata agli utenti autenticati).
- * Recupera da MariaDB i TMDB ID dei film preferiti dell'utente loggato,
- * poi interroga MongoDB per ottenere titolo, poster e anno di ciascun film.
- * I risultati vengono ordinati per voto medio decrescente e presentati
- * in una griglia di card cliccabili.
- *
- * @note Interagisce con la tabella MariaDB: `preferiti`.
- * @note Interagisce con la collezione MongoDB: `films` (query con operatore $in).
- */
+// Pagina preferiti: mostra i film che l'utente ha salvato come preferiti.
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/functions.php');
 require_once(__DIR__ . '/../../config/connection.php');

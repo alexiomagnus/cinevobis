@@ -1,14 +1,5 @@
 <?php
-/**
- * Pagina delle recensioni personali (riservata agli utenti autenticati).
- * Recupera da MariaDB i TMDB ID e i dati (voto, commento) di tutti i film
- * recensiti dall'utente loggato, poi interroga MongoDB per ottenere poster
- * e titolo di ciascun film. I risultati vengono presentati come card con
- * il commento e il voto dell'utente.
- *
- * @note Interagisce con la tabella MariaDB: `recensioni`.
- * @note Interagisce con la collezione MongoDB: `films` (query con operatore $in).
- */
+// Elenca le recensioni personali dell'utente con i dettagli dei film.
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/functions.php');
 require_once(__DIR__ . '/../../config/connection.php');
@@ -24,6 +15,7 @@ if (!$username) {
     header("Location: /index.php");
     exit();
 }
+
 
 // Estrazione tmdb_id + dati recensione
 $recensioni_map = [];

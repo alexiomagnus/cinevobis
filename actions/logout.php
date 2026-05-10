@@ -1,11 +1,5 @@
 <?php
-/**
- * Gestisce il processo di logout: registra la data/ora di uscita nel DB
- * e invalida la sessione.
- * Al termine reindirizza l'utente alla home con il parametro ?logout=success.
- *
- * @note Interagisce con la tabella MariaDB: `sessioni` (tramite userObj::setDataLogout).
- */
+// Esegue il logout dell'utente, aggiorna la sessione nel DB e termina la sessione.
 require_once(__DIR__ . '/../config/config.php');
 require_once(__DIR__ . '/../config/connection.php');
 require_once(__DIR__ . '/../includes/user_obj.php');

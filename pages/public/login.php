@@ -1,13 +1,5 @@
 <?php
-/**
- * Pagina di login. Verifica le credenziali dell'utente tramite userObj::findByUsername
- * e password_verify. Se l'autenticazione va a buon fine, rigenera l'ID di sessione
- * per prevenire la Session Fixation e popola le variabili di sessione.
- * Registra anche la data/ora di accesso tramite userObj::createDataLogin.
- * Gli utenti già autenticati vengono reindirizzati alla home.
- *
- * @note Interagisce con la tabella MariaDB: `utenti`, `sessioni` (tramite userObj).
- */
+// Pagina di login: valida credenziali, rigenera la sessione e imposta i dati utente.
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');
@@ -20,6 +12,7 @@ if (isset($_SESSION['username'])) {
 
 $errore = "";
 
+// Logica login
 if (isset($_POST['login'])) {
     $username = trim($_POST["username"]);
     $password = trim($_POST["password"]);

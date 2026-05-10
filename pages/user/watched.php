@@ -1,13 +1,5 @@
 <?php
-/**
- * Pagina dei film visti ("Watched"), riservata agli utenti autenticati.
- * Recupera da MariaDB i TMDB ID dei film segnati come visti dall'utente,
- * poi interroga MongoDB per ottenere titolo, poster e anno. I risultati
- * sono ordinati per voto medio decrescente e presentati in griglia.
- *
- * @note Interagisce con la tabella MariaDB: `watched`.
- * @note Interagisce con la collezione MongoDB: `films` (query con operatore $in).
- */
+// Pagina dei film visti dall'utente, con i dati recuperati da MongoDB.
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/functions.php');
 require_once(__DIR__ . '/../../config/connection.php');

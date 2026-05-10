@@ -1,13 +1,6 @@
 <?php
-/**
- * Pagina di dettaglio film (pubblica). Recupera i dati del film dall'API TMDB,
- * li salva in MongoDB alla prima visita e li aggiorna se sono più vecchi di 30 giorni.
- * Per gli utenti autenticati gestisce le azioni POST per aggiungere/rimuovere il film
- * da Preferiti, Watchlist e Watched, e verifica se l'utente ha già scritto una recensione.
- *
- * @note Interagisce con la collezione MongoDB: `films` (insert/update/find).
- * @note Interagisce con le tabelle MariaDB: `preferiti`, `watchlist`, `watched`, `recensioni`.
- */
+// Pagina pubblica di dettaglio film: recupera dati TMDB, salva/aggiorna MongoDB
+// e gestisce le azioni utente su preferiti, watchlist e watched.
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');
@@ -345,6 +338,7 @@ if ($tmdb_id != null && $id_utente != null) {
         error_log("Errore nel DB: " . $e->getMessage());
     }
 }
+
 
 // Contiamo le recensioni degli altri utenti
 $recensioni_altri = 0;

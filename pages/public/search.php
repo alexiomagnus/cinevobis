@@ -1,10 +1,5 @@
 <?php
-/**
- * Pagina di ricerca film. Riceve il termine di ricerca tramite GET (?search=...),
- * interroga l'API TMDB sull'endpoint /search/movie e ordina i risultati per popolarità
- * decrescente con un bubble sort manuale. I risultati vengono normalizzati tramite
- * movieObj::search() e visualizzati come lista di card cliccabili.
- */
+// Pagina di ricerca film: interroga l'API TMDB e mostra i risultati all'utente.
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/functions.php');
 require_once(__DIR__ . '/../../config/connection.php');
@@ -23,33 +18,46 @@ $tmdb = Tmdb::client($_ENV['API_KEY']);
 
 $errore = "";
 $moviesList = [];
+$results = []; // Inizializziamo sempre l'array per evitare "Undefined variable"
 $searched = isset($_GET['search']) ? trim($_GET['search']) : '';
-
+$api_failed = false;
 
 if ($searched !== '') {
-    $raw = $tmdb->raw()->url('/search/movie', [
-        'query' => $searched,
-        'language' => 'it-IT'
-    ]);
+    try {
+        $raw = $tmdb->raw()->url('/search/movie', [
+            'query' => $searched,
+            'language' => 'it-IT'
+        ]);
 
-    $results = [];
+        if ($raw !== null) {
+            $body = $raw->getBody();
 
-    if ($raw !== null) {
-        $body = $raw->getBody();
-
-        if (isset($body['results'])) {
-            $results = $body['results'];
+            if (isset($body['results']) && is_array($body['results'])) {
+                $results = $body['results'];
+                // Ordiniamo i risultati direttamente qui
+                $results = order_of_popularity(count($results), $results);
+            } else {
+                $api_failed = true; 
+            }
+        } else {
+            $api_failed = true;
         }
+    } catch (Exception $e) {
+        // Logghiamo l'errore e segnaliamo il fallimento dell'API
+        error_log("Errore connessione con TMDB: " . $e->getMessage());
+        $api_failed = true;
     }
-
-    $n = count($results);
-
-    $results = order_of_popularity($n, $results);
-
-    if (empty($results)) 
+    
+    // Gestione unificata degli stati finali (Errori API, Nessun risultato, Successo)
+    if ($api_failed) {
+        $errore = "Si è verificato un errore temporaneo nella ricerca dei film. Riprova più tardi.";
+        
+    } elseif (empty($results)) {
+        
         $errore = "Nessun risultato trovato per: " . htmlspecialchars($searched);
-    else 
+    } else {
         $moviesList = movieObj::search($results);
+    }
 }
 ?>
 <!DOCTYPE html>

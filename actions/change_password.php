@@ -1,12 +1,6 @@
 <?php
-/**
- * Gestisce il cambio password dell'utente autenticato: verifica la password
- * attuale, controlla la corrispondenza tra la nuova password e la conferma,
- * quindi aggiorna il record tramite userObj::changePassword.
- * Richiede una sessione attiva; in caso contrario reindirizza alla home.
- *
- * @note Interagisce con la tabella MariaDB: `utenti` (tramite userObj::changePassword).
- */
+// Gestisce il cambio password per l'utente autenticato.
+// Verifica password attuale e aggiorna il record tramite userObj.
 require_once(__DIR__ . '/../config/config.php');
 require_once(__DIR__ . '/../config/connection.php');
 require_once(__DIR__ . '/../includes/user_obj.php');
@@ -28,10 +22,13 @@ if (isset($_POST['cambia_password'])) {
 
     if (!$password_attuale || !$nuova_password || !$conferma) {
         $errore = "Compila tutti i campi";
+
     } elseif ($nuova_password !== $conferma) {
         $errore = "Le nuove password non coincidono";
+
     } elseif ($password_attuale === $nuova_password) {
         $errore = "La nuova password deve essere diversa dalla attuale";
+        
     } else {
         try {
             $user = new userObj($conn, $username);

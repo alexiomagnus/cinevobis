@@ -1,11 +1,6 @@
 <?php
-/**
- * Pagina di esplorazione per genere. Riceve l'ID e il nome del genere tramite
- * i parametri GET (?id=...&name=...), interroga MongoDB per trovare tutti i film
- * che contengono quel genere nell'array 'genres', e li mostra in una griglia di card.
- *
- * @note Interagisce con la collezione MongoDB: `films` (query su campo `genres.id`).
- */
+// Pagina di esplorazione per genere. Riceve id e nome via GET, trova i film
+// con quel genere in MongoDB e li mostra in una griglia di card.
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');
@@ -66,33 +61,23 @@ if (!empty($id_genere)) {
             <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 row-cols-xl-6 g-3">
                 
                 <?php 
-                /** * Iterazione della collezione di film.
-                 * Ogni elemento $film è un array associativo contenente i dati del database.
-                 */
+                // Iterazione della lista di film recuperata da MongoDB.
                 foreach ($cursor as $film): 
                     
-                    // 1. Recupero dell'ID (fondamentale per link o operazioni specifiche)
+                    // Recupero dell'ID per generare il link alla pagina del film.
                     $id = $film['id'] ?? '';
 
-                    // 2. Gestione del Titolo con valore di fallback (default) se mancante
+                    // Titolo con valore di fallback se il campo non è presente.
                     $titolo = $film['title'] ?? 'Titolo non disponibile';
 
-                    /**
-                     * 3. Costruzione dell'URL del Poster
-                     * Se il percorso esiste, concateniamo l'URL base di TMDB.
-                     * Altrimenti, usiamo un'immagine segnaposto (placeholder) per non rompere il layout.
-                     */
+                    // Costruzione dell'URL del poster o fallback placeholder.
                     $baseUrl = "https://image.tmdb.org/t/p/w500";
                     $placeholderUrl = "https://via.placeholder.com/500x750?text=Immagine+non+disponibile";
 
                     $posterPath = $film['poster_path'] ?? '';
                     $poster = !empty($posterPath) ? $baseUrl . $posterPath : $placeholderUrl;
 
-                    /**
-                     * 4. Estrazione dell'Anno
-                     * La data arriva solitamente in formato 'YYYY-MM-DD'.
-                     * Usiamo substr per prendere solo i primi 4 caratteri (l'anno).
-                     */
+                    // Estraggo l'anno dalla data di rilascio nel formato YYYY-MM-DD.
                     $dataRilascio = $film['release_date'] ?? '';
                     $anno = !empty($dataRilascio) ? substr($dataRilascio, 0, 4) : 'N.D.';
                 ?>

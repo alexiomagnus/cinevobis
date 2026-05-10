@@ -1,12 +1,6 @@
 <?php
-/**
- * Homepage di Cinevobis. Recupera da MongoDB due liste di film:
- * - "Film in evidenza": gli ultimi 12 film aggiunti al catalogo (ordinati per data).
- * - "Migliori film": i 6 film con il voto medio più alto, da cui viene estratto
- *   il "Film della settimana" usando il numero della settimana ISO come seed deterministico.
- *
- * @note Interagisce con la collezione MongoDB: `films` (database: `cinevobis`).
- */
+// Home page Cinevobis: mostra film in evidenza e migliori film.
+// Recupera i dati da MongoDB dalla collezione `films` del database `cinevobis`.
 require_once(__DIR__ . '/config/config.php');
 require_once(__DIR__ . '/config/connection.php');
 require_once(__DIR__ . '/includes/header_logic.php');
@@ -16,13 +10,12 @@ use MongoDB\Client;
 
 $nome = $_SESSION['nome'] ?? '';
 
-
-// DIchiarazione variabili
+// Prepara gli array di dati che verranno popolati dal database.
 $collection = [];
 $cursor = [];
 
 try {
-    // Connessione a MongoDB
+    // Connessione a MongoDB locale e selezione della collezione film.
     $mongoClient = new Client("mongodb://localhost:27017");
     $db = $mongoClient->selectDatabase('cinevobis');
     $collection = $db->selectCollection('films');
@@ -31,8 +24,7 @@ try {
     error_log("Errore MongoDB: " . $e->getMessage());
 }
 
-
-// I Film in evidenza
+// Film in evidenza: ultimi 12 film aggiunti.
 $recommendedFilms = [];
 
 try {
@@ -44,6 +36,7 @@ try {
 
     $recommendedFilms = iterator_to_array($cursor);
 
+    // Prende i migliori 6 film ordinati per voto medio.
     $cursor = $collection->find([], [
         'limit' => 6,
         'sort' => ['vote_average' => -1],
@@ -54,17 +47,16 @@ try {
     error_log("Errore: " . $e->getMessage());
 }
 
-
-// I migliori Film
+// Mappa i risultati dei migliori film e sceglie il film della settimana.
 $topFilms = [];
 $film = [];
 
 try {
     $topFilms = iterator_to_array($cursor);
     
-    // Film della settimana: cambia ogni lunedì usando il numero della settimana come seed
-    $weekSeed = (int)date('oW');  // anno ISO + numero settimana
-    $index = $weekSeed % count($topFilms);
+    // Seed deterministico basato sul numero ISO della settimana.
+    $weekSeed = (int)date('oW');
+    $index = !empty($topFilms) ? $weekSeed % count($topFilms) : 0;
     $film = $topFilms[$index] ?? null;
 
 } catch (Exception $e) {

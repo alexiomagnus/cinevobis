@@ -1,12 +1,5 @@
 <?php
-/**
- * Gestione notifiche (area admin). Mostra tutte le notifiche inviate dagli utenti
- * tramite la pagina di contatto, divise in "non lette" e "lette". Permette di
- * segnare una notifica come letta (POST con id_notifica) e di eliminare in blocco
- * tutte le notifiche già lette (POST con campo delete).
- *
- * @note Interagisce con le tabelle MariaDB: `notifiche`, `utenti` (LEFT JOIN).
- */
+// Pagina admin per gestire le notifiche inviate dagli utenti.
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');
@@ -18,6 +11,25 @@ $id_profilo = $_SESSION['id_profilo'] ?? 0;
 if (!$username || $id_profilo != 1) {
     header("Location: /index.php");
     exit();
+}
+
+
+// Recupero notifiche
+$notifiche = "";
+
+try {
+    $sql = "SELECT * 
+            FROM notifiche n
+            LEFT JOIN utenti u ON n.id_utente = u.id_utente
+            ORDER BY n.data_invio DESC";
+             
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+
+    $notifiche = $stmt->fetchAll();
+
+} catch (PDOException $e) {
+    error_log("Errore: " . $e->getMessage());
 }
 
 
@@ -38,24 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 
-$notifiche = "";
-
-try {
-    $sql = "SELECT * 
-            FROM notifiche n
-            LEFT JOIN utenti u ON n.id_utente = u.id_utente
-            ORDER BY n.data_invio DESC";
-             
-    $stmt = $conn->prepare($sql);
-    $stmt->execute();
-
-    $notifiche = $stmt->fetchAll();
-
-} catch (PDOException $e) {
-    error_log("Errore: " . $e->getMessage());
-}
-
-
+// Eliminare notifiche lette
 if (isset($_POST['delete'])) {
     try {
         $sql = "DELETE FROM notifiche WHERE letta = 1";

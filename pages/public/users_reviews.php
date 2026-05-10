@@ -1,11 +1,5 @@
 <?php
-/**
- * Pagina pubblica che mostra le recensioni scritte dagli utenti per un film specifico.
- * Riceve il TMDB ID del film tramite GET (?tmdb_id=...) e recupera commento, voto
- * e dati anagrafici di ogni recensore tramite JOIN tra le tabelle recensioni e utenti.
- *
- * @note Interagisce con le tabelle MariaDB: `recensioni`, `utenti` (JOIN).
- */
+// Mostra le recensioni degli utenti per un film specifico.
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');

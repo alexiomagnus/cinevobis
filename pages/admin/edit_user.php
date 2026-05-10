@@ -1,21 +1,16 @@
 <?php
-/**
- * Pagina di modifica utente (area admin). Riceve lo username tramite GET,
- * carica i dati correnti dell'utente e permette all'admin di aggiornare
- * nome, cognome, email e stato attivo tramite userObj::update, oppure di
- * eliminare definitivamente l'account tramite userObj::delete.
- *
- * @note Interagisce con la tabella MariaDB: `utenti` (tramite userObj::update e userObj::delete).
- */
+// Pagina admin per modificare o eliminare un utente esistente.
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');
 
-$username = $_GET['username'] ?? '';
+// Controllo autenticazione
+$username   = $_SESSION['username']   ?? '';
+$id_profilo = $_SESSION['id_profilo'] ?? 0;
 
-if (!$username) {
-    header("Location: admin_area.php");
+if (!$username || $id_profilo != 1) {
+    header("Location: /index.php");
     exit();
 }
 

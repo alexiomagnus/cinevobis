@@ -1,8 +1,5 @@
 <?php
-/**
- * Rappresenta un film e si occupa di normalizzare i dati grezzi provenienti
- * dall'API TMDB o da MongoDB in un formato strutturato e uniforme.
- */
+// Gestisce la normalizzazione dei dati di un film provenienti da TMDB o MongoDB.
 class movieObj
 {
     private string $titolo;
@@ -18,13 +15,8 @@ class movieObj
     private string $paese;
     private array $registi;
 
-    
-    /**
-     * Popola le proprietà del film a partire da un array grezzo (TMDB o MongoDB).
-     * Applica valori di fallback per i campi mancanti e limita il cast ai primi 12 attori.
-     *
-     * @param array $data Array associativo con i dati del film (struttura TMDB).
-     */
+    // Costruttore della classe: estrae e normalizza i dettagli essenziali del film 
+    // (titolo, trama, cast, ecc.) a partire dall'array di dati grezzi ricevuto in input.
     public function __construct(array $data)
     {
         $this->titolo = $data['title'] ?? 'Titolo non disponibile';
@@ -42,18 +34,13 @@ class movieObj
         $this->generi = $data['genres'] ?? [];
         $this->paese = $data['production_countries'][0]['name'] ?? 'Nessun paese';
         
+        // Limita il cast ai primi 12 attori per evitare array troppo pesanti
         $this->cast = array_slice($data['credits']['cast'] ?? [], 0, 12);
         $this->registi = $this->searchDirectors($data);
     }
 
-
-    /**
-     * Filtra il crew del film per estrarre solo i membri con job === 'Director'.
-     * Reindizza l'array risultante per rimuovere i gap numerici lasciati da array_filter.
-     *
-     * @param array $data Array grezzo del film contenente la chiave 'credits.crew'.
-     * @return array Array dei registi con i loro dati TMDB.
-     */
+    // Funzione privata di supporto: analizza i dati della troupe (crew) 
+    // e filtra l'array per restituire esclusivamente i membri col ruolo di regista.
     private function searchDirectors(array $data): array
     {
         $crew = $data['credits']['crew'] ?? [];
@@ -65,14 +52,8 @@ class movieObj
         return array_values($directors);
     }
 
-
-    /**
-     * Converte un array di risultati di ricerca TMDB in un formato semplificato
-     * adatto alla visualizzazione nelle liste (id, titolo, anno, URL poster thumbnail).
-     *
-     * @param array $movies Array di film nel formato restituito dall'endpoint /search/movie di TMDB.
-     * @return array Array semplificato con id, titolo, anno e URL poster (w92).
-     */
+    // Metodo statico: processa una lista di risultati grezzi (es. risultati di ricerca TMDB)
+    // e restituisce un array semplificato contenente solo ID, titolo, anno e URL della locandina.
     public static function search(array $movies): array
     {
         $moviesList = [];
@@ -87,13 +68,8 @@ class movieObj
         return $moviesList;
     }
 
-
-    /**
-     * Serializza tutte le proprietà del film in un array associativo.
-     * Utile per passare i dati alle view senza esporre l'oggetto direttamente.
-     *
-     * @return array Array associativo con tutti i campi del film (titolo, trama, cast, ecc.).
-     */
+    // Restituisce tutte le proprietà dell'oggetto film formattate in un array associativo, 
+    // ideale per il salvataggio su database documentali (come MongoDB) o per risposte JSON.
     public function toArray(): array
     {
         return [
@@ -112,3 +88,4 @@ class movieObj
         ];
     }
 }
+?>

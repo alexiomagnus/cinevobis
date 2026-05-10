@@ -1,12 +1,5 @@
 <?php
-/**
- * Pagina di gestione sessioni (area admin). Mostra le ultime N sessioni di
- * accesso al sito con username, data di login e data di logout. Il numero
- * di righe da visualizzare è configurabile tramite il parametro GET ?righe=N
- * (default: 15). Utilizza userObj::readAccess per la query.
- *
- * @note Interagisce con le tabelle MariaDB: `sessioni`, `utenti` (tramite userObj::readAccess).
- */
+// Pagina admin che mostra le ultime sessioni di accesso al sito.
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');

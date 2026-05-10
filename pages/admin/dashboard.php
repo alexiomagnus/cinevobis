@@ -1,13 +1,6 @@
 <?php
-/**
- * Dashboard amministrativa (riservata al profilo admin, id_profilo = 1).
- * Raccoglie e mostra quattro contatori statistici: numero di film nel catalogo
- * MongoDB, numero di utenti registrati, numero totale di sessioni e numero di
- * notifiche non lette. Fornisce link rapidi alle sezioni di gestione.
- *
- * @note Interagisce con la collezione MongoDB: `films` (countDocuments).
- * @note Interagisce con le tabelle MariaDB: `utenti`, `sessioni`, `notifiche`.
- */
+// Dashboard admin che mostra le statistiche del sito:
+// film in MongoDB, utenti, sessioni e notifiche non lette.
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');

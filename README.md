@@ -1,6 +1,6 @@
-# CineVobis
+# Cinevobis
 
-**CineVobis** è una piattaforma web dedicata alla gestione e alla scoperta di contenuti cinematografici. Il sistema permette agli utenti di gestire il proprio profilo, creare liste di film e scrivere recensioni, offrendo al contempo strumenti amministrativi avanzati per la gestione del catalogo.
+**Cinevobis** è una piattaforma web dedicata alla gestione e alla scoperta di contenuti cinematografici. Il sistema permette agli utenti di gestire il proprio profilo, creare liste di film e scrivere recensioni, offrendo al contempo strumenti amministrativi avanzati per la gestione del catalogo.
 
 ## Caratteristiche Principali
 
@@ -30,7 +30,7 @@ Apri il terminale e clona il progetto:
 
 ```bash
 git clone https://github.com/alexiomagnus/cinevobis.git
-cd CineVobis
+cd cinevobis
 ```
 
 ### 2. Configurazione dei Database
@@ -73,14 +73,14 @@ DB_NAME=cinevobis
 DB_USER=tuo_utente
 DB_PASS=tua_password
 
+Questi valori verranno caricati da `config/connection.php` per gestire le connessioni al sistema
+
 (Se vuoi utilizzare l'utente root metti a DB_USER=root e a DB_PASS=root)
 
 # Configurazione MongoDB
 MONGO_URI=mongodb://localhost:27017
 MONGO_DB=cinevobis
 ```
-
-Questi valori verranno caricati da `config/connection.php` per gestire le connessioni al sistema.
 
 ### 5. Avvio del Progetto
 
@@ -100,4 +100,4 @@ Punta il tuo browser all'indirizzo: `http://localhost:8000`.
 *   `/includes`: Classi oggetto (User, Movie) e componenti comuni della UI.
 *   `/pages`: Interfacce divise per tipologia di utente (admin, user, public).
 
-Arrivederci.
+Spero sia stato chiaro, buon divertimento.

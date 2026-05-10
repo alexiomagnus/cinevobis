@@ -1,4 +1,5 @@
 <?php
+// Pagina termini di servizio
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');

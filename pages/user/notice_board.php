@@ -1,15 +1,5 @@
 <?php
-/**
- * Pagina bacheca globale che mostra le ultime 20 recensioni inserite nel sistema.
- * Recupera i dati testuali (voto, commento, autore) da MariaDB e i dettagli 
- * tecnici del film (titolo, locandina, ecc.) da MongoDB.
- * * Il recupero da MongoDB avviene tramite una query batch ($in) su TMDB ID,
- * con successivo riordinamento manuale per preservare la cronologia (data_aggiunto).
- *
- * @note Interagisce con:
- * - MariaDB: tabelle `recensioni` e `utenti` (per i dati sociali).
- * - MongoDB: collezione `films` (per i metadati dei media).
- */
+// Bacheca globale: mostra le ultime recensioni con i dettagli dei film.
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/functions.php');
 require_once(__DIR__ . '/../../config/connection.php');

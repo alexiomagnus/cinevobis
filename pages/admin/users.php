@@ -1,12 +1,5 @@
 <?php
-/**
- * Pagina di gestione utenti (area admin). Recupera e mostra in tabella
- * tutti gli utenti registrati con username, nome, cognome, email, ruolo
- * e stato attivo/inattivo. Ogni riga include un link alla pagina di modifica
- * individuale (edit_user.php). Riservata agli utenti con id_profilo = 1.
- *
- * @note Interagisce con le tabelle MariaDB: `utenti`, `profili` (tramite userObj::readAll).
- */
+// Pagina admin per la lista degli utenti registrati.
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');
