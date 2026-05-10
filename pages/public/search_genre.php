@@ -66,14 +66,35 @@ if (!empty($id_genere)) {
             <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 row-cols-xl-6 g-3">
                 
                 <?php 
-                /** @var array $film */
-                foreach ($cursor as $film):
+                /** * Iterazione della collezione di film.
+                 * Ogni elemento $film è un array associativo contenente i dati del database.
+                 */
+                foreach ($cursor as $film): 
+                    
+                    // 1. Recupero dell'ID (fondamentale per link o operazioni specifiche)
                     $id = $film['id'] ?? '';
+
+                    // 2. Gestione del Titolo con valore di fallback (default) se mancante
                     $titolo = $film['title'] ?? 'Titolo non disponibile';
-                    $poster = !empty($film['poster_path']) 
-                        ? "https://image.tmdb.org/t/p/w500" . $film['poster_path'] 
-                        : "https://via.placeholder.com/500x750?text=No+Poster";
-                    $anno = !empty($film['release_date']) ? substr($film['release_date'], 0, 4) : '';
+
+                    /**
+                     * 3. Costruzione dell'URL del Poster
+                     * Se il percorso esiste, concateniamo l'URL base di TMDB.
+                     * Altrimenti, usiamo un'immagine segnaposto (placeholder) per non rompere il layout.
+                     */
+                    $baseUrl = "https://image.tmdb.org/t/p/w500";
+                    $placeholderUrl = "https://via.placeholder.com/500x750?text=Immagine+non+disponibile";
+
+                    $posterPath = $film['poster_path'] ?? '';
+                    $poster = !empty($posterPath) ? $baseUrl . $posterPath : $placeholderUrl;
+
+                    /**
+                     * 4. Estrazione dell'Anno
+                     * La data arriva solitamente in formato 'YYYY-MM-DD'.
+                     * Usiamo substr per prendere solo i primi 4 caratteri (l'anno).
+                     */
+                    $dataRilascio = $film['release_date'] ?? '';
+                    $anno = !empty($dataRilascio) ? substr($dataRilascio, 0, 4) : 'N.D.';
                 ?>
 
                 <div class="col">

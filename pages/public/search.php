@@ -6,6 +6,7 @@
  * movieObj::search() e visualizzati come lista di card cliccabili.
  */
 require_once(__DIR__ . '/../../config/config.php');
+require_once(__DIR__ . '/../../config/functions.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');
 require_once(__DIR__ . '/../../includes/movie_obj.php');
@@ -43,17 +44,7 @@ if ($searched !== '') {
 
     $n = count($results);
 
-    // Ordinare per popolarità
-    for ($i = 0; $i < $n - 1; $i++) {
-        for ($j = $i + 1; $j < $n; $j++) {
-            if ($results[$i]['popularity'] < $results[$j]['popularity']) {
-                // scambio
-                $temp = $results[$i];
-                $results[$i] = $results[$j];
-                $results[$j] = $temp;
-            }
-        }
-    }
+    $results = order_of_popularity($n, $results);
 
     if (empty($results)) 
         $errore = "Nessun risultato trovato per: " . htmlspecialchars($searched);

@@ -520,31 +520,47 @@ try {
                         <div>
                             <h4 class="fw-bold mb-4" style="color: var(--text);">Cast Principale</h4>
                             <div class="row g-3">
-                                <?php foreach ($cast as $actor):
-                                    $profile = $actor['profile_path']
-                                        ? "https://image.tmdb.org/t/p/w185" . $actor['profile_path']
-                                        : "https://ui-avatars.com/api/?name=" . urlencode($actor['name']) . "&background=f1f5f9&color=64748b";
+                                <?php 
+                                foreach ($cast as $actor):
+                                    // 1. Estrazione dati con valori di default
+                                    $nome = $actor['name'] ?? 'Attore Sconosciuto';
+                                    $ruolo = $actor['character'] ?? 'Personaggio non specificato';
+                                    $idTMDB = $actor['id'] ?? '';
+                                    
+                                    // 2. Logica per l'immagine del profilo
+                                    $path = $actor['profile_path'] ?? null;
+                                    if ($path) {
+                                        $fotoUrl = "https://image.tmdb.org/t/p/w185" . $path;
+                                    } else {
+                                        $fotoUrl = "https://ui-avatars.com/api/?name=" . urlencode($nome) . "&background=f1f5f9&color=64748b";
+                                    }
                                 ?>
-                                    <div class="col-12 col-sm-6 col-lg-4">
-                                        <a href="https://www.themoviedb.org/person/<?= $actor['id'] ?>" class="text-decoration-none d-block">
-                                            <div class="d-flex align-items-center p-2 rounded-3 transition-hover" 
-                                                 style="background-color: var(--bg-surface); border: 1px solid var(--border);">
-                                                <img src="<?= $profile ?>"
-                                                     class="cast-avatar rounded-circle border border-2 border-white shadow-sm me-3"
-                                                     loading="lazy"
-                                                     alt="<?= htmlspecialchars($actor['name']) ?>">
-                                                <div class="overflow-hidden">
-                                                    <p class="mb-0 fw-bold text-truncate" style="font-size: 0.95rem; color: var(--text);">
-                                                        <?= htmlspecialchars($actor['name']) ?>
-                                                    </p>
-                                                    <p class="mb-0 text-truncate" style="font-size: 0.85rem; color: var(--text-muted);">
-                                                        <?= htmlspecialchars($actor['character']) ?>
-                                                    </p>
-                                                </div>
+
+                                <div class="col-12 col-sm-6 col-lg-4">
+                                    <a href="https://www.themoviedb.org/person/<?= $idTMDB ?>" class="text-decoration-none d-block" target="_blank">
+                                        <div class="d-flex align-items-center p-2 rounded-3 transition-hover" 
+                                            style="background-color: var(--bg-surface); border: 1px solid var(--border);">
+                                            
+                                            <img src="<?= $fotoUrl ?>"
+                                                class="cast-avatar rounded-circle border border-2 border-white shadow-sm me-3"
+                                                style="width: 50px; height: 50px; object-fit: cover;"
+                                                loading="lazy"
+                                                alt="<?= htmlspecialchars($nome) ?>">
+
+                                            <div class="overflow-hidden">
+                                                <p class="mb-0 fw-bold text-truncate" style="font-size: 0.95rem; color: var(--text);">
+                                                    <?= htmlspecialchars($nome) ?>
+                                                </p>
+                                                <p class="mb-0 text-truncate" style="font-size: 0.85rem; color: var(--text-muted);">
+                                                    <?= htmlspecialchars($ruolo) ?>
+                                                </p>
                                             </div>
-                                        </a>
-                                    </div>
-                                <?php endforeach; ?>
+
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <?php endforeach; // Fine del ciclo ?>
                             </div>
                         </div>
 

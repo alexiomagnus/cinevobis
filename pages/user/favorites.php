@@ -78,7 +78,7 @@ if (!empty($ids)) {
             ]
         );
 
-        $films = ordinamentoFilm($cursor, $ids);
+        $films = movie_sorting($cursor, $ids);
 
     } catch (Exception $e) {
         error_log("Errore in MongoDB: " . $e->getMessage());

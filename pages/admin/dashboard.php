@@ -91,33 +91,19 @@ try {
     <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="/assets/css/style.css">
     <style>
-        .card-link {
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            border: 1px solid var(--border) !important;
-            border-radius: var(--radius-md);
+        /* 1. Gestione Hover (Bootstrap non ha utility per transform) */
+        .hover-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
         }
-        .card-link:hover {
+        .hover-card:hover {
             transform: translateY(-3px);
-            box-shadow: var(--shadow-md) !important;
-            border-color: var(--accent) !important;
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important; /* Equivale a shadow-md */
+            border-color: var(--accent, #0d6efd) !important;
         }
-        .stat-card {
-            border-left: 3px solid var(--border);
-            border-radius: 8px;
-        }
-        .stat-card .stat-label {
-            font-size: 0.7rem;
-            letter-spacing: 0.5px;
-        }
-        /* Card gestione più grandi */
-        .action-card {
-            padding: 2.5rem 1.5rem !important;
-            min-height: 220px;
-        }
-        .action-card .card-icon {
-            font-size: 3.5rem;
-            line-height: 1;
-        }
+        
+        /* 2. Micro-rifiniture non presenti in Bootstrap */
+        .min-h-280 { min-height: 280px; }
+        .letter-spacing-sm { letter-spacing: 0.5px; }
     </style>
 </head>
 <body class="d-flex flex-column min-vh-100 bg-light">
@@ -133,64 +119,62 @@ try {
             </div>
         </div>
 
-        <!-- Statistiche -->
         <div class="row g-3 mb-5">
             <div class="col-6 col-md-3">
-                <div class="card border-0 shadow-sm p-3 stat-card bg-white">
-                    <div class="text-muted stat-label fw-bold text-uppercase mb-1">Film</div>
-                    <div class="fs-4 fw-bold text-dark"><?= number_format($totaleFilm, 0, ',', '.') ?></div>
+                <div class="card border-0 shadow-sm bg-white border-start border-4 h-100 d-flex flex-column justify-content-center p-3">
+                    <div class="text-muted fw-bold text-uppercase mb-1 letter-spacing-sm" style="font-size: 0.75rem;">Film</div>
+                    <div class="fw-bold text-dark fs-3"><?= number_format($totaleFilm, 0, ',', '.') ?></div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="card border-0 shadow-sm p-3 stat-card bg-white">
-                    <div class="text-muted stat-label fw-bold text-uppercase mb-1">Utenti</div>
-                    <div class="fs-4 fw-bold text-dark"><?= number_format($totaleUtenti, 0, ',', '.') ?></div>
+                <div class="card border-0 shadow-sm bg-white border-start border-4 h-100 d-flex flex-column justify-content-center p-3">
+                    <div class="text-muted fw-bold text-uppercase mb-1 letter-spacing-sm" style="font-size: 0.75rem;">Utenti</div>
+                    <div class="fw-bold text-dark fs-3"><?= number_format($totaleUtenti, 0, ',', '.') ?></div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="card border-0 shadow-sm p-3 stat-card bg-white">
-                    <div class="text-muted stat-label fw-bold text-uppercase mb-1">Sessioni</div>
-                    <div class="fs-4 fw-bold text-dark"><?= number_format($totaleSessioni, 0, ',', '.') ?></div>
+                <div class="card border-0 shadow-sm bg-white border-start border-4 h-100 d-flex flex-column justify-content-center p-3">
+                    <div class="text-muted fw-bold text-uppercase mb-1 letter-spacing-sm" style="font-size: 0.75rem;">Sessioni</div>
+                    <div class="fw-bold text-dark fs-3"><?= number_format($totaleSessioni, 0, ',', '.') ?></div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="card border-0 shadow-sm p-3 stat-card bg-white">
-                    <div class="text-muted stat-label fw-bold text-uppercase mb-1">Messaggi</div>
-                    <div class="fs-4 fw-bold text-dark"><?= number_format($totaleNotifiche, 0, ',', '.') ?></div>
+                <div class="card border-0 shadow-sm bg-white border-start border-4 h-100 d-flex flex-column justify-content-center p-3">
+                    <div class="text-muted fw-bold text-uppercase mb-1 letter-spacing-sm" style="font-size: 0.75rem;">Messaggi</div>
+                    <div class="fw-bold text-dark fs-3"><?= number_format($totaleNotifiche, 0, ',', '.') ?></div>
                 </div>
             </div>
         </div>
 
         <h2 class="h6 fw-bold text-uppercase text-muted mb-4">Gestione Sistema</h2>
 
-        <!-- Card azioni -->
         <div class="row g-4">
             <div class="col-12 col-md-6 col-lg-3">
-                <a href="films.php" class="card card-link action-card h-100 text-decoration-none bg-white text-center d-flex flex-column align-items-center justify-content-center">
-                    <div class="card-icon text-warning mb-3"><i class="bi bi-collection-play-fill"></i></div>
-                    <h3 class="h5 fw-bold text-dark mb-2">Archivio Film</h3>
-                    <p class="text-muted small mb-0">Gestisci il catalogo multimediale e i film</p>
+                <a href="films.php" class="card hover-card min-h-280 text-decoration-none bg-white text-center d-flex flex-column align-items-center justify-content-center py-5 px-4 border rounded">
+                    <div class="text-warning mb-3 display-3 lh-1"><i class="bi bi-collection-play-fill"></i></div>
+                    <h3 class="fs-4 fw-bold text-dark mb-2">Archivio Film</h3>
+                    <p class="text-muted fs-6 mb-0">Gestisci il catalogo multimediale e i film</p>
                 </a>
             </div>
             <div class="col-12 col-md-6 col-lg-3">
-                <a href="users.php" class="card card-link action-card h-100 text-decoration-none bg-white text-center d-flex flex-column align-items-center justify-content-center">
-                    <div class="card-icon text-success mb-3"><i class="bi bi-person-lines-fill"></i></div>
-                    <h3 class="h5 fw-bold text-dark mb-2">Utenti</h3>
-                    <p class="text-muted small mb-0">Amministra gli account e i ruoli utenti</p>
+                <a href="users.php" class="card hover-card min-h-280 text-decoration-none bg-white text-center d-flex flex-column align-items-center justify-content-center py-5 px-4 border rounded">
+                    <div class="text-success mb-3 display-3 lh-1"><i class="bi bi-person-lines-fill"></i></div>
+                    <h3 class="fs-4 fw-bold text-dark mb-2">Utenti</h3>
+                    <p class="text-muted fs-6 mb-0">Amministra gli account e i ruoli utenti</p>
                 </a>
             </div>
             <div class="col-12 col-md-6 col-lg-3">
-                <a href="sessions.php" class="card card-link action-card h-100 text-decoration-none bg-white text-center d-flex flex-column align-items-center justify-content-center">
-                    <div class="card-icon text-primary mb-3"><i class="bi bi-shield-lock-fill"></i></div>
-                    <h3 class="h5 fw-bold text-dark mb-2">Log Accessi</h3>
-                    <p class="text-muted small mb-0">Monitora la sicurezza e le sessioni attive</p>
+                <a href="sessions.php" class="card hover-card min-h-280 text-decoration-none bg-white text-center d-flex flex-column align-items-center justify-content-center py-5 px-4 border rounded">
+                    <div class="text-primary mb-3 display-3 lh-1"><i class="bi bi-shield-lock-fill"></i></div>
+                    <h3 class="fs-4 fw-bold text-dark mb-2">Log Accessi</h3>
+                    <p class="text-muted fs-6 mb-0">Monitora la sicurezza e le sessioni attive</p>
                 </a>
             </div>
             <div class="col-12 col-md-6 col-lg-3">
-                <a href="notifications.php" class="card card-link action-card h-100 text-decoration-none bg-white text-center d-flex flex-column align-items-center justify-content-center">
-                    <div class="card-icon text-danger mb-3"><i class="bi bi-chat-left-dots-fill"></i></div>
-                    <h3 class="h5 fw-bold text-dark mb-2">Messaggi</h3>
-                    <p class="text-muted small mb-0">Gestisci le comunicazioni degli utenti</p>
+                <a href="notifications.php" class="card hover-card min-h-280 text-decoration-none bg-white text-center d-flex flex-column align-items-center justify-content-center py-5 px-4 border rounded">
+                    <div class="text-danger mb-3 display-3 lh-1"><i class="bi bi-chat-left-dots-fill"></i></div>
+                    <h3 class="fs-4 fw-bold text-dark mb-2">Messaggi</h3>
+                    <p class="text-muted fs-6 mb-0">Gestisci le comunicazioni degli utenti</p>
                 </a>
             </div>
         </div>

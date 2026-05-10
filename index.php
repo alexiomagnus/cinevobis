@@ -27,7 +27,7 @@ try {
     $db = $mongoClient->selectDatabase('cinevobis');
     $collection = $db->selectCollection('films');
 
-} catch (MongoDBException $e) {
+} catch (Exception $e) {
     error_log("Errore MongoDB: " . $e->getMessage());
 }
 
@@ -57,6 +57,7 @@ try {
 
 // I migliori Film
 $topFilms = [];
+$film = [];
 
 try {
     $topFilms = iterator_to_array($cursor);
@@ -92,7 +93,9 @@ try {
                 <h1 class="fw-bold mb-4">Benvenuto</h1>
             <?php endif; ?>
 
-            <?php if (!empty($topFilms)):
+            <?php 
+            /** @var array $film */
+            if (!empty($topFilms)):
                 $id = $film['id'] ?? '';
                 
                 $titolo = $film['title'] ?? '';
@@ -162,7 +165,9 @@ try {
                 </div>
             <?php else: ?>
                 <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 row-cols-xl-6 g-3">
-                    <?php foreach ($recommendedFilms as $film):
+                    <?php 
+                    /** @var array $film */
+                    foreach ($recommendedFilms as $film):
                         $id     = $film['id'] ?? '';
                         $titolo = $film['title'] ?? 'Titolo non disponibile';
                         $poster = !empty($film['poster_path']) ? "https://image.tmdb.org/t/p/w500" . $film['poster_path'] : "https://via.placeholder.com/500x750?text=No+Poster";
@@ -195,7 +200,9 @@ try {
                 </div>
             <?php else: ?>
                 <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 row-cols-xl-6 g-3">
-                    <?php foreach ($topFilms as $film):
+                    <?php 
+                    /** @var array $film */
+                    foreach ($topFilms as $film):
                         $id     = $film['id'] ?? '';
                         $titolo = $film['title'] ?? 'Titolo non disponibile';
                         $poster = !empty($film['poster_path']) ? "https://image.tmdb.org/t/p/w500" . $film['poster_path'] : "https://via.placeholder.com/500x750?text=No+Poster";
