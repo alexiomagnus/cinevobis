@@ -4,11 +4,16 @@
 -- Host: localhost    Database: cinevobis
 -- ------------------------------------------------------
 -- Server version	11.8.6-MariaDB
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO,MYSQL40' */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*M!100616 SET @OLD_NOTE_VERBOSITY=@@NOTE_VERBOSITY, NOTE_VERBOSITY=0 */;
 
 --
@@ -16,6 +21,8 @@
 --
 
 DROP TABLE IF EXISTS `notifiche`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `notifiche` (
   `id_notifica` int(11) NOT NULL AUTO_INCREMENT,
   `titolo` varchar(255) DEFAULT NULL,
@@ -26,7 +33,8 @@ CREATE TABLE `notifiche` (
   PRIMARY KEY (`id_notifica`),
   KEY `id_utente` (`id_utente`),
   CONSTRAINT `notifiche_ibfk_1` FOREIGN KEY (`id_utente`) REFERENCES `utenti` (`id_utente`)
-) TYPE=InnoDB AUTO_INCREMENT=31;
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `notifiche`
@@ -45,6 +53,8 @@ SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 --
 
 DROP TABLE IF EXISTS `preferiti`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `preferiti` (
   `id_preferito` int(11) NOT NULL AUTO_INCREMENT,
   `tmdb_id` int(11) NOT NULL,
@@ -53,7 +63,8 @@ CREATE TABLE `preferiti` (
   PRIMARY KEY (`id_preferito`),
   KEY `id_utente` (`id_utente`),
   CONSTRAINT `preferiti_ibfk_1` FOREIGN KEY (`id_utente`) REFERENCES `utenti` (`id_utente`)
-) TYPE=InnoDB AUTO_INCREMENT=25;
+) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `preferiti`
@@ -74,7 +85,7 @@ INSERT INTO `preferiti` VALUES
 (14,1226863,4,'2026-05-08 19:26:55'),
 (17,155,1,'2026-05-08 22:12:52'),
 (21,129,10,'2026-05-09 18:55:02'),
-(24,129,1,'2026-05-10 10:02:13');
+(25,129,1,'2026-05-10 10:27:22');
 /*!40000 ALTER TABLE `preferiti` ENABLE KEYS */;
 UNLOCK TABLES;
 COMMIT;
@@ -85,11 +96,14 @@ SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 --
 
 DROP TABLE IF EXISTS `profili`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `profili` (
   `id_profilo` int(11) NOT NULL AUTO_INCREMENT,
   `nome_profilo` varchar(100) NOT NULL,
   PRIMARY KEY (`id_profilo`)
-) TYPE=InnoDB AUTO_INCREMENT=3;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `profili`
@@ -111,6 +125,8 @@ SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 --
 
 DROP TABLE IF EXISTS `recensioni`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `recensioni` (
   `id_recensione` int(11) NOT NULL AUTO_INCREMENT,
   `tmdb_id` int(11) NOT NULL,
@@ -121,7 +137,8 @@ CREATE TABLE `recensioni` (
   PRIMARY KEY (`id_recensione`),
   KEY `id_utente` (`id_utente`),
   CONSTRAINT `recensioni_ibfk_1` FOREIGN KEY (`id_utente`) REFERENCES `utenti` (`id_utente`)
-) TYPE=InnoDB AUTO_INCREMENT=57;
+) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `recensioni`
@@ -168,6 +185,8 @@ SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 --
 
 DROP TABLE IF EXISTS `sessioni`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `sessioni` (
   `id_sessione` varchar(255) NOT NULL,
   `id_utente` int(11) NOT NULL,
@@ -176,7 +195,8 @@ CREATE TABLE `sessioni` (
   PRIMARY KEY (`id_sessione`),
   KEY `id_utente` (`id_utente`),
   CONSTRAINT `sessioni_ibfk_1` FOREIGN KEY (`id_utente`) REFERENCES `utenti` (`id_utente`) ON DELETE CASCADE ON UPDATE CASCADE
-) TYPE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `sessioni`
@@ -279,7 +299,7 @@ INSERT INTO `sessioni` VALUES
 ('9eda922c7ad0804f46256f75bb3b6617',1,'2026-05-07 21:42:59','2026-05-07 21:56:27'),
 ('9f34f3cc99a5de0598d983529fc72f1c',1,'2026-05-06 14:46:42','2026-05-06 14:54:02'),
 ('9f3fa601096c26b4994ecb4a3c8306a8',1,'2026-03-25 18:23:48',NULL),
-('a33a7a8a5ee34c020cfc05f01b258640',1,'2026-05-10 12:02:00',NULL),
+('a33a7a8a5ee34c020cfc05f01b258640',1,'2026-05-10 12:02:00','2026-05-10 12:26:17'),
 ('a477f9ef5225a29f395fe3fc0e596464',1,'2026-03-25 18:20:29','2026-03-25 18:22:05'),
 ('a484942aefe00b2f1b477fea3a39e24c',5,'2026-05-08 21:07:02','2026-05-08 21:19:26'),
 ('a70cd906540d07384d78ba1780eddc54',1,'2026-04-23 19:50:22','2026-04-23 20:23:47'),
@@ -328,6 +348,7 @@ INSERT INTO `sessioni` VALUES
 ('f2c98e62d02ae5874cff68c3aeb49465',1,'2026-03-27 09:35:22','2026-03-27 09:35:28'),
 ('f37460f6c45627f06a209bd7b2d20159',1,'2026-05-05 23:26:36',NULL),
 ('f404018aacf436676f3d15a1ea30da5e',1,'2026-03-30 18:23:39','2026-03-30 18:27:27'),
+('f415446e4ca6cf80551171c5e1574c59',1,'2026-05-10 12:26:24',NULL),
 ('f75e4fb63aae159b3fab4008dab53681',1,'2026-05-05 19:00:56',NULL),
 ('f87c8ae11c66d00f8525479898a96c1d',1,'2026-05-06 18:30:30','2026-05-06 20:12:52'),
 ('fab084cc50d233147e319310495fa48e',1,'2026-05-07 12:27:32',NULL),
@@ -343,6 +364,8 @@ SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 --
 
 DROP TABLE IF EXISTS `utenti`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `utenti` (
   `id_utente` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(100) NOT NULL,
@@ -358,7 +381,8 @@ CREATE TABLE `utenti` (
   UNIQUE KEY `email` (`email`),
   KEY `id_profilo` (`id_profilo`),
   CONSTRAINT `utenti_ibfk_1` FOREIGN KEY (`id_profilo`) REFERENCES `profili` (`id_profilo`) ON UPDATE CASCADE
-) TYPE=InnoDB AUTO_INCREMENT=58;
+) ENGINE=InnoDB AUTO_INCREMENT=58 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `utenti`
@@ -419,6 +443,8 @@ SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 --
 
 DROP TABLE IF EXISTS `watched`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `watched` (
   `id_watched` int(11) NOT NULL AUTO_INCREMENT,
   `tmdb_id` int(11) NOT NULL,
@@ -427,7 +453,8 @@ CREATE TABLE `watched` (
   PRIMARY KEY (`id_watched`),
   KEY `id_utente` (`id_utente`),
   CONSTRAINT `watched_ibfk_1` FOREIGN KEY (`id_utente`) REFERENCES `utenti` (`id_utente`)
-) TYPE=InnoDB AUTO_INCREMENT=45;
+) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `watched`
@@ -475,6 +502,8 @@ SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 --
 
 DROP TABLE IF EXISTS `watchlist`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `watchlist` (
   `id_watchlist` int(11) NOT NULL AUTO_INCREMENT,
   `tmdb_id` int(11) NOT NULL,
@@ -483,7 +512,8 @@ CREATE TABLE `watchlist` (
   PRIMARY KEY (`id_watchlist`),
   KEY `id_utente` (`id_utente`),
   CONSTRAINT `watchlist_ibfk_1` FOREIGN KEY (`id_utente`) REFERENCES `utenti` (`id_utente`)
-) TYPE=InnoDB AUTO_INCREMENT=23;
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `watchlist`
@@ -509,11 +539,18 @@ INSERT INTO `watchlist` VALUES
 UNLOCK TABLES;
 COMMIT;
 SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
+
+--
+-- Dumping routines for database 'cinevobis'
+--
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2026-05-10 12:09:15
+-- Dump completed on 2026-05-10 12:59:17
