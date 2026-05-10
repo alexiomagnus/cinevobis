@@ -72,6 +72,7 @@ DB_HOST=localhost
 DB_NAME=cinevobis
 DB_USER=tuo_utente
 DB_PASS=tua_password
+```
 
 Questi valori verranno caricati da `config/connection.php` per gestire le connessioni al sistema
 
@@ -80,6 +81,18 @@ Questi valori verranno caricati da `config/connection.php` per gestire le connes
 # Configurazione MongoDB
 MONGO_URI=mongodb://localhost:27017
 MONGO_DB=cinevobis
+
+
+# Configurazione TMDB
+Il sistema per funzionare correttamente richiede l'API di TMDB
+
+3.  Crea un account TMDB e richiedi l'API gratuita dal sito ufficiale: https://www.themoviedb.org/
+4.  Aggiungi la tua chiave al file .env
+
+Usa la chiave più lunga offerta da TMDB
+
+```env
+API_KEY=la_tua_chiave_tmdb
 ```
 
 ### 5. Avvio del Progetto
