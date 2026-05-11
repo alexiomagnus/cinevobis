@@ -33,7 +33,7 @@ CREATE TABLE `notifiche` (
   PRIMARY KEY (`id_notifica`),
   KEY `id_utente` (`id_utente`),
   CONSTRAINT `notifiche_ibfk_1` FOREIGN KEY (`id_utente`) REFERENCES `utenti` (`id_utente`)
-) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -43,6 +43,10 @@ CREATE TABLE `notifiche` (
 SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `notifiche` WRITE;
 /*!40000 ALTER TABLE `notifiche` DISABLE KEYS */;
+INSERT INTO `notifiche` VALUES
+(31,'Ottimo servizio','Salve, mi complimento per l\'ottimo servizio offerto, una cosa che aggiungerei è la parte social, sarebbe bello interagire con gli altri utenti, vedere i loro profili, ecc...','2026-05-10 14:03:57',5,0),
+(36,'Password dimenticata','Salve, sono Mario Rossi e ho dimenticato la password per entrare nell\'account, potete cambiarmela, il mio account è: mariorossi@gmail.com','2026-05-10 14:29:27',NULL,0),
+(38,'Richiesta','Mi regalate il DVD del film di Mario Galaxy?','2026-05-11 10:26:08',58,1);
 /*!40000 ALTER TABLE `notifiche` ENABLE KEYS */;
 UNLOCK TABLES;
 COMMIT;
@@ -63,7 +67,7 @@ CREATE TABLE `preferiti` (
   PRIMARY KEY (`id_preferito`),
   KEY `id_utente` (`id_utente`),
   CONSTRAINT `preferiti_ibfk_1` FOREIGN KEY (`id_utente`) REFERENCES `utenti` (`id_utente`)
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -74,7 +78,6 @@ SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `preferiti` WRITE;
 /*!40000 ALTER TABLE `preferiti` DISABLE KEYS */;
 INSERT INTO `preferiti` VALUES
-(2,424,1,'2026-05-06 19:55:02'),
 (3,157336,1,'2026-05-06 19:55:10'),
 (6,207,1,'2026-05-06 19:56:36'),
 (7,149870,1,'2026-05-06 19:56:50'),
@@ -85,7 +88,9 @@ INSERT INTO `preferiti` VALUES
 (14,1226863,4,'2026-05-08 19:26:55'),
 (17,155,1,'2026-05-08 22:12:52'),
 (21,129,10,'2026-05-09 18:55:02'),
-(25,129,1,'2026-05-10 10:27:22');
+(27,129,1,'2026-05-10 15:40:40'),
+(31,1226863,58,'2026-05-11 10:27:34'),
+(32,27205,1,'2026-05-11 13:29:04');
 /*!40000 ALTER TABLE `preferiti` ENABLE KEYS */;
 UNLOCK TABLES;
 COMMIT;
@@ -137,7 +142,7 @@ CREATE TABLE `recensioni` (
   PRIMARY KEY (`id_recensione`),
   KEY `id_utente` (`id_utente`),
   CONSTRAINT `recensioni_ibfk_1` FOREIGN KEY (`id_utente`) REFERENCES `utenti` (`id_utente`)
-) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=61 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -149,7 +154,7 @@ LOCK TABLES `recensioni` WRITE;
 /*!40000 ALTER TABLE `recensioni` DISABLE KEYS */;
 INSERT INTO `recensioni` VALUES
 (15,1325734,4,'2026-05-08 19:25:27','Davvero un grande film',8.0),
-(27,129,1,'2026-05-06 16:13:19','Il miglior film della Studio Ghibli',9.0),
+(27,129,1,'2026-05-11 13:28:26','Il miglior film della Studio Ghibli',10.0),
 (32,1266127,5,'2026-05-08 19:08:12','Film molto bello',8.0),
 (33,936075,5,'2026-05-08 19:09:13','Incredibile',10.0),
 (34,1242898,5,'2026-05-08 19:10:04','Terribile',5.0),
@@ -168,13 +173,16 @@ INSERT INTO `recensioni` VALUES
 (47,950387,4,'2026-05-08 19:27:56','Davvero terribile',4.0),
 (48,77338,1,'2026-05-08 19:29:33','Molto bello',8.5),
 (49,567609,1,'2026-05-08 19:30:04','Carino',7.0),
-(50,424,1,'2026-05-08 19:31:25','Uno dei migliori film sulla seconda guerra mondiale',10.0),
+(50,424,1,'2026-05-11 13:16:57','Uno dei migliori film sulla seconda guerra mondiale',9.5),
 (51,278,1,'2026-05-08 19:33:07','Capolavoro',10.0),
 (52,207,1,'2026-05-08 19:32:10','Alto livello, un ottimo Robin Williams',8.5),
 (53,2277,1,'2026-05-08 19:32:47','Molto commovente',8.0),
 (54,1214931,4,'2026-05-08 21:30:58','Gran bel film',8.0),
 (55,245891,4,'2026-05-08 22:03:08','Semplice ma efficace',7.5),
-(56,129,10,'2026-05-09 18:55:31','Film grandioso',10.0);
+(56,129,10,'2026-05-09 18:55:31','Film grandioso',10.0),
+(58,389,6,'2026-05-10 14:55:03','Bellissimo',10.0),
+(59,1226863,58,'2026-05-11 10:28:26','YOSHIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII!!!!!!!!!!!!!!!',10.0),
+(60,936075,1,'2026-05-11 13:17:34','Gran bel film',8.0);
 /*!40000 ALTER TABLE `recensioni` ENABLE KEYS */;
 UNLOCK TABLES;
 COMMIT;
@@ -209,6 +217,8 @@ INSERT INTO `sessioni` VALUES
 ('012fc1cc2ed0c5c279f2feacf76ee38d',1,'2026-04-23 22:01:01','2026-04-23 22:02:42'),
 ('058f459a4ccc6a6a7321370696b82887',1,'2026-05-08 13:24:26',NULL),
 ('0689b0ec162c1ffee704e4423fb716bd',1,'2026-05-08 19:46:32','2026-05-08 20:04:28'),
+('080363d39361e1f2a404977ecea56da6',57,'2026-05-10 17:16:23',NULL),
+('0bbfbac7610d5bc02f89fa6afc0b99cd',1,'2026-05-10 21:17:28','2026-05-10 21:36:39'),
 ('0e1d91d4d809a99e6b62f3df131269fd',1,'2026-05-06 17:08:15',NULL),
 ('0e529b764545af08032dea96ef0ca06d',1,'2026-05-06 20:37:38','2026-05-06 21:22:35'),
 ('0ee152fe15e7e1781873bd894613572e',1,'2026-04-23 21:55:58','2026-04-23 22:00:51'),
@@ -223,6 +233,7 @@ INSERT INTO `sessioni` VALUES
 ('172de2978f96be95c4d6855dc95b204f',1,'2026-03-27 10:09:41','2026-03-27 10:10:11'),
 ('1926352fe92e82605ffe094800cf4cf9',1,'2026-05-06 14:38:17','2026-05-06 14:39:45'),
 ('1df8f2f087345b5b7825990948542ed0',1,'2026-05-09 19:08:47','2026-05-09 20:10:01'),
+('1eadcd4f4f4afca14e99bbe90aeb649c',1,'2026-05-10 16:26:18','2026-05-10 16:28:06'),
 ('1fd1ca63d4907e9b5a517f02e103031a',1,'2026-05-08 16:34:55','2026-05-08 17:21:28'),
 ('1fd1fc7131a2523f6739c2ec40c2a837',1,'2026-04-23 21:01:52','2026-04-23 21:52:59'),
 ('22b2d1cc3150f931169e4a623ade2534',1,'2026-04-22 16:09:51','2026-04-22 18:23:03'),
@@ -245,17 +256,22 @@ INSERT INTO `sessioni` VALUES
 ('387579df4d1d3e5315096c25b84889f0',1,'2026-04-23 23:00:42','2026-04-24 00:45:12'),
 ('397fb05fc96fc54448a4fdce56f62af6',1,'2026-05-03 19:36:55',NULL),
 ('3b4f11104ed4cfb95d88f45adb7457fb',1,'2026-05-06 14:54:23',NULL),
+('3d425f5cf85a82f6a087473b15fb2ea9',5,'2026-05-10 16:53:26','2026-05-10 16:53:36'),
 ('3fbebb040f548d49cf0670fa61c14cca',1,'2026-05-04 10:34:49',NULL),
 ('410426c9d749dc165bd4aecc351a4c85',14,'2026-04-23 22:17:28','2026-04-23 22:17:45'),
 ('42ba650d3b1cad0bd56d3df12fc031fa',1,'2026-05-09 00:05:51','2026-05-09 00:19:32'),
 ('45c5fdd9888848e3bdb440d69f4f2bc2',6,'2026-03-30 18:28:01','2026-03-30 18:28:06'),
 ('4a250024fcdde8b1b3dd7b3467f6625f',1,'2026-05-08 09:58:26',NULL),
 ('4d5c2bdb6094d1e47e0e870d02d4e74e',1,'2026-04-24 01:04:45','2026-04-24 01:05:31'),
+('4d657cb1c11371c1b558110ef13ad39d',58,'2026-05-11 12:31:42','2026-05-11 12:34:11'),
 ('4f2f89de9bf6fa0fe30fb8965c1f59ef',1,'2026-05-08 18:07:48',NULL),
 ('4f88bd5ab14f8313947555aee89cf201',1,'2026-04-23 22:02:47','2026-04-23 22:17:03'),
 ('510d5962e7a90bc72b538c7031eab01d',1,'2026-05-06 13:30:29','2026-05-06 13:35:34'),
+('5294a836fc96236f3fd559776f405b87',1,'2026-05-11 18:11:05',NULL),
 ('53c8547f1870e95af9513eeb5a10c91c',1,'2026-04-23 22:28:43','2026-04-23 22:39:06'),
+('5409179ca3a1b488cc22c925eca56388',1,'2026-05-10 20:02:12','2026-05-10 20:35:45'),
 ('54c289a73c0da47c8a720a5a8bbe60d7',1,'2026-04-24 22:01:45',NULL),
+('594d335d40f64bbddfa9faf6c5d81644',5,'2026-05-10 16:02:39','2026-05-10 16:04:02'),
 ('59ba8e083b31081f8af7eb04361259fc',4,'2026-05-06 14:54:10','2026-05-06 14:54:17'),
 ('5b7a24177e2e67c3fcf30df28b97e537',1,'2026-05-08 23:59:22','2026-05-09 00:01:50'),
 ('5d90c365f58461b2a83fe643c3228c53',1,'2026-05-10 02:34:44','2026-05-10 02:56:48'),
@@ -268,14 +284,19 @@ INSERT INTO `sessioni` VALUES
 ('683f403372ea1da627cbbd560c07c66d',1,'2026-04-19 18:02:17',NULL),
 ('688d8e831a13e90c0a9bbf8075b964c0',1,'2026-05-06 15:36:46',NULL),
 ('688fd3c4f0444932796d55099b6a6a94',4,'2026-05-06 14:39:51',NULL),
+('6ae158cc8f4a4805d89b96ea2d66014a',44,'2026-05-11 15:41:36',NULL),
 ('6b789cd4a1dadd1dd412bc89b3a2fe82',4,'2026-05-06 20:13:01','2026-05-06 20:37:32'),
 ('6bd87857ac81c9d4b9a9114dc1cbd010',1,'2026-04-22 18:31:48','2026-04-22 18:34:28'),
 ('6ceed541eb8e947df425b2e244a4c5ee',1,'2026-04-23 20:37:06',NULL),
+('6f5e1da2c9828c8455be3ddf5bcba9ef',1,'2026-05-10 18:55:06','2026-05-10 19:29:47'),
 ('73321f607d9f9579c2c02e4cc745dd6b',1,'2026-05-07 22:09:04',NULL),
 ('73b33b898c631f652d41cd2e22e68352',1,'2026-04-17 13:35:17','2026-04-17 13:36:11'),
 ('75b55e05146627e9ccfc9516e2170efd',1,'2026-05-04 20:25:12',NULL),
 ('7cd956bc695e9634d123917d93c2ab24',1,'2026-05-05 16:41:50',NULL),
 ('8126a5e14cd8d129418bebdcb8f49f63',1,'2026-05-10 02:22:54',NULL),
+('81b8cbec532b09ed0e6fc0e77fc7357e',1,'2026-05-10 19:42:57','2026-05-10 19:59:16'),
+('82c11c2369d7ec78fb6b2dc45af40f7d',1,'2026-05-10 14:56:01','2026-05-10 16:02:29'),
+('835b17ef4120004173cccec261e9d38c',1,'2026-05-10 13:03:35',NULL),
 ('84417979d9b5f510657c09543d9acd1e',1,'2026-05-09 23:09:59',NULL),
 ('85b348526adf4bbe32ca46dab7a8a8f2',1,'2026-05-05 08:20:37','2026-05-05 11:50:58'),
 ('864f2f4472c823b57df04e3fbb5d17ab',1,'2026-05-08 20:29:03',NULL),
@@ -295,10 +316,13 @@ INSERT INTO `sessioni` VALUES
 ('95fa6fe845513ffff0e269dc2a85f680',1,'2026-05-09 20:18:25','2026-05-09 20:53:11'),
 ('960b32e69df31b01bf9a1af546693cd8',1,'2026-03-27 10:03:00','2026-03-27 10:04:57'),
 ('96b466621d7b9a064c8306d9f831c3a3',1,'2026-05-06 14:44:22','2026-05-06 14:44:28'),
+('98cbd1e1ffe222b19aef89b45e250838',58,'2026-05-11 12:24:52',NULL),
+('9b691b787656148af945ea8b14fd1822',1,'2026-05-11 18:18:25',NULL),
 ('9eb559deb20277da128e93422f695499',1,'2026-05-07 22:24:35',NULL),
 ('9eda922c7ad0804f46256f75bb3b6617',1,'2026-05-07 21:42:59','2026-05-07 21:56:27'),
 ('9f34f3cc99a5de0598d983529fc72f1c',1,'2026-05-06 14:46:42','2026-05-06 14:54:02'),
 ('9f3fa601096c26b4994ecb4a3c8306a8',1,'2026-03-25 18:23:48',NULL),
+('a06889c61cd23e71b588ceba04beb049',1,'2026-05-10 17:09:53',NULL),
 ('a33a7a8a5ee34c020cfc05f01b258640',1,'2026-05-10 12:02:00','2026-05-10 12:26:17'),
 ('a477f9ef5225a29f395fe3fc0e596464',1,'2026-03-25 18:20:29','2026-03-25 18:22:05'),
 ('a484942aefe00b2f1b477fea3a39e24c',5,'2026-05-08 21:07:02','2026-05-08 21:19:26'),
@@ -314,6 +338,7 @@ INSERT INTO `sessioni` VALUES
 ('b4cdda15075c059ef6e04a17e5ba8a5f',1,'2026-05-08 19:43:54',NULL),
 ('b51a20d28c49e436beef32ab4a06d138',4,'2026-05-09 20:10:17','2026-05-09 20:10:45'),
 ('b5626e2b600011ca8d582e7d88a92eab',1,'2026-04-15 22:09:09','2026-04-15 22:10:08'),
+('b6db0521cf4b0d95cfe94aa6a6b04b8c',58,'2026-05-11 12:27:24','2026-05-11 12:31:26'),
 ('ba045843a6ca718e155b1d2f69987e40',4,'2026-05-06 21:26:28','2026-05-06 21:41:39'),
 ('bc2b8ed1b06b1bac1150640f0ff16316',1,'2026-05-09 22:44:08',NULL),
 ('bc43366d58b172cff0a4336ba922093d',1,'2026-03-25 18:22:14','2026-03-25 18:22:48'),
@@ -326,6 +351,7 @@ INSERT INTO `sessioni` VALUES
 ('c4bda5c83001afbec67582a4c4b22b7d',1,'2026-05-10 02:56:59',NULL),
 ('c563789bdb6efd1d2bbc6a6e89c40859',1,'2026-04-23 22:25:32',NULL),
 ('c56f7c4c4e05c5c2ddc85b9b41eddd78',1,'2026-04-29 12:17:11','2026-04-29 12:57:21'),
+('c6928aad96ee2f8bc8eb308b0196f4fa',1,'2026-05-10 16:28:44',NULL),
 ('c6a4163400c261bf5506a8f288b756eb',1,'2026-05-07 14:46:28',NULL),
 ('c737a4825aae7aaea1fcb195aa8ca369',1,'2026-05-06 21:22:58',NULL),
 ('cdb47ad9e943a8c87d1df62704c1d036',1,'2026-05-06 17:09:06',NULL),
@@ -340,17 +366,21 @@ INSERT INTO `sessioni` VALUES
 ('d7d83f3a5d9ae973bac6db319f7eed4b',1,'2026-04-19 16:37:05',NULL),
 ('d96ab62ed7351c68427a68307b6ed134',4,'2026-05-06 13:35:57','2026-05-06 13:36:50'),
 ('da3f07ec30e02ad0d9b7d19f80b195a4',1,'2026-03-25 19:26:56',NULL),
+('dcf94fa16768caf4304894c3f8db7eb2',6,'2026-05-10 16:53:48','2026-05-10 17:09:44'),
 ('de211e890f489a173ead66ef61cf8b0d',1,'2026-04-29 16:18:55','2026-04-29 16:27:56'),
 ('e2ed179a003b2c732a572b2bd1ec3a93',10,'2026-05-09 20:53:18','2026-05-09 21:04:03'),
+('e663057c31d5da44e5a57c2458e44cc5',1,'2026-05-11 14:12:55','2026-05-11 15:41:28'),
 ('eb96335cb7140a9e3e282af7baf30085',1,'2026-05-05 11:51:07',NULL),
 ('ecf7440fed422a57b68cdc76bf92f5b3',1,'2026-05-09 22:59:37',NULL),
 ('f01ae4f0ca2ee15e70c2b43592739309',1,'2026-05-07 22:13:12',NULL),
 ('f2c98e62d02ae5874cff68c3aeb49465',1,'2026-03-27 09:35:22','2026-03-27 09:35:28'),
+('f35ddc6b1c305a1a3b05d88b84a12641',1,'2026-05-10 16:04:28',NULL),
 ('f37460f6c45627f06a209bd7b2d20159',1,'2026-05-05 23:26:36',NULL),
 ('f404018aacf436676f3d15a1ea30da5e',1,'2026-03-30 18:23:39','2026-03-30 18:27:27'),
-('f415446e4ca6cf80551171c5e1574c59',1,'2026-05-10 12:26:24',NULL),
+('f415446e4ca6cf80551171c5e1574c59',1,'2026-05-10 12:26:24','2026-05-10 14:54:32'),
 ('f75e4fb63aae159b3fab4008dab53681',1,'2026-05-05 19:00:56',NULL),
 ('f87c8ae11c66d00f8525479898a96c1d',1,'2026-05-06 18:30:30','2026-05-06 20:12:52'),
+('f8da2943fb473b4387cc00ec43b85cfb',1,'2026-05-11 12:35:18',NULL),
 ('fab084cc50d233147e319310495fa48e',1,'2026-05-07 12:27:32',NULL),
 ('fc62965b2147501d2a088dfe60bd4b1d',1,'2026-04-19 16:26:02','2026-04-19 16:37:00'),
 ('ff4fdbd86f8cc0bf475632f133eb3efb',1,'2026-05-09 21:04:09','2026-05-09 21:26:55');
@@ -381,7 +411,7 @@ CREATE TABLE `utenti` (
   UNIQUE KEY `email` (`email`),
   KEY `id_profilo` (`id_profilo`),
   CONSTRAINT `utenti_ibfk_1` FOREIGN KEY (`id_profilo`) REFERENCES `profili` (`id_profilo`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=58 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -401,14 +431,12 @@ INSERT INTO `utenti` VALUES
 (9,'carlos.santana','$2y$10$4TMwlTJPm4uzHZyA20UEVeRtjQ7qNW5jeXsrfwJ4AXPg.3iLvHb9e','carlos@mail.es','Carlos','Santana',2,0,'2026-03-25 18:22:28'),
 (10,'kenji.sato','$2y$10$4TMwlTJPm4uzHZyA20UEVeRtjQ7qNW5jeXsrfwJ4AXPg.3iLvHb9e','kenji@mail.jp','Kenji','Sato',2,1,'2026-03-25 18:22:28'),
 (11,'min.ji','$2y$10$4TMwlTJPm4uzHZyA20UEVeRtjQ7qNW5jeXsrfwJ4AXPg.3iLvHb9e','minji@mail.kr','Min','Ji',2,0,'2026-03-25 18:22:28'),
-(12,'chen.wei','$2y$10$4TMwlTJPm4uzHZyA20UEVeRtjQ7qNW5jeXsrfwJ4AXPg.3iLvHb9e','chen@mail.cn','Chen','Wei',2,1,'2026-03-25 18:22:28'),
 (13,'olivia.brown','$2y$10$4TMwlTJPm4uzHZyA20UEVeRtjQ7qNW5jeXsrfwJ4AXPg.3iLvHb9e','olivia@mail.ca','Olivia','Brown',2,1,'2026-03-25 18:22:28'),
 (14,'liam.neeson','$2y$10$4TMwlTJPm4uzHZyA20UEVeRtjQ7qNW5jeXsrfwJ4AXPg.3iLvHb9e','liam.n@mail.ie','Liam','Neeson',2,1,'2026-03-25 18:22:28'),
 (16,'joao.silva','$2y$10$4TMwlTJPm4uzHZyA20UEVeRtjQ7qNW5jeXsrfwJ4AXPg.3iLvHb9e','joao@mail.br','Joao','Silva',2,1,'2026-03-25 18:22:28'),
 (19,'peter.jackson','$2y$10$4TMwlTJPm4uzHZyA20UEVeRtjQ7qNW5jeXsrfwJ4AXPg.3iLvHb9e','peter@mail.nz','Peter','Jackson',2,1,'2026-03-25 18:22:28'),
 (23,'charlize.theron','$2y$10$4TMwlTJPm4uzHZyA20UEVeRtjQ7qNW5jeXsrfwJ4AXPg.3iLvHb9e','charlize@mail.za','Charlize','Theron',2,1,'2026-03-25 18:22:28'),
 (24,'sofia.gomez','$2y$10$4TMwlTJPm4uzHZyA20UEVeRtjQ7qNW5jeXsrfwJ4AXPg.3iLvHb9e','sofia@mail.co','Sofia','Gomez',2,1,'2026-03-25 18:22:28'),
-(25,'andrea.romano','$2y$10$4TMwlTJPm4uzHZyA20UEVeRtjQ7qNW5jeXsrfwJ4AXPg.3iLvHb9e','andrea@mail.it','Andrea','Romano',2,1,'2026-03-25 18:22:28'),
 (26,'marta.ferrari','$2y$10$4TMwlTJPm4uzHZyA20UEVeRtjQ7qNW5jeXsrfwJ4AXPg.3iLvHb9e','marta@mail.it','Marta','Ferrari',2,1,'2026-03-25 18:22:28'),
 (27,'william.wallace','$2y$10$4TMwlTJPm4uzHZyA20UEVeRtjQ7qNW5jeXsrfwJ4AXPg.3iLvHb9e','william@mail.gb','William','Wallace',2,1,'2026-03-25 18:22:28'),
 (28,'elena.kournikova','$2y$10$4TMwlTJPm4uzHZyA20UEVeRtjQ7qNW5jeXsrfwJ4AXPg.3iLvHb9e','elena@mail.ru','Elena','Kournikova',2,1,'2026-03-25 18:22:28'),
@@ -431,8 +459,8 @@ INSERT INTO `utenti` VALUES
 (46,'sam.wilson','$2y$10$4TMwlTJPm4uzHZyA20UEVeRtjQ7qNW5jeXsrfwJ4AXPg.3iLvHb9e','sam@mail.us','Sam','Wilson',2,0,'2026-03-25 18:22:28'),
 (48,'scott.lang','$2y$10$4TMwlTJPm4uzHZyA20UEVeRtjQ7qNW5jeXsrfwJ4AXPg.3iLvHb9e','scott@mail.us','Scott','Lang',2,1,'2026-03-25 18:22:28'),
 (49,'hope.vandyne','$2y$10$4TMwlTJPm4uzHZyA20UEVeRtjQ7qNW5jeXsrfwJ4AXPg.3iLvHb9e','hope@mail.us','Hope','Van Dyne',2,1,'2026-03-25 18:22:28'),
-(50,'carol.danvers','$2y$10$4TMwlTJPm4uzHZyA20UEVeRtjQ7qNW5jeXsrfwJ4AXPg.3iLvHb9e','carol@mail.us','Carol','Danvers',2,0,'2026-03-25 18:22:28'),
-(57,'mariorossi','$2y$12$z.9xE8MeNPKGbgg.bZwTtuO3eEI03.GgBLNl.e0LuWIVam1zqMFki','raffaeleboffa92@gmail.com','Raffaele','Boffa',2,1,'2026-05-07 13:04:33');
+(57,'mario.rossi','$2y$10$4TMwlTJPm4uzHZyA20UEVeRtjQ7qNW5jeXsrfwJ4AXPg.3iLvHb9e','mariorossi@gmail.com','Mario','Rossi',2,1,'2026-05-07 13:04:33'),
+(58,'Dilin','$2y$12$QyM0hGzDJlEGmHlxr3spF.gWX7OeL/nWMBg7ed9LR7gpTehAVE5k6','dylan@mail.com','Dylan','Palladino',2,1,'2026-05-11 12:24:36');
 /*!40000 ALTER TABLE `utenti` ENABLE KEYS */;
 UNLOCK TABLES;
 COMMIT;
@@ -453,7 +481,7 @@ CREATE TABLE `watched` (
   PRIMARY KEY (`id_watched`),
   KEY `id_utente` (`id_utente`),
   CONSTRAINT `watched_ibfk_1` FOREIGN KEY (`id_utente`) REFERENCES `utenti` (`id_utente`)
-) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -464,7 +492,6 @@ SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `watched` WRITE;
 /*!40000 ALTER TABLE `watched` DISABLE KEYS */;
 INSERT INTO `watched` VALUES
-(11,129,1,'2026-05-06 15:39:37'),
 (14,1325734,4,'2026-05-06 19:22:47'),
 (16,687163,57,'2026-05-07 11:05:21'),
 (18,1266127,5,'2026-05-08 19:08:12'),
@@ -491,7 +518,11 @@ INSERT INTO `watched` VALUES
 (39,2277,1,'2026-05-08 19:32:47'),
 (40,1214931,4,'2026-05-08 21:30:58'),
 (41,245891,4,'2026-05-08 22:03:08'),
-(43,129,10,'2026-05-09 18:55:10');
+(43,129,10,'2026-05-09 18:55:10'),
+(48,389,6,'2026-05-10 14:55:03'),
+(50,1226863,58,'2026-05-11 10:27:39'),
+(51,936075,1,'2026-05-11 10:52:33'),
+(52,129,1,'2026-05-11 13:28:26');
 /*!40000 ALTER TABLE `watched` ENABLE KEYS */;
 UNLOCK TABLES;
 COMMIT;
@@ -512,7 +543,7 @@ CREATE TABLE `watchlist` (
   PRIMARY KEY (`id_watchlist`),
   KEY `id_utente` (`id_utente`),
   CONSTRAINT `watchlist_ibfk_1` FOREIGN KEY (`id_utente`) REFERENCES `utenti` (`id_utente`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -526,7 +557,6 @@ INSERT INTO `watchlist` VALUES
 (3,858024,1,'2026-05-05 21:06:24'),
 (4,1214931,1,'2026-05-05 21:06:29'),
 (6,687163,1,'2026-05-05 21:06:36'),
-(8,1226863,1,'2026-05-05 21:06:42'),
 (9,936075,1,'2026-05-05 21:06:45'),
 (10,1084242,1,'2026-05-05 21:06:58'),
 (12,1226863,4,'2026-05-06 12:45:25'),
@@ -534,7 +564,9 @@ INSERT INTO `watchlist` VALUES
 (14,687163,4,'2026-05-06 12:46:17'),
 (16,129,5,'2026-05-08 19:16:35'),
 (17,1084242,5,'2026-05-08 19:16:48'),
-(18,1266127,1,'2026-05-08 19:29:50');
+(18,1266127,1,'2026-05-08 19:29:50'),
+(24,1226863,1,'2026-05-10 13:57:24'),
+(27,1226863,58,'2026-05-11 10:27:37');
 /*!40000 ALTER TABLE `watchlist` ENABLE KEYS */;
 UNLOCK TABLES;
 COMMIT;
@@ -553,4 +585,4 @@ SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2026-05-10 12:59:17
+-- Dump completed on 2026-05-11 20:16:09

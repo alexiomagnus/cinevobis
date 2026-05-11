@@ -1,0 +1,21 @@
+# Nega accesso a file sensibili nella root
+<FilesMatch "^(\.env|\.gitignore|README\.md|repomix-output\.md|package\.json|package-lock\.json|composer\.json|composer\.lock)$">
+    Require all denied
+</FilesMatch>
+
+# Nega accesso a qualsiasi file .log ovunque
+<FilesMatch "\.log$">
+    Require all denied
+</FilesMatch>
+
+# Nega accesso alle cartelle sensibili
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    RewriteRule ^assets(/.*)?$ - [F,L]
+    RewriteRule ^database(/.*)?$ - [F,L]
+    RewriteRule ^vendor(/.*)?$ - [F,L]
+    RewriteRule ^node_modules(/.*)?$ - [F,L]
+    RewriteRule ^config(/.*)?$ - [F,L]
+    RewriteRule ^\.git(/.*)?$ - [F,L]
+</IfModule>

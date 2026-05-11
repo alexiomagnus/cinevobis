@@ -39,7 +39,8 @@ if (isset($_POST['delete_user']) && $username) {
             exit();
         }
     } catch (PDOException $e) {
-        $errore = "Errore durante l'eliminazione: " . $e->getMessage();
+        error_log("Errore durante l'eliminazione: " . $e->getMessage());
+        $errore = "Errore durante l'eliminazione";
     }
 }
 
