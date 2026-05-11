@@ -147,7 +147,7 @@ try {
                                     </button>
                                 </div>
                                 <div class="p-1 bg-danger bg-opacity-10">
-                                    <button type="submit" name="delete_user" class="btn w-100 d-flex justify-content-between align-items-center text-start text-danger border-0" style="padding: 12px;" onclick="return confirm('Stai per eliminare definitivamente il tuo account su Cinevobis. Confermi?');">
+                                    <button type="submit" name="delete_user" class="btn w-100 d-flex justify-content-between align-items-center text-start text-danger border-0" style="padding: 12px;" onclick="return confirm('Stai per eliminare il tuo account su Cinevobis. Confermi?');">
                                         <span class="fw-bold">Elimina account</span>
                                         <i class="bi bi-trash3"></i>
                                     </button>

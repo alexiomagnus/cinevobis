@@ -35,12 +35,13 @@ if (isset($_POST['login'])) {
 
                 header("Location: /index.php");
                 exit();
-            } else { 
-                $errore = "Utente non attivo"; 
+            } else {
+                // Messaggio generico per sicurezza (anche per account disabilitati)
+                $errore = "Credenziali non valide"; 
             }
-            
         } else { 
-            $errore = "Dati non validi"; 
+            // Messaggio generico per sicurezza
+            $errore = "Credenziali non valide"; 
         }
 
     } catch (PDOException $e) { 
