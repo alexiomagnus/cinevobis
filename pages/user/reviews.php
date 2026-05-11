@@ -77,8 +77,7 @@ if (!empty($ids)) {
         $cursor = $collection->find(
             ['id' => ['$in' => $ids]],
             [
-                'sort' => ['vote_average' => -1],
-                'typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array'],
+                'typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']
             ]
         );
 

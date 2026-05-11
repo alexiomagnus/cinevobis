@@ -16,7 +16,6 @@
     RewriteRule ^vendor(/.*)?$ - [F,L]
     RewriteRule ^config(/.*)?$ - [F,L]
     RewriteRule ^\.git(/.*)?$ - [F,L]
-    RewriteRule ^actions(/.*)?$ - [F,L]
     RewriteRule ^includes(/.*)?$ - [F,L]
 
 </IfModule>
