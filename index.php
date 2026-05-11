@@ -72,7 +72,7 @@ $film = search_film_by_id($topFilms, $movie_id);
     <title>Cinevobis</title>
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body class="d-flex flex-column min-vh-100">
 

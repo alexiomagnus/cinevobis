@@ -8,14 +8,15 @@
     Require all denied
 </FilesMatch>
 
-# Nega accesso alle cartelle sensibili
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    RewriteRule ^assets(/.*)?$ - [F,L]
+    # Nega accesso alle cartelle sensibili
     RewriteRule ^database(/.*)?$ - [F,L]
     RewriteRule ^vendor(/.*)?$ - [F,L]
-    RewriteRule ^node_modules(/.*)?$ - [F,L]
     RewriteRule ^config(/.*)?$ - [F,L]
     RewriteRule ^\.git(/.*)?$ - [F,L]
+    RewriteRule ^actions(/.*)?$ - [F,L]
+    RewriteRule ^includes(/.*)?$ - [F,L]
+
 </IfModule>
