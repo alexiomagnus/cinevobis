@@ -111,9 +111,9 @@ class userObj {
         return ['ok' => true];
     }
 
-    // Rimuove definitivamente l'utente dal database.
-    public function delete() {
-        $sql  = "DELETE FROM utenti WHERE username = :username";
+    // disabilita l'utente dal database.
+    public function disable() {
+        $sql  = "UPDATE utenti SET attivo = 0 WHERE username = :username";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([':username' => $this->username]);
     }

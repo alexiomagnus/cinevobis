@@ -37,3 +37,14 @@ function order_of_popularity ($n, $results) {
 
     return $results;
 }
+
+function search_film_by_id($topFilms, $movie_id) {
+    foreach($topFilms as $topFilm) {
+        if((int) $topFilm['id'] === $movie_id) {
+            $film = $topFilm;
+            break;
+        }   
+    }
+
+    return $film;
+}

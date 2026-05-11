@@ -21,11 +21,11 @@ require_once(__DIR__ . '/../../includes/user_obj.php');
         <div class="card shadow-sm border-0 p-4 p-md-5">
             <h1 class="fw-bold mb-4">Informativa sulla Privacy</h1>
             
-            <p class="text-muted">Ultimo aggiornamento: 25 Marzo 2026</p>
+            <p class="text-muted">Ultimo aggiornamento: 11 Maggio 2026</p>
             
             <section class="mb-4 mt-4">
                 <h2 class="h4 fw-bold">1. Raccolta dei dati</h2>
-                <p>Quando ti registri su Cinevobis, raccogliamo informazioni come il tuo nome, cognome, indirizzo email e il paese di residenza, necessari per fornirti il nostro servizio di tracciamento e recensione dei film.</p>
+                <p>Quando ti registri su Cinevobis, raccogliamo informazioni come il tuo nome, cognome e indirizzo email necessari per fornirti il nostro servizio di tracciamento e recensione dei film.</p>
             </section>
 
             <section class="mb-4">
@@ -35,7 +35,7 @@ require_once(__DIR__ . '/../../includes/user_obj.php');
 
             <section class="mb-4">
                 <h2 class="h4 fw-bold">3. Conservazione e Sicurezza</h2>
-                <p>Non vendiamo né condividiamo i tuoi dati personali con terze parti per scopi commerciali o di marketing. Adottiamo misure di sicurezza standard per proteggere le tue informazioni (come le password crittografate) da accessi non autorizzati.</p>
+                <p>Non vendiamo né condividiamo i tuoi dati personali con terze parti per scopi commerciali o di marketing. Adottiamo misure di sicurezza standard per proteggere le tue informazioni da accessi non autorizzati.</p>
             </section>
 
             <section class="mb-4">

@@ -29,10 +29,10 @@ if (isset($_POST['change_password'])) {
     exit();
 }
 
-// Gestione Eliminazione Account (Porta subito alla Home)
+// Gestione Disabilitazione Account (Porta subito alla Home)
 if (isset($_POST['delete_user']) && $username) {
     try {
-        if ($user->delete()) {
+        if ($user->disable()) {
             // Distruggiamo la sessione per sicurezza prima del redirect
             session_destroy();
             header("Location: /index.php");

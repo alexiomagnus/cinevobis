@@ -2,6 +2,7 @@
 // Home page Cinevobis: mostra film in evidenza e migliori film.
 // Recupera i dati da MongoDB dalla collezione `films` del database `cinevobis`.
 require_once(__DIR__ . '/config/config.php');
+require_once(__DIR__ . '/config/functions.php');
 require_once(__DIR__ . '/config/connection.php');
 require_once(__DIR__ . '/includes/header_logic.php');
 require_once(__DIR__ . '/vendor/autoload.php');
@@ -10,12 +11,13 @@ use MongoDB\Client;
 
 $nome = $_SESSION['nome'] ?? '';
 
-// Prepara gli array di dati che verranno popolati dal database.
+
+// Connessione a MongoDB locale e selezione della collezione film.
 $collection = [];
 $cursor = [];
 
+
 try {
-    // Connessione a MongoDB locale e selezione della collezione film.
     $mongoClient = new Client("mongodb://localhost:27017");
     $db = $mongoClient->selectDatabase('cinevobis');
     $collection = $db->selectCollection('films');
@@ -24,43 +26,43 @@ try {
     error_log("Errore MongoDB: " . $e->getMessage());
 }
 
-// Film in evidenza: ultimi film aggiunti.
+
+// Film da mostrare
 $recommendedFilms = [];
+$topFilms = [];
 
 try {
+    // Film in evidenza gli ultimi 12 film più recenti
     $cursor = $collection->find([], [
-        'limit' => 6,
+        'limit' => 12,
         'sort' => ['release_date' => -1],
         'typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']
     ]);
 
     $recommendedFilms = iterator_to_array($cursor);
 
-    // Prende i migliori film ordinati per voto medio.
+
+    // Prende i migliori 12 film ordinati per voto medio
     $cursor = $collection->find([], [
-        'limit' => 6,
+        'limit' => 12,
         'sort' => ['vote_average' => -1],
         'typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']
     ]);
+
+     $topFilms = iterator_to_array($cursor);
     
 } catch (Exception $e) {
     error_log("Errore: " . $e->getMessage());
 }
 
-// Mappa i risultati dei migliori film e sceglie il film della settimana.
-$topFilms = [];
-$film = [];
 
-try {
-    $topFilms = iterator_to_array($cursor);
-    
-    // srand((int)date('oW'));
-    srand(10);
-    $film = $topFilms[array_rand($topFilms)] ?? null;
+// Film casuale ogni settimana in prima pagina
+// srand((int)date('oW'));
+// $film = $topFilms[array_rand($topFilms)] ?? null;
 
-} catch (Exception $e) {
-    error_log("Errore: " . $e->getMessage());
-}
+// Film statico in prima pagina
+$movie_id = 129;  // La città incantata
+$film = search_film_by_id($topFilms, $movie_id);
 ?>
 <!DOCTYPE html>
 <html lang="it">
@@ -86,7 +88,7 @@ try {
 
             <?php 
             /** @var array $film */
-            if (!empty($topFilms)):
+            if (!empty($film)):
                 $id = $film['id'] ?? '';
                 
                 $titolo = $film['title'] ?? '';
@@ -259,7 +261,7 @@ try {
                 </div>
             <?php endif; ?>
 
-            <hr class="my-5 border-0" style="border-top: 0.5px solid var(--bs-border-color) !important;">
+            <hr class="my-5 border-0" style="border-top: 0.5px solid var(--text) !important;">
 
             <div class="mt-5 mb-5 py-lg-4">
                 <div class="row g-4 g-lg-5 align-items-center">

@@ -17,7 +17,7 @@ try {
 
     // Prende i film in evidenza ordinati per data di uscita.
     $cursor = $collection->find([], [
-        'limit' => 24,
+        'limit' => 36,
         'sort' => ['release_date' => -1],
         'typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']
     ]);

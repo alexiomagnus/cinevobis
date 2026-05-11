@@ -226,7 +226,7 @@ if (empty($movie_id)) {
             <?php endif; ?>
 
         <?php else: ?>
-            <div class="alert alert-warning shadow-sm rounded-4"><?= htmlspecialchars($errore) ?></div>
+            <div class="alert alert-info shadow-sm rounded-4 border-0"><?= htmlspecialchars($errore) ?></div>
         <?php endif; ?>
     </main>
 
