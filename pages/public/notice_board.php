@@ -101,13 +101,13 @@ if (!empty($ids)) {
             <h1 class="fw-bold m-0">Bacheca</h1>
         </div>
 
-        <p class="text-muted mb-4">Le ultime recensioni della community</p>
-
         <?php if (empty($films)): ?>
             <div class="alert alert-info shadow-sm rounded-4 border-0">
                 <i class="bi bi-info-circle me-2"></i>Non ci sono ancora recensioni in bacheca
             </div>
         <?php else: ?>
+            <p class="text-muted mb-4">Le ultime recensioni della community</p>
+            
             <div class="row row-cols-1 row-cols-md-2 g-3">
                 <?php
                 foreach ($films as $film):

@@ -145,19 +145,20 @@ if (!empty($ids)) {
     <main class="container mt-5 mb-5 flex-grow-1">
         <h1 class="fw-bold mb-4">Recensioni</h1>
 
-        <?php 
-        if ($count > 0) {
-            echo "<div class='mb-4'>";
-            echo "<small class='text-uppercase fw-bold text-muted d-block mb-2' style='letter-spacing:1px'>Hai recensito " . htmlspecialchars($count) . " Film</small>";
-            echo "</div>";
-        }
-        ?>
-
         <?php if (empty($films)): ?>
             <div class="alert alert-info shadow-sm rounded-4 border-0">
                 <i class="bi bi-info-circle me-2"></i>Non hai ancora recensito nessun film
             </div>
+            
         <?php else: ?>
+            <?php 
+            if ($count > 0) {
+                echo "<div class='mb-4'>";
+                echo "<small class='text-uppercase fw-bold text-muted d-block mb-2' style='letter-spacing:1px'>Hai recensito " . htmlspecialchars($count) . " Film</small>";
+                echo "</div>";
+            }
+            ?>
+            
             <div class="row row-cols-1 row-cols-md-2 g-3">
                 <?php
                 /** @var array $film */

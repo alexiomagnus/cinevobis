@@ -22,8 +22,10 @@ function movie_sorting($cursor, $ids) {
     return $films;
 }
 
-function order_of_popularity ($n, $results) {
+
+function order_of_popularity ($results) {
     // Ordinare per popolarità
+    $n = count($results);
     for ($i = 0; $i < $n - 1; $i++) {
         for ($j = $i + 1; $j < $n; $j++) {
             if ($results[$i]['popularity'] < $results[$j]['popularity']) {
@@ -38,13 +40,13 @@ function order_of_popularity ($n, $results) {
     return $results;
 }
 
+
 function search_film_by_id($topFilms, $movie_id) {
     foreach($topFilms as $topFilm) {
         if((int) $topFilm['id'] === $movie_id) {
-            $film = $topFilm;
-            break;
+            return $topFilm;
         }   
     }
 
-    return $film;
+    return null;
 }

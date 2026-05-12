@@ -15,6 +15,7 @@ if (!$username) {
     exit();
 }
 
+
 $userData = null;
 $dataRegistrazione = "N/D";
 $user = new userObj($conn, $username);
@@ -67,8 +68,8 @@ try {
     $stmt->execute([':id_utente' => $_SESSION['id_utente']]);
     $countReviews = $stmt->fetchColumn();
 
-    // IDs Preferiti (per MongoDB)
-    $stmt = $conn->prepare("SELECT tmdb_id FROM preferiti WHERE id_utente = :id_utente ORDER BY data_aggiunto DESC LIMIT 4");
+    // Ids Preferiti (per MongoDB)
+    $stmt = $conn->prepare("SELECT tmdb_id FROM preferiti WHERE id_utente = :id_utente ORDER BY data_aggiunto DESC");
     $stmt->execute([':id_utente' => $_SESSION['id_utente']]);
     $ids = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
 
@@ -83,7 +84,9 @@ if (!empty($ids)) {
         $mongoClient = new Client("mongodb://localhost:27017");
         $db = $mongoClient->selectDatabase('cinevobis');
         $collection = $db->selectCollection('films');
-        $cursor = $collection->find(['id' => ['$in' => $ids]], ['typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']]);
+        $cursor = $collection->find(
+            ['id' => ['$in' => $ids]], 
+            ['typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']]);
         $favorites = movie_sorting($cursor, $ids);
     } catch (Exception $e) {
         error_log("Errore MongoDB: " . $e->getMessage());
@@ -184,22 +187,22 @@ if (!empty($ids)) {
                         </div>
 
                         <?php if (!empty($favorites)): ?>
-                        <div class="mb-4">
-                            <p class="small fw-bold mb-2" style="color: var(--text-muted);">Ultimi preferiti</p>
-                            <div class="row g-2">
-                                <?php foreach ($favorites as $film): ?>
-                                <div class="col-3">
-                                    <a href="/pages/public/film.php?tmdb_id=<?= htmlspecialchars($film['id']) ?>" class="d-block text-decoration-none">
-                                        <img src="https://image.tmdb.org/t/p/w200<?= htmlspecialchars($film['poster_path'] ?? '') ?>"
-                                             alt="<?= htmlspecialchars($film['title'] ?? '') ?>"
-                                             class="img-fluid rounded-3 w-100 card-hover"
-                                             style="aspect-ratio: 2/3; object-fit: cover; border: 1px solid var(--border);"
-                                             onerror="this.style.visibility='hidden'">
-                                    </a>
+                            <div class="mb-4">
+                                <p class="small fw-bold mb-2" style="color: var(--text-muted);">Ultimi preferiti</p>
+                                <div class="row g-2">
+                                    <?php for ($i = 0; $i < min(4, count($favorites)); $i++): ?>
+                                    <div class="col-3">
+                                        <a href="/pages/public/film.php?tmdb_id=<?= htmlspecialchars($favorites[$i]['id']) ?>" class="d-block text-decoration-none">
+                                            <img src="https://image.tmdb.org/t/p/w200<?= htmlspecialchars($favorites[$i]['poster_path'] ?? '') ?>"
+                                                alt="<?= htmlspecialchars($favorites[$i]['title'] ?? '') ?>"
+                                                class="img-fluid rounded-3 w-100 card-hover"
+                                                style="aspect-ratio: 2/3; object-fit: cover; border: 1px solid var(--border);"
+                                                onerror="this.style.visibility='hidden'">
+                                        </a>
+                                    </div>
+                                    <?php endfor; ?>
                                 </div>
-                                <?php endforeach; ?>
                             </div>
-                        </div>
                         <?php endif; ?>
 
                         <div class="rounded-4 mb-4" style="background-color: var(--bg-surface); border: 1px solid var(--border); box-shadow: var(--shadow-sm); overflow: hidden;">

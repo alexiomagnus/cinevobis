@@ -35,7 +35,7 @@ if ($searched !== '') {
             if (isset($body['results']) && is_array($body['results'])) {
                 $results = $body['results'];
                 // Ordiniamo i risultati direttamente qui
-                $results = order_of_popularity(count($results), $results);
+                $results = order_of_popularity($results);
             } else {
                 $api_failed = true; 
             }

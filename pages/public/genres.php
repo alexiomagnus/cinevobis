@@ -7,7 +7,7 @@ require_once(__DIR__ . '/../../vendor/autoload.php');
 use MongoDB\Client;
 
 $generi = [];
-$errorMessage = null;
+$errore = null;
 
 try {
     $mongoClient = new MongoDB\Client("mongodb://localhost:27017");
@@ -27,7 +27,7 @@ try {
 
 } catch (Exception $e) {
     error_log("Errore con MongoDB: " . $e->getMessage());
-    $errorMessage = "Impossibile caricare i generi. Riprova più tardi.";
+    $errore = "Impossibile caricare i generi.";
 }
 ?>
 <!DOCTYPE html>
@@ -53,9 +53,9 @@ try {
             </div>
             <p class="mb-4" style="color: var(--text-muted);">Esplora il catalogo per categoria</p>
 
-            <?php if ($errorMessage): ?>
-                <div class="alert alert-danger">
-                    <i class="bi bi-exclamation-triangle me-2"></i><?= htmlspecialchars($errorMessage) ?>
+            <?php if ($errore): ?>
+                <div class="alert alert-info shadow-sm rounded-4 border-0">
+                    <i class="bi bi-info-circle me-2"></i></i><?= htmlspecialchars($errore) ?>
                 </div>
 
             <?php elseif (empty($generi)): ?>

@@ -7,58 +7,55 @@ require_once(__DIR__ . '/config/connection.php');
 require_once(__DIR__ . '/includes/header_logic.php');
 require_once(__DIR__ . '/vendor/autoload.php');
 
-use MongoDB\Client;
-
 $nome = $_SESSION['nome'] ?? '';
-
-
-// Connessione a MongoDB locale e selezione della collezione film.
-$collection = [];
-$cursor = [];
-
-
-try {
-    $mongoClient = new Client("mongodb://localhost:27017");
-    $db = $mongoClient->selectDatabase('cinevobis');
-    $collection = $db->selectCollection('films');
-
-} catch (Exception $e) {
-    error_log("Errore MongoDB: " . $e->getMessage());
-}
-
 
 // Film da mostrare
 $recommendedFilms = [];
 $topFilms = [];
 
+
 try {
-    // Film in evidenza gli ultimi 12 film più recenti
+    // Controllo per evitare errori se MongoDB è offline
+    if (!$collection) {
+        throw new \Exception("Connessione a MongoDB non disponibile.");
+    }
+
+    // Film in evidenza: gli ultimi 12 film più recenti
     $cursor = $collection->find([], [
         'limit' => 12,
-        'sort' => ['release_date' => -1],
-        'typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']
+        'sort' => ['release_date' => -1]
     ]);
 
     $recommendedFilms = iterator_to_array($cursor);
 
+} catch (\Throwable $e) { // \Throwable cattura sia Exception che Fatal Error
+    error_log("Errore caricamento film in evidenza: " . $e->getMessage());
+}
+
+
+try {
+    // Controllo per evitare errori se MongoDB è offline
+    if (!$collection) {
+        throw new \Exception("Connessione a MongoDB non disponibile.");
+    }
 
     // Prende i migliori 12 film ordinati per voto medio
     $cursor = $collection->find([], [
         'limit' => 12,
-        'sort' => ['vote_average' => -1],
-        'typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']
+        'sort' => ['vote_average' => -1]
     ]);
 
-     $topFilms = iterator_to_array($cursor);
+    $topFilms = iterator_to_array($cursor);
     
-} catch (Exception $e) {
-    error_log("Errore: " . $e->getMessage());
+} catch (\Throwable $e) {
+    error_log("Errore caricamento migliori film: " . $e->getMessage());
 }
 
 
 // Film casuale ogni settimana in prima pagina
 // srand((int)date('oW'));
 // $film = $topFilms[array_rand($topFilms)] ?? null;
+
 
 // Film statico in prima pagina
 $movie_id = 129;  // La città incantata
