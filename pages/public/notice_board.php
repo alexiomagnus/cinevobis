@@ -16,7 +16,7 @@ $films = [];
 
 try {
     // Recupero le ultime 20 recensioni globali includendo nome e cognome
-    $sql = "SELECT tmdb_id, commento, voto, nome, cognome
+    $sql = "SELECT tmdb_id, commento, voto, nome, cognome, u.id_utente
             FROM recensioni r
             JOIN utenti u ON r.id_utente = u.id_utente
             ORDER BY data_aggiunto DESC 
@@ -32,10 +32,12 @@ try {
         $tmdb_id = (int) $row['tmdb_id'];
         $ids[] = $tmdb_id;
 
+        // Mappatura separata per gestire correttamente URL e visualizzazione
         $recensioni_map[$tmdb_id] = [
             'voto' => $row['voto'],
             'commento' => $row['commento'],
-            'autore' => $row['nome'] . ' ' . $row['cognome'] // Mappatura nome e cognome
+            'nome_completo' => $row['nome'] . ' ' . $row['cognome'],
+            'id_utente' => $row['id_utente']
         ];
     }
 
@@ -44,7 +46,6 @@ try {
 }
 
 if (!empty($ids)) {
-    // Connessione a MongoDB e ricerca film
     try {
         $mongoClient = new Client("mongodb://localhost:27017");
         $db = $mongoClient->selectDatabase("cinevobis");
@@ -118,25 +119,32 @@ if (!empty($ids)) {
                     $rec = $recensioni_map[$id] ?? [];
                     $voto = isset($rec['voto']) ? (float) $rec['voto'] : null;
                     $commento = $rec['commento'] ?? '';
-                    $autore = $rec['autore'] ?? 'Utente Anonimo';
+                    $nome_autore = $rec['nome_completo'] ?? 'Utente Anonimo';
+                    $id_autore = $rec['id_utente'] ?? 0;
                 ?>
                 <div class="col">
-                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden transition-hover position-relative">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden transition-hover">
                         <div class="d-flex">
-                            <img src="<?= htmlspecialchars($poster) ?>"
-                                 alt="<?= htmlspecialchars($titolo) ?>"
-                                 class="review-poster">
+                            <a href="/pages/public/film.php?tmdb_id=<?= $id ?>" class="poster-link">
+                                <img src="<?= htmlspecialchars($poster) ?>"
+                                     alt="<?= htmlspecialchars($titolo) ?>"
+                                     class="review-poster">
+                            </a>
 
                             <div class="card-body d-flex flex-column justify-content-between p-3">
                                 <div>
                                     <h5 class="fw-bold mb-1">
-                                        <a href="/pages/public/film.php?tmdb_id=<?= $id ?>" class="text-decoration-none text-dark stretched-link">
+                                        <a href="/pages/public/film.php?tmdb_id=<?= $id ?>" class="text-decoration-none text-dark">
                                             <?= htmlspecialchars($titolo) ?>
                                         </a>
                                     </h5>
                                     
-                                    <div class="small mb-2" style="color: var(--accent);">
-                                        <i class="bi bi-person-circle me-1"></i><?= htmlspecialchars($autore) ?>
+                                    <div class="small mb-2">
+                                        <i class="bi bi-person-circle me-1" style="color: var(--accent);"></i>
+                                        <a href="/pages/public/users_profiles.php?id=<?= urlencode($id_autore) ?>" 
+                                           class="text-decoration-none fw-semibold text-dark">
+                                            <?= htmlspecialchars($nome_autore) ?>
+                                        </a>
                                     </div>
 
                                     <?php if (!empty($commento)): ?>

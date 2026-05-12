@@ -20,6 +20,13 @@ $userData = null;
 $dataRegistrazione = "N/D";
 $user = new userObj($conn, $username);
 
+// Recuperiamo i dati utente
+$userData = $user->findByUsername();
+if ($userData && $userData['data_registrazione']) {
+    $date = new DateTime($userData['data_registrazione']);
+    $dataRegistrazione = $date->format('Y');
+}
+
 // Gestione Cambia Password
 if (isset($_POST['change_password'])) {
     header("Location: /actions/change_password.php");
@@ -84,35 +91,6 @@ if (!empty($ids)) {
     } catch (Exception $e) {
         error_log("Errore MongoDB: " . $e->getMessage());
     }
-}
-
-
-// Sezione user per diventare tester
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $tester_attivo = isset($_POST['tester_attivo']) ? 3 : 2;
-    $id_utente = $_SESSION['id_utente'];
-
-    try {
-        $sql = "UPDATE utenti SET id_profilo = :tester_attivo WHERE id_utente = :id_utente";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([
-            ':tester_attivo' => $tester_attivo,
-            'id_utente' => $id_utente
-        ]);
-
-        // Aggiornare l'id profilo nella sessione
-        $_SESSION['id_profilo'] = $tester_attivo; 
-    } catch (PDOException $e) {
-        error_log("Errore nel DB: " . $e->getMessage());
-        $errore = "Non è stato possibile attivare la modalità tester";
-    }
-}
-
-// Recuperiamo i dati utente
-$userData = $user->findByUsername();
-if ($userData && $userData['data_registrazione']) {
-    $date = new DateTime($userData['data_registrazione']);
-    $dataRegistrazione = $date->format('Y');
 }
 ?>
 <!DOCTYPE html>
@@ -230,22 +208,6 @@ if ($userData && $userData['data_registrazione']) {
                         <div class="rounded-4 mb-4" style="background-color: var(--bg-surface); border: 1px solid var(--border); box-shadow: var(--shadow-sm); overflow: hidden;">
                             <div class="d-flex justify-content-between align-items-center p-3 border-bottom gap-3">
                                 <span class="d-flex align-items-center gap-2" style="color: var(--text-muted); white-space: nowrap;">
-                                    <i class="bi bi-person"></i> Profilo
-                                </span>
-                                <?php 
-                                $profilo = '';
-                                if($userData['id_profilo'] == 1) {
-                                    $profilo = 'Admin';
-                                } elseif($userData['id_profilo'] == 2) {
-                                    $profilo = 'User';
-                                } elseif($userData['id_profilo'] == 3) {
-                                    $profilo = 'Tester';
-                                }
-                                ?>
-                                <span class="fw-medium text-end text-truncate"><?= htmlspecialchars($profilo) ?></span>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center p-3 border-bottom gap-3">
-                                <span class="d-flex align-items-center gap-2" style="color: var(--text-muted); white-space: nowrap;">
                                     <i class="bi bi-person"></i> Username
                                 </span>
                                 <span class="fw-medium text-end text-truncate"><?= htmlspecialchars($userData['username']) ?></span>
@@ -269,10 +231,9 @@ if ($userData && $userData['data_registrazione']) {
                                 <span class="fw-medium text-end text-truncate"><?= htmlspecialchars($userData['cognome'] ?? 'Non inserito') ?></span>
                             </div>
                         </div>
-                        
 
                         <form method="POST">
-                            <div class="rounded-4 overflow-hidden mb-5" style="background-color: var(--bg-surface); border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
+                            <div class="rounded-4 overflow-hidden" style="background-color: var(--bg-surface); border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
                                 <div class="p-1 border-bottom">
                                     <button type="submit" name="change_password" class="btn w-100 d-flex justify-content-between align-items-center text-start border-0" style="color: var(--text); padding: 12px; border-radius: 8px;">
                                         <span class="fw-medium">Modifica la password</span>
@@ -280,9 +241,7 @@ if ($userData && $userData['data_registrazione']) {
                                     </button>
                                 </div>
                                 <div class="p-1 bg-danger bg-opacity-10">
-                                    <button type="submit" name="delete_user" class="btn w-100 d-flex justify-content-between align-items-center text-start text-danger border-0" 
-                                            style="padding: 12px; border-radius: 8px;" 
-                                            onclick="return confirm('Stai per eliminare il tuo account su Cinevobis. Confermi?');">
+                                    <button type="submit" name="delete_user" class="btn w-100 d-flex justify-content-between align-items-center text-start text-danger border-0" style="padding: 12px; border-radius: 8px;" onclick="return confirm('Stai per eliminare il tuo account su Cinevobis. Confermi?');">
                                         <span class="fw-bold">Elimina account</span>
                                         <i class="bi bi-trash3"></i>
                                     </button>
@@ -290,31 +249,6 @@ if ($userData && $userData['data_registrazione']) {
                             </div>
                         </form>
 
-                        <?php if($_SESSION['id_profilo'] != 1): ?>
-                            <form method="POST">
-                                <div class="mb-4">
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" 
-                                            type="checkbox" 
-                                            name="tester_attivo" 
-                                            id="tester_attivo"
-                                            <?= ($userData['id_profilo'] == 3) ? 'checked' : '' ?>>
-                                        <label class="form-check-label fw-semibold" for="tester_attivo">
-                                            Tester
-                                        </label>
-                                    </div>
-                                    <p class="small mt-2 text-start" style="color: var(--text-muted);">
-                                        <i class="bi bi-info-circle me-1"></i>
-                                        Attivando questa modalità, accetti la presenza di contenuti aggiuntivi utilizzati per verificare il funzionamento del sistema (ad esempio annunci e nuove implementazioni). 
-                                        Il comportamento del sito potrebbe non essere quello definitivo. Clicca salva per applicare le modifiche.
-                                    </p>
-                                    <button type="submit" id="tester_submit" name="update_tester"
-                                        class="btn btn-outline-secondary">
-                                        Salva
-                                    </button>
-                                </div>
-                            </form>
-                        <?php endif; ?>
                     <?php endif; ?>
                 </div>
             </div>

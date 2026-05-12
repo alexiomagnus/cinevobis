@@ -26,6 +26,8 @@ $errore = "";
 $movie_id = $_GET['tmdb_id'] ?? null;
 $collection = [];
 
+$id_profilo = $_SESSION['id_profilo']; 
+
 // Connessione a MongoDB
 try {
     $mongoClient = new Client("mongodb://localhost:27017");
@@ -282,7 +284,7 @@ if ($tmdb_id !== null) {
 
                                 <div>
                                     <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <h4 class="fw-bold m-0" style="color: var(--text);">Sinossi</h4>
+                                        <h4 class="fw-bold m-0" style="color: var(--text);">Trama</h4>
                                         <div class="d-flex align-items-center fs-4 fw-bold">
                                             <i class="bi bi-star-fill text-warning me-2"></i>
                                             <span>
@@ -302,6 +304,7 @@ if ($tmdb_id !== null) {
                             </div>
                         </div>
 
+                        <!-- STAT BAR -->
                         <div class="row text-center py-4 rounded-4 mb-5 mx-0" style="background-color: var(--bg-muted); border: 1px solid var(--border);">
                             <div class="col-4 border-end" style="border-color: var(--border) !important;">
                                 <div class="small text-uppercase fw-bold" style="color: var(--text-muted);">Durata</div>
@@ -317,6 +320,7 @@ if ($tmdb_id !== null) {
                             </div>
                         </div>
 
+                        <!-- CAST -->
                         <div>
                             <h4 class="fw-bold mb-4" style="color: var(--text);">Cast Principale</h4>
                             <div class="row g-3">
@@ -355,6 +359,32 @@ if ($tmdb_id !== null) {
                             </div>
                         </div>
 
+                        <!-- Player per admin o tester -->
+                        <?php if($id_profilo == 1 || $id_profilo == 3): ?>
+                            <div class="mt-5 pt-4" style="border-top: 1px solid var(--border);">
+                                <div class="d-flex align-items-center gap-2 mb-3">
+                                    <h4 class="fw-bold mb-0" style="color: var(--text);">Guarda il Film</h4>  
+                                </div>
+
+                                <div class="rounded-4 overflow-hidden shadow-sm" 
+                                    style="border: 1px solid var(--border); background: #000;">
+                                    <div class="ratio ratio-16x9">
+                                        <iframe src="https://vsembed.su/embed/movie?tmdb=<?= (int)$movie_id ?>"
+                                                allowfullscreen
+                                                allow="encrypted-media; picture-in-picture"
+                                                loading="lazy"
+                                                style="border: none;">
+                                        </iframe>
+                                    </div>
+                                </div>
+
+                                <p class="small mt-2 text-end" style="color: var(--text-muted);">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Contenuto fornito da terze parti
+                                </p>
+                            </div>
+                        <?php endif; ?>
+
                     </div>
                 </div>
             </div>
@@ -386,6 +416,7 @@ if ($tmdb_id !== null) {
                 <div><?= htmlspecialchars($errore) ?></div>
             </div>
         <?php endif; ?>
+
     </main>
 
     <?php require_once(__DIR__ . '/../../includes/footer.php'); ?>

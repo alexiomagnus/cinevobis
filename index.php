@@ -258,7 +258,7 @@ $film = search_film_by_id($topFilms, $movie_id);
                 </div>
             <?php endif; ?>
 
-            <hr class="my-5 border-0" style="border-top: 0.5px solid var(--text) !important;">
+            <hr class="my-5 border-0" style="border-top: 0.5px solid var(--text-muted) !important;">
 
             <div class="mt-5 mb-5 py-lg-4">
                 <div class="row g-4 g-lg-5 align-items-center">

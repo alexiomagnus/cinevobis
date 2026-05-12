@@ -103,6 +103,7 @@ if (isset($_POST['write_review'])) {
     }
 }
 
+
 // Eliminare film
 if (isset($_POST['delete_review'])) {
     try {
