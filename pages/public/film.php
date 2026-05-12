@@ -166,6 +166,13 @@ if ($tmdb_id !== null) {
         error_log("Errore nel DB: " . $e->getMessage());
     }
 }
+
+
+// Siti per vedere il film
+$links = [    
+    'VidSrc' => 'https://vsembed.ru//embed/movie?tmdb=',
+    'VixSrc' => 'https://vixsrc.to/movie/'
+];
 ?>
 <!DOCTYPE html>
 <html lang="it">
@@ -363,13 +370,25 @@ if ($tmdb_id !== null) {
                         <?php if($id_profilo == 1 || $id_profilo == 3): ?>
                             <div class="mt-5 pt-4" style="border-top: 1px solid var(--border);">
                                 <div class="d-flex align-items-center gap-2 mb-3">
-                                    <h4 class="fw-bold mb-0" style="color: var(--text);">Guarda il Film</h4>  
+                                    <h3 class="fw-bold mb-0" style="color: var(--text);">Visiona il Film</h3>
                                 </div>
+
+                                <small class="text-uppercase fw-bold text-muted d-block mb-2" style="letter-spacing:1px">Sorgente</small>
+
+                                <select id="siteSelect" class="form-select form-select-lg mb-3" name="sites">
+                                    <?php /** @var array $links **/
+                                    foreach($links as $key => $value): ?>
+                                        <option value="<?php echo $value; ?>">
+                                            <?php echo $key; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
 
                                 <div class="rounded-4 overflow-hidden shadow-sm" 
                                     style="border: 1px solid var(--border); background: #000;">
                                     <div class="ratio ratio-16x9">
-                                        <iframe src="https://vsembed.su/embed/movie?tmdb=<?= (int)$movie_id ?>"
+                                        <iframe id="videoFrame"
+                                                src="<?php echo reset($links) . $movie_id; ?>"
                                                 allowfullscreen
                                                 allow="encrypted-media; picture-in-picture"
                                                 loading="lazy"
@@ -423,5 +442,13 @@ if ($tmdb_id !== null) {
 
     <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/assets/js/script.js"></script>
+    <script>
+        const select = document.getElementById('siteSelect');
+        const iframe = document.getElementById('videoFrame');
+
+        select.addEventListener('change', function() {
+            iframe.src = this.value + "<?= $movie_id ?>";
+        });
+    </script>
 </body>
 </html>

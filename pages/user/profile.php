@@ -154,7 +154,7 @@ if ($userData && $userData['data_registrazione']) {
                             <div class="col-sm-6">
                                 <div class="p-3 rounded-4 h-100" style="background-color: var(--bg-surface); border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
                                     <div class="d-flex align-items-center gap-3">
-                                        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px; background-color: rgba(99, 102, 241, 0.1); color: var(--accent);">
+                                        <div class="rounded d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px; background-color: rgba(99, 102, 241, 0.1); color: var(--accent);">
                                             <i class="bi bi-film fs-5"></i>
                                         </div>
                                         <div>
@@ -167,7 +167,7 @@ if ($userData && $userData['data_registrazione']) {
                             <div class="col-sm-6">
                                 <div class="p-3 rounded-4 h-100" style="background-color: var(--bg-surface); border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
                                     <div class="d-flex align-items-center gap-3">
-                                        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px; background-color: rgba(99, 102, 241, 0.1); color: var(--accent);">
+                                        <div class="rounded d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px; background-color: rgba(99, 102, 241, 0.1); color: var(--accent);">
                                             <i class="bi bi-calendar-check fs-5"></i>
                                         </div>
                                         <div>
@@ -183,7 +183,7 @@ if ($userData && $userData['data_registrazione']) {
                             <div class="col-sm-6">
                                 <div class="p-3 rounded-4 h-100" style="background-color: var(--bg-surface); border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
                                     <div class="d-flex align-items-center gap-3">
-                                        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px; background-color: rgba(99, 102, 241, 0.1); color: var(--accent);">
+                                        <div class="rounded d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px; background-color: rgba(99, 102, 241, 0.1); color: var(--accent);">
                                             <i class="bi bi-bookmark fs-5"></i>
                                         </div>
                                         <div>
@@ -196,7 +196,7 @@ if ($userData && $userData['data_registrazione']) {
                             <div class="col-sm-6">
                                 <div class="p-3 rounded-4 h-100" style="background-color: var(--bg-surface); border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
                                     <div class="d-flex align-items-center gap-3">
-                                        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px; background-color: rgba(99, 102, 241, 0.1); color: var(--accent);">
+                                        <div class="rounded d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px; background-color: rgba(99, 102, 241, 0.1); color: var(--accent);">
                                             <i class="bi bi-chat-square-text fs-5"></i>
                                         </div>
                                         <div>
