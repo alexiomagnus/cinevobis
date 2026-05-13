@@ -120,7 +120,7 @@ if (empty($movie_id)) {
                                             $registi_links = array_map(function ($regista) {
                                                 $name = htmlspecialchars($regista['name']);
                                                 $id   = urlencode($regista['id']);
-                                                return "<a href='https://www.themoviedb.org/person/$id' class='text-decoration-none' style='color: var(--accent); transition: color 0.2s;' onmouseover='this.style.color=\"var(--accent-hover)\"' onmouseout='this.style.color=\"var(--accent)\"'>$name</a>";
+                                                return "<a href='https://www.themoviedb.org/person/$id' class='text-decoration-none' target='_blank' style='color: var(--accent); transition: color 0.2s;' onmousregistaeover='this.style.color=\"var(--accent-hover)\"' onmouseout='this.style.color=\"var(--accent)\"'>$name</a>";
                                             }, $data['registi']);
                                             echo implode(', ', $registi_links);
                                             ?>
@@ -178,7 +178,7 @@ if (empty($movie_id)) {
                                 ?>
                                     <div class="col-12 col-sm-6 col-lg-4">
                                         <a href="https://www.themoviedb.org/person/<?= $actor['id'] ?>"
-                                           class="text-decoration-none d-block">
+                                           class="text-decoration-none d-block" target="_blank">
                                             <div class="d-flex align-items-center p-2 rounded-3 transition-hover" 
                                                  style="background-color: var(--bg-surface); border: 1px solid var(--border);">
                                                 <img src="<?= $profile ?>"
