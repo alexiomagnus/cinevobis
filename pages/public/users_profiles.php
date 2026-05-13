@@ -244,7 +244,7 @@ if (!empty($ids)) {
             </div>
 
             <div class="col-lg-6 d-none d-lg-block"
-                 style="background-image: url('/assets/img/tesseract.png'); background-size: cover; background-position: center; border-left: 1px solid var(--border);">
+                 style="background-image: url('/assets/img/tesseract.jpg'); background-size: cover; background-position: center; border-left: 1px solid var(--border);">
             </div>
 
         </div>
