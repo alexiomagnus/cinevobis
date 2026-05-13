@@ -69,10 +69,9 @@ if ($tmdb_id !== null) {
     <?php require_once(__DIR__ . '/../../includes/header.php'); ?>
 
     <main class="container mt-5 mb-5 flex-grow-1">
-        <h1 class="fw-bold mb-2">Recensioni della Community</h1>
-        <p class="text-muted mb-4">Scopri cosa pensano gli altri utenti</p>
+        <h1 class="fw-bold mb-4">Recensioni della Community</h1>
 
-        <small class='text-uppercase fw-bold text-muted d-block mb-3' style='letter-spacing:1px'>
+        <small class='text-uppercase fw-bold text-muted d-block mb-4' style='letter-spacing:1px'>
             <?php 
             if (!empty($titolo)) {
                 if ($numero_recensioni == 1) 
