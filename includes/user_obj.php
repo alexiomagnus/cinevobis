@@ -2,7 +2,7 @@
 // Rappresenta un utente e raggruppa le operazioni CRUD sugli account, le sessioni
 // e le liste personali (preferiti, watchlist, watched, recensioni).
 class userObj {
-    private string $username;
+    private ?string $username;
     private ?string $password;
     private ?string $nome;
     private ?string $cognome;
@@ -13,7 +13,7 @@ class userObj {
 
     // Costruttore della classe: inizializza le proprietà dell'oggetto utente.
     // Se viene passata una password, ne genera automaticamente l'hash.
-    public function __construct(PDO $db, string $username, ?string $password = null, ?string $nome = null, ?string $cognome = null,
+    public function __construct(PDO $db, ?string $username = null, ?string $password = null, ?string $nome = null, ?string $cognome = null,
                             ?string $email = null, ?int $attivo = null, ?int $id_profilo = null) {
         $this->db           = $db;
         $this->username     = $username;
@@ -59,10 +59,21 @@ class userObj {
         return $stmt->fetch();
     }
 
+    // Cerca e restituisce tutti i dati di un singolo utente filtrando per il suo username.
+    public function findUser(string $username) {
+        $sql = "SELECT id_utente, username, password, nome, cognome, email,
+                       id_profilo, attivo, tester, data_registrazione
+                FROM utenti WHERE username = :username";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':username', $username);
+        $stmt->execute();
+        return $stmt->fetch();
+    }
+
     // Recupera la lista di tutti gli utenti registrati, includendo anche il nome del loro profilo (es. Admin, User).
     public function readAll() {
         $sql = "SELECT u.id_utente, u.username, u.nome, u.cognome, u.email,
-                       u.attivo, p.nome_profilo
+                       u.attivo, u.tester, p.nome_profilo
                 FROM utenti u
                 LEFT JOIN profili p ON p.id_profilo = u.id_profilo
                 ORDER BY u.username";
@@ -253,4 +264,3 @@ class userObj {
         return (int) $stmt->fetchColumn();
     }
 }
-?>

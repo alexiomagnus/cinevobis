@@ -1,28 +1,42 @@
 <?php
 // Mostra le recensioni degli utenti per un film specifico.
 require_once(__DIR__ . '/../../config/config.php');
+require_once(__DIR__ . '/../../config/functions.php');
 require_once(__DIR__ . '/../../config/connection.php');
+require_once(__DIR__ . '/../../includes/user_obj.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');
 require_once(__DIR__ . '/../../vendor/autoload.php');
 
 $recensioni_altri = [];
-$movie_id = $_GET['tmdb_id'] ?? null;
+$tmdb_id = $_GET['tmdb_id'] ?? null;
+$titolo = $_GET['title'] ?? null;
+$numero_recensioni = 0;
 
 // Recuperiamo le recensioni degli altri utenti
 try {   
-    $sql = "SELECT r.commento, r.voto, u.nome, u.cognome
+    $sql = "SELECT r.commento, r.voto, u.nome, u.cognome, u.username, u.id_utente
             FROM recensioni r
             JOIN utenti u ON r.id_utente = u.id_utente 
             WHERE tmdb_id = :tmdb_id
             ORDER BY r.tmdb_id DESC";
 
     $stmt = $conn->prepare($sql);
-    $stmt->execute([':tmdb_id' => $movie_id]);
+    $stmt->execute([':tmdb_id' => $tmdb_id]);
 
     $recensioni_altri = $stmt->fetchAll();
-
 } catch (PDOException $e) {
     error_log("Errore nel DB: " . $e->getMessage());
+}
+
+
+// Conta recensioni
+if ($tmdb_id !== null) {
+    try {
+        $userObj = new userObj($conn);
+        $numero_recensioni = $userObj->countReviews((int)$tmdb_id);
+    } catch (PDOException $e) {
+        error_log("Errore nel DB: " . $e->getMessage());
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -58,6 +72,17 @@ try {
         <h1 class="fw-bold mb-2">Recensioni della Community</h1>
         <p class="text-muted mb-4">Scopri cosa pensano gli altri utenti</p>
 
+        <small class='text-uppercase fw-bold text-muted d-block mb-3' style='letter-spacing:1px'>
+            <?php 
+            if (!empty($titolo)) {
+                if ($numero_recensioni == 1) 
+                    echo htmlspecialchars($numero_recensioni) . ' recensione per: "' . htmlspecialchars($titolo) . '"';
+                else 
+                    echo htmlspecialchars($numero_recensioni) . ' recensioni per: "' . htmlspecialchars($titolo) . '"'; 
+            }
+            ?>
+        </small>
+
             <div class="row row-cols-1 row-cols-md-2 g-4">
                 <?php foreach ($recensioni_altri as $r): 
                     $poster_url = !empty($r['poster']) ? "https://image.tmdb.org/t/p/w500" . $r['poster'] : "https://via.placeholder.com/500x750?text=No+Poster";
@@ -68,11 +93,13 @@ try {
 
                                 <div class="card-body d-flex flex-column justify-content-between p-3">
                                     <div>
-                                        <div class="small mb-2" style="color: var(--accent);">
-                                            <i class="bi bi-person-circle me-1"></i><?= htmlspecialchars($r['nome']) . " " . htmlspecialchars($r['cognome'])?>
-                                        </div>
-
-                                        <?php if (!empty($r['commento'])): ?>
+                                        <div class="small mb-2">
+                                            <i class="bi bi-person-circle me-1" style="color: var(--accent);"></i>
+                                            <a href="/pages/public/users_profiles.php?id=<?= urlencode($r['id_utente']) ?>&username=<?= urlencode($r['username']) ?>" 
+                                            class="text-decoration-none fw-semibold text-dark">
+                                                <?= htmlspecialchars($r['nome'] . " " . $r['cognome']) ?>
+                                            </a>
+                                        </div> <?php if (!empty($r['commento'])): ?>
                                             <p class="text-muted small mb-2 text-justify">
                                                 "<?= nl2br(htmlspecialchars($r['commento'])) ?>"
                                             </p>

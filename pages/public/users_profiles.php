@@ -8,85 +8,67 @@ require_once(__DIR__ . '/../../includes/user_obj.php');
 use MongoDB\Client;
 
 // Controllo autenticazione
-$username = $_SESSION['username'] ?? '';
-
-if (!$username) {
-    header("Location: /index.php");
-    exit();
-}
-
+$username = $_GET['username'] ?? '';
 
 $userData = null;
 $dataRegistrazione = "N/D";
-$user = new userObj($conn, $username);
+$userObj = new userObj($conn);
+
 
 // Recuperiamo i dati utente
-$userData = $user->findByUsername();
+$userData = $userObj->findUser($username);
+
 if ($userData && $userData['data_registrazione']) {
     $date = new DateTime($userData['data_registrazione']);
     $dataRegistrazione = $date->format('Y');
 }
 
-// Gestione Cambia Password
-if (isset($_POST['change_password'])) {
-    header("Location: /actions/change_password.php");
-    exit();
-}
-
-// Gestione Disabilitazione Account
-if (isset($_POST['delete_user']) && $username) {
-    try {
-        if ($user->disable()) {
-            session_destroy();
-            header("Location: /index.php");
-            exit();
-        }
-    } catch (PDOException $e) {
-        error_log("Errore durante l'eliminazione: " . $e->getMessage());
-        $errore = "Errore durante l'eliminazione";
-    }
-}
 
 // Conteggi statistiche (MariaDB)
 $countWatched = 0;
 $countWatchlist = 0;
 $countReviews = 0;
+$id_utente = $userData['id_utente'];
 
 try {
     // Film visti anno corrente
     $stmt = $conn->prepare("SELECT COUNT(*) FROM watched WHERE id_utente = :id_utente AND YEAR(data_aggiunto) = YEAR(CURRENT_DATE)");
-    $stmt->execute([':id_utente' => $_SESSION['id_utente']]);
+    $stmt->execute([':id_utente' => $id_utente]);
     $countWatched = $stmt->fetchColumn();
 
     // Watchlist
     $stmt = $conn->prepare("SELECT COUNT(*) FROM watchlist WHERE id_utente = :id_utente");
-    $stmt->execute([':id_utente' => $_SESSION['id_utente']]);
+    $stmt->execute([':id_utente' => $id_utente]);
     $countWatchlist = $stmt->fetchColumn();
 
     // Recensioni
     $stmt = $conn->prepare("SELECT COUNT(*) FROM recensioni WHERE id_utente = :id_utente");
-    $stmt->execute([':id_utente' => $_SESSION['id_utente']]);
+    $stmt->execute([':id_utente' => $id_utente]);
     $countReviews = $stmt->fetchColumn();
 
     // Ids Preferiti (per MongoDB)
     $stmt = $conn->prepare("SELECT tmdb_id FROM preferiti WHERE id_utente = :id_utente ORDER BY data_aggiunto DESC");
-    $stmt->execute([':id_utente' => $_SESSION['id_utente']]);
+    $stmt->execute([':id_utente' => $id_utente]);
     $ids = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
 
 } catch (PDOException $e) {
     error_log("Errore nel DB: " . $e->getMessage());
 }
 
+
 // Recupero dettagli preferiti da MongoDB
 $favorites = [];
+
 if (!empty($ids)) {
     try {
         $mongoClient = new Client("mongodb://localhost:27017");
         $db = $mongoClient->selectDatabase('cinevobis');
         $collection = $db->selectCollection('films');
+        
         $cursor = $collection->find(
             ['id' => ['$in' => $ids]], 
             ['typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']]);
+
         $favorites = movie_sorting($cursor, $ids);
     } catch (Exception $e) {
         error_log("Errore MongoDB: " . $e->getMessage());
@@ -118,7 +100,7 @@ if (!empty($ids)) {
 
                 <div style="max-width: 550px; width: 100%; margin: 0 auto;">
 
-                    <h1 class="fw-bolder text-center mb-5" style="letter-spacing: -0.5px;">Il tuo profilo</h1>
+                    <h1 class="fw-bolder text-center mb-5" style="letter-spacing: -0.5px;">Il profilo di <?php echo htmlspecialchars($userData['nome']) . " " . htmlspecialchars($userData['cognome']);?></h1>
 
                     <?php if (isset($errore)): ?>
                         <div class="alert alert-danger mb-4" role="alert">
@@ -224,30 +206,28 @@ if (!empty($ids)) {
                                 </span>
                                 <span class="fw-medium text-end text-truncate"><?= htmlspecialchars($userData['nome'] ?? 'Non inserito') ?></span>
                             </div>
-                            <div class="d-flex justify-content-between align-items-center p-3 gap-3">
+                            <div class="d-flex justify-content-between align-items-center p-3 border-bottom gap-3">
                                 <span class="d-flex align-items-center gap-2" style="color: var(--text-muted); white-space: nowrap;">
                                     <i class="bi bi-person-vcard"></i> Cognome
                                 </span>
                                 <span class="fw-medium text-end text-truncate"><?= htmlspecialchars($userData['cognome'] ?? 'Non inserito') ?></span>
                             </div>
-                        </div>
-
-                        <form method="POST">
-                            <div class="rounded-4 overflow-hidden" style="background-color: var(--bg-surface); border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
-                                <div class="p-1 border-bottom">
-                                    <button type="submit" name="change_password" class="btn w-100 d-flex justify-content-between align-items-center text-start border-0" style="color: var(--text); padding: 12px; border-radius: 8px;">
-                                        <span class="fw-medium">Modifica la password</span>
-                                        <i class="bi bi-chevron-right" style="color: var(--text-muted);"></i>
-                                    </button>
-                                </div>
-                                <div class="p-1 bg-danger bg-opacity-10">
-                                    <button type="submit" name="delete_user" class="btn w-100 d-flex justify-content-between align-items-center text-start text-danger border-0" style="padding: 12px; border-radius: 8px;" onclick="return confirm('Stai per eliminare il tuo account su Cinevobis. Confermi?');">
-                                        <span class="fw-bold">Elimina account</span>
-                                        <i class="bi bi-trash3"></i>
-                                    </button>
-                                </div>
+                            
+                            <div class="d-flex justify-content-between align-items-center p-3 gap-3">
+                                <span class="d-flex align-items-center gap-2" style="color: var(--text-muted); white-space: nowrap;">
+                                    <i class="bi bi-person-check"></i> Tester
+                                </span>
+                                <?php
+                                $tester = '';
+                                
+                                if($userData['tester'] == 1)
+                                    $tester = 'Attivo';
+                                else
+                                    $tester = 'Disattivato';
+                                ?>
+                                <span class="fw-medium text-end text-truncate"><?= htmlspecialchars($tester) ?></span>
                             </div>
-                        </form>
+                        </div>
 
                     <?php endif; ?>
                 </div>

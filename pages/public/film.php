@@ -160,7 +160,7 @@ if ($tmdb_id !== null && $id_utente !== null) {
 $recensioni_altri = 0;
 if ($tmdb_id !== null) {
     try {
-        $userObj          = $userObj ?? new userObj($conn, '');
+        $userObj = new userObj($conn);
         $recensioni_altri = $userObj->countReviews((int)$tmdb_id);
     } catch (PDOException $e) {
         error_log("Errore nel DB: " . $e->getMessage());
@@ -322,7 +322,7 @@ $links = [
                                     <p class="text-justify lh-lg fs-6 mb-4" style="color: var(--text-muted);"><?= nl2br(htmlspecialchars($trama)) ?></p>
                                     
                                     <?php if ($recensioni_altri > 0): ?>
-                                        <a href="/pages/public/community_reviews.php?tmdb_id=<?= urlencode($tmdb_id) ?>" class="text-decoration-none fw-bold" style="color: var(--accent);">
+                                        <a href="/pages/public/community_reviews.php?tmdb_id=<?= urlencode($tmdb_id) ?>&title=<?= urlencode($titolo) ?>"" class="text-decoration-none fw-bold" style="color: var(--accent);">
                                             <i class="bi bi-chat-left-text-fill me-1"></i> Leggi le recensioni della community
                                         </a>
                                     <?php endif; ?>
@@ -390,7 +390,7 @@ $links = [
                         </div>
 
                         <!-- Player per admin o tester -->
-                        <?php if($_SESSION['tester'] == 1): ?>
+                        <?php if(isset($_SESSION['tester']) && $_SESSION['tester'] == 1): ?>
                             <div class="mt-5 pt-4" style="border-top: 1px solid var(--border);">
                                 <div class="d-flex align-items-center gap-2 mb-3">
                                     <h3 class="fw-bold mb-0" style="color: var(--text);">Visiona il Film</h3>

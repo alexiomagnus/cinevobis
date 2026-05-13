@@ -15,8 +15,8 @@ $recensioni_map = [];
 $films = [];
 
 try {
-    // Recupero le ultime 20 recensioni globali includendo nome e cognome
-    $sql = "SELECT tmdb_id, commento, voto, nome, cognome, u.id_utente
+    // Recupero le ultime 20 recensioni globali includendo nome, cognome e username
+    $sql = "SELECT tmdb_id, commento, voto, nome, cognome, u.id_utente, u.username
             FROM recensioni r
             JOIN utenti u ON r.id_utente = u.id_utente
             ORDER BY data_aggiunto DESC 
@@ -37,13 +37,15 @@ try {
             'voto' => $row['voto'],
             'commento' => $row['commento'],
             'nome_completo' => $row['nome'] . ' ' . $row['cognome'],
-            'id_utente' => $row['id_utente']
+            'id_utente' => $row['id_utente'],
+            'username' => $row['username']
         ];
     }
 
 } catch (PDOException $e) {
     error_log("Errore nel DB: " . $e->getMessage());
 }
+
 
 if (!empty($ids)) {
     try {
@@ -121,6 +123,7 @@ if (!empty($ids)) {
                     $commento = $rec['commento'] ?? '';
                     $nome_autore = $rec['nome_completo'] ?? 'Utente Anonimo';
                     $id_autore = $rec['id_utente'] ?? 0;
+                    $username = $rec['username'] ?? '';
                 ?>
                 <div class="col">
                     <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden transition-hover">
@@ -134,14 +137,14 @@ if (!empty($ids)) {
                             <div class="card-body d-flex flex-column justify-content-between p-3">
                                 <div>
                                     <h5 class="fw-bold mb-1">
-                                        <a href="/pages/public/film.php?tmdb_id=<?= $id ?>" class="text-decoration-none text-dark">
+                                        <a href="/pages/public/film.php?tmdb_id=<?= urldecode($id) ?>" class="text-decoration-none text-dark">
                                             <?= htmlspecialchars($titolo) ?>
                                         </a>
                                     </h5>
                                     
                                     <div class="small mb-2">
                                         <i class="bi bi-person-circle me-1" style="color: var(--accent);"></i>
-                                        <a href="/pages/public/users_profiles.php?id=<?= urlencode($id_autore) ?>" 
+                                        <a href="/pages/public/users_profiles.php?id=<?= urlencode($id_autore) ?>&username=<?= urlencode($username) ?>" 
                                            class="text-decoration-none fw-semibold text-dark">
                                             <?= htmlspecialchars($nome_autore) ?>
                                         </a>

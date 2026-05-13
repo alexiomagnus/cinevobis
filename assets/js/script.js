@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const provenienza = document.referrer;
     
     // Raggruppiamo le pagine che condividono questa logica
-    const pagineTracciate = ['login.php', 'signup.php', 'change_password.php', 'profile.php', 'contact.php'];
+    const pagineTracciate = ['login.php', 'signup.php', 'change_password.php', 'profile.php', 'contact.php', 'users_profiles.php'];
 
     // Controlliamo se siamo in una di queste pagine
     const isPaginaTracciata = pagineTracciate.some(pagina => paginaAttuale.includes(pagina));
