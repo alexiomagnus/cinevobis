@@ -51,7 +51,7 @@ class userObj {
     // Cerca e restituisce tutti i dati di un singolo utente filtrando per il suo username.
     public function findByUsername() {
         $sql = "SELECT id_utente, username, password, nome, cognome, email,
-                       attivo, id_profilo, data_registrazione
+                       id_profilo, attivo, tester, data_registrazione
                 FROM utenti WHERE username = :username";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':username', $this->username);

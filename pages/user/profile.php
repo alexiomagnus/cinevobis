@@ -86,27 +86,29 @@ if (!empty($ids)) {
     }
 }
 
-
 // Sezione user per diventare tester
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $tester_attivo = isset($_POST['tester_attivo']) ? 3 : 2;
+    $tester = isset($_POST['tester']) ? 1 : 0;  // ON and OFF
     $id_utente = $_SESSION['id_utente'];
 
     try {
-        $sql = "UPDATE utenti SET id_profilo = :tester_attivo WHERE id_utente = :id_utente";
+        $sql = "UPDATE utenti SET tester = :tester WHERE id_utente = :id_utente";
         $stmt = $conn->prepare($sql);
         $stmt->execute([
-            ':tester_attivo' => $tester_attivo,
-            'id_utente' => $id_utente
+            ':tester' => $tester,
+            ':id_utente' => $id_utente
         ]);
 
-        // Aggiornare l'id profilo nella sessione
-        $_SESSION['id_profilo'] = $tester_attivo; 
+        // Aggiornare la variabile tester nella sessione
+        $_SESSION['tester'] = $tester;
+        $userData['tester'] = $tester;
+
     } catch (PDOException $e) {
         error_log("Errore nel DB: " . $e->getMessage());
         $errore = "Non è stato possibile attivare la modalità tester";
     }
 }
+
 
 // Recuperiamo i dati utente
 $userData = $user->findByUsername();
@@ -234,12 +236,12 @@ if ($userData && $userData['data_registrazione']) {
                                 </span>
                                 <?php 
                                 $profilo = '';
+
                                 if($userData['id_profilo'] == 1) {
                                     $profilo = 'Admin';
+
                                 } elseif($userData['id_profilo'] == 2) {
                                     $profilo = 'User';
-                                } elseif($userData['id_profilo'] == 3) {
-                                    $profilo = 'Tester';
                                 }
                                 ?>
                                 <span class="fw-medium text-end text-truncate"><?= htmlspecialchars($profilo) ?></span>
@@ -262,11 +264,26 @@ if ($userData && $userData['data_registrazione']) {
                                 </span>
                                 <span class="fw-medium text-end text-truncate"><?= htmlspecialchars($userData['nome'] ?? 'Non inserito') ?></span>
                             </div>
-                            <div class="d-flex justify-content-between align-items-center p-3 gap-3">
+                            <div class="d-flex justify-content-between align-items-center p-3 border-bottom gap-3">
                                 <span class="d-flex align-items-center gap-2" style="color: var(--text-muted); white-space: nowrap;">
                                     <i class="bi bi-person-vcard"></i> Cognome
                                 </span>
                                 <span class="fw-medium text-end text-truncate"><?= htmlspecialchars($userData['cognome'] ?? 'Non inserito') ?></span>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between align-items-center p-3 gap-3">
+                                <span class="d-flex align-items-center gap-2" style="color: var(--text-muted); white-space: nowrap;">
+                                    <i class="bi bi-person-check"></i> Tester
+                                </span>
+                                <?php
+                                $tester = '';
+                                
+                                if($userData['tester'] == 1)
+                                    $tester = 'Attivo';
+                                else
+                                    $tester = 'Disattivato';
+                                ?>
+                                <span class="fw-medium text-end text-truncate"><?= htmlspecialchars($tester) ?></span>
                             </div>
                         </div>
                         
@@ -290,31 +307,29 @@ if ($userData && $userData['data_registrazione']) {
                             </div>
                         </form>
 
-                        <?php if($_SESSION['id_profilo'] != 1): ?>
-                            <form method="POST">
-                                <div class="mb-4">
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" 
-                                            type="checkbox" 
-                                            name="tester_attivo" 
-                                            id="tester_attivo"
-                                            <?= ($userData['id_profilo'] == 3) ? 'checked' : '' ?>>
-                                        <label class="form-check-label fw-semibold" for="tester_attivo">
-                                            Tester
-                                        </label>
-                                    </div>
-                                    <p class="small mt-2 text-start" style="color: var(--text-muted);">
-                                        <i class="bi bi-info-circle me-1"></i>
-                                        Attivando questa modalità, accetti la presenza di contenuti aggiuntivi utilizzati per verificare il funzionamento del sistema (ad esempio annunci e nuove implementazioni). 
-                                        Il comportamento del sito potrebbe non essere quello definitivo. Clicca salva per applicare le modifiche.
-                                    </p>
-                                    <button type="submit" id="tester_submit" name="update_tester"
-                                        class="btn btn-outline-secondary">
-                                        Salva
-                                    </button>
+                        <form method="POST">
+                            <div class="mb-4">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input"
+                                        type="checkbox" 
+                                        name="tester" 
+                                        id="tester"
+                                        <?= ($userData['tester'] == 1) ? 'checked' : '' ?>>
+                                    <label class="form-check-label fw-semibold" for="tester">
+                                        Tester
+                                    </label>
                                 </div>
-                            </form>
-                        <?php endif; ?>
+                                <p class="small mt-2 text-start" style="color: var(--text-muted);">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Attivando questa modalità, accetti la presenza di contenuti aggiuntivi utilizzati per verificare il funzionamento del sistema (ad esempio annunci e nuove implementazioni). 
+                                    Il comportamento del sito potrebbe non essere quello definitivo. Clicca salva per applicare le modifiche.
+                                </p>
+                                <button type="submit" name="update_tester"
+                                    class="btn btn-outline-secondary">
+                                    Salva
+                                </button>
+                            </div>
+                        </form>
                     <?php endif; ?>
                 </div>
             </div>

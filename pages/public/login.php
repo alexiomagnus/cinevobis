@@ -30,6 +30,7 @@ if (isset($_POST['login'])) {
                 $_SESSION['username']  = $utente['username'];
                 $_SESSION['id_profilo'] = $utente['id_profilo'];
                 $_SESSION['nome'] = $utente['nome'];
+                $_SESSION['tester'] = $utente['tester'];
 
                 $user->createDataLogin(date('Y-m-d H:i:s'), session_id(), $utente['id_utente']);
 

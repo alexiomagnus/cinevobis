@@ -26,7 +26,6 @@ $errore = "";
 $movie_id = $_GET['tmdb_id'] ?? null;
 $collection = [];
 
-$id_profilo = $_SESSION['id_profilo']; 
 
 // Connessione a MongoDB
 try {
@@ -156,6 +155,7 @@ if ($tmdb_id !== null && $id_utente !== null) {
     }
 }
 
+
 // Conteggio recensioni della community
 $recensioni_altri = 0;
 if ($tmdb_id !== null) {
@@ -241,20 +241,39 @@ $links = [
                                 <?php endif; ?>
 
                                 <?php if (!empty($registi)): ?>
-                                    <div class="mb-4">
-                                        <small class="text-uppercase fw-bold d-block mb-1" style="letter-spacing: 1px; color: var(--text-muted);">Regia</small>
-                                        <p class="fs-5 fw-medium mb-0" style="color: var(--text);">
-                                            <?php
-                                            $registi_links = array_map(function ($regista) {
-                                                $name = htmlspecialchars($regista['name']);
-                                                $id   = urlencode($regista['id']);
-                                                return "<a href='https://www.themoviedb.org/person/$id' class='text-decoration-none' style='color: var(--accent); transition: color 0.2s;' onmouseover='this.style.color=\"var(--accent-hover)\"' onmouseout='this.style.color=\"var(--accent)\"'>$name</a>";
-                                            }, $registi);
-                                            echo implode(', ', $registi_links);
-                                            ?>
-                                        </p>
-                                    </div>
-                                <?php endif; ?>
+
+                                <?php
+                                // Trasformo l'array dei registi in link HTML
+                                $registi_links = [];
+                                
+                                foreach ($registi as $regista) {
+                                    $name = htmlspecialchars($regista['name']);
+                                    $id   = urlencode($regista['id']);
+
+                                    $registi_links[] = "<a href='https://www.themoviedb.org/person/$id'
+                                                        class='text-decoration-none'
+                                                        style='color: var(--accent); transition: color 0.2s;'
+                                                        onmouseover='this.style.color=\"var(--accent-hover)\"'
+                                                        onmouseout='this.style.color=\"var(--accent)\"'
+                                                        target='_blank'>
+                                                        $name
+                                                        </a>";
+                                }
+                                $registi_output = implode(', ', $registi_links);
+                                ?>
+
+                                <div class="mb-4">
+                                    <small class="text-uppercase fw-bold d-block mb-1"
+                                        style="letter-spacing: 1px; color: var(--text-muted);">
+                                        Regia
+                                    </small>
+
+                                    <p class="fs-5 fw-medium mb-0" style="color: var(--text);">
+                                        <?= $registi_output ?>
+                                    </p>
+                                </div>
+
+                            <?php endif; ?>
 
                                 <div class="d-flex flex-wrap gap-2 mb-4">
                                     <?php foreach ($generi as $genre): ?>
@@ -332,13 +351,17 @@ $links = [
                             <h4 class="fw-bold mb-4" style="color: var(--text);">Cast Principale</h4>
                             <div class="row g-3">
                                 <?php foreach ($cast as $actor):
-                                    $nome   = $actor['name']      ?? 'Attore Sconosciuto';
-                                    $ruolo  = $actor['character'] ?? 'Personaggio non specificato';
-                                    $idTMDB = $actor['id']        ?? '';
-                                    $path   = $actor['profile_path'] ?? null;
-                                    $fotoUrl = $path
-                                        ? "https://image.tmdb.org/t/p/w185" . $path
-                                        : "https://ui-avatars.com/api/?name=" . urlencode($nome) . "&background=f1f5f9&color=64748b";
+                                    $nome = $actor['name'] ?? 'Attore Sconosciuto';
+                                    $ruolo = $actor['character'] ?? 'Personaggio non specificato';
+                                    $idTMDB = $actor['id'] ?? '';
+                                    $path = $actor['profile_path'] ?? null;
+                                    
+                                    if ($path) {
+                                        $fotoUrl = 'https://image.tmdb.org/t/p/w185' . $path;
+                                    } else {
+                                        $nomeEncoded = urlencode($nome);
+                                        $fotoUrl = "https://ui-avatars.com/api/?name={$nomeEncoded}&background=f1f5f9&color=64748b";
+                                    }
                                 ?>
                                 <div class="col-12 col-sm-6 col-lg-4">
                                     <a href="https://www.themoviedb.org/person/<?= $idTMDB ?>" class="text-decoration-none d-block" target="_blank">
@@ -367,26 +390,36 @@ $links = [
                         </div>
 
                         <!-- Player per admin o tester -->
-                        <?php if($id_profilo == 1 || $id_profilo == 3): ?>
+                        <?php if($_SESSION['tester'] == 1): ?>
                             <div class="mt-5 pt-4" style="border-top: 1px solid var(--border);">
                                 <div class="d-flex align-items-center gap-2 mb-3">
                                     <h3 class="fw-bold mb-0" style="color: var(--text);">Visiona il Film</h3>
                                 </div>
 
-                                <small class="text-uppercase fw-bold text-muted d-block mb-2" style="letter-spacing:1px">Sorgente</small>
-
-                                <select id="siteSelect" class="form-select form-select-lg mb-3" name="sites">
-                                    <?php /** @var array $links **/
-                                    foreach($links as $key => $value): ?>
-                                        <option value="<?php echo $value; ?>">
-                                            <?php echo $key; ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
+                                <div class="mb-3">
+                                    <label for="siteSelect" class="form-label text-uppercase fw-bold mb-1" style="letter-spacing: 1px; color: var(--text-muted); font-size: 0.75rem;">
+                                        Sorgente Video
+                                    </label>
+                                    
+                                    <div class="input-group input-group-sm shadow-sm rounded-3 overflow-hidden" style="border: 1px solid var(--border); max-width: 250px;">
+                                        <span class="input-group-text border-0" style="background-color: var(--bg-muted); color: var(--text-muted);">
+                                            <i class="bi bi-play-circle-fill"></i>
+                                        </span>
+                                        <select id="siteSelect" class="form-select border-0 shadow-none" name="sites" style="background-color: var(--bg-surface); color: var(--text); font-weight: 500; cursor: pointer;">
+                                            <?php /** @var array $links **/
+                                            foreach($links as $key => $value): ?>
+                                                <option value="<?php echo $value; ?>" style="background-color: var(--bg-surface); color: var(--text);">
+                                                    Server: <?php echo $key; ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                </div>
 
                                 <div class="rounded-4 overflow-hidden shadow-sm" 
                                     style="border: 1px solid var(--border); background: #000;">
                                     <div class="ratio ratio-16x9">
+                                        <!--Primo elemento dell'array con reset() -->
                                         <iframe id="videoFrame"
                                                 src="<?php echo reset($links) . $movie_id; ?>"
                                                 allowfullscreen
