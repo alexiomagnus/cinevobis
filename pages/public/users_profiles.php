@@ -100,7 +100,17 @@ if (!empty($ids)) {
 
                 <div style="max-width: 550px; width: 100%; margin: 0 auto;">
 
-                    <h1 class="fw-bolder text-center mb-5" style="letter-spacing: -0.5px;">Il profilo di <?php echo htmlspecialchars($userData['nome']) . " " . htmlspecialchars($userData['cognome']);?></h1>
+                    <?php 
+                    if (isset($_SESSION['username']) && $_SESSION['username'] == $username) {
+                        echo "<h2 class='fw-bolder text-center mb-5' style='letter-spacing: -0.5px;'>";
+                        echo "Il tuo profilo";
+                        echo "</h2>";
+                    } else {
+                        echo "<h2 class='fw-bolder text-center mb-5' style='letter-spacing: -0.5px;'>";
+                        echo "Il profilo di " . htmlspecialchars($userData['nome']) . " " . htmlspecialchars($userData['cognome']);
+                        echo "</h2>";
+                    }
+                    ?>
 
                     <?php if (isset($errore)): ?>
                         <div class="alert alert-danger mb-4" role="alert">
@@ -234,7 +244,7 @@ if (!empty($ids)) {
             </div>
 
             <div class="col-lg-6 d-none d-lg-block"
-                 style="background-image: url('/assets/img/astronaut.jpeg'); background-size: cover; background-position: center; border-left: 1px solid var(--border);">
+                 style="background-image: url('/assets/img/tesseract.png'); background-size: cover; background-position: center; border-left: 1px solid var(--border);">
             </div>
 
         </div>
