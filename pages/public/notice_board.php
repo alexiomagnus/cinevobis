@@ -100,7 +100,6 @@ if (!empty($ids)) {
 
     <main class="container mt-5 mb-5 flex-grow-1">
         <div class="d-flex align-items-center mb-4">
-            <i class="bi bi-journal-text fs-2 me-3 text-warning"></i>
             <h1 class="fw-bold m-0">Bacheca</h1>
         </div>
 

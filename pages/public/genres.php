@@ -48,7 +48,6 @@ try {
         <div class="container">
 
             <div class="d-flex align-items-center gap-2 mb-2">
-                <i class="bi bi-grid-fill" style="color: var(--accent); font-size: 1.6rem"></i>
                 <h1 class="fw-bold mb-0">Generi</h1>
             </div>
             <p class="mb-4" style="color: var(--text-muted);">Esplora il catalogo per categoria</p>

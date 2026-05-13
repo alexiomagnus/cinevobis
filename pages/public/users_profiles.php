@@ -90,7 +90,7 @@ if (!empty($ids)) {
     <div class="container-fluid p-0 overflow-hidden">
         <div class="row g-0 vh-100">
 
-            <div class="col-lg-6 d-flex flex-column position-relative px-4 py-5 vh-100 overflow-y-auto">
+            <div class="col-12 d-flex flex-column position-relative px-4 py-5 vh-100 overflow-y-auto">
 
                 <a href="javascript:void(0)" 
                    onclick="closeAndRedirect()" 
@@ -241,10 +241,6 @@ if (!empty($ids)) {
 
                     <?php endif; ?>
                 </div>
-            </div>
-
-            <div class="col-lg-6 d-none d-lg-block"
-                 style="background-image: url('/assets/img/tesseract.jpg'); background-size: cover; background-position: center; border-left: 1px solid var(--border);">
             </div>
 
         </div>
