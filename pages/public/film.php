@@ -431,25 +431,38 @@ $links = [
             </div>
 
             <?php if ($trailerKey): ?>
-            <div class="modal fade" id="trailerModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-xl modal-dialog-centered">
-                    <div class="modal-content shadow-lg border-0" style="background-color: var(--bg-surface);">
-                        <div class="modal-header border-0 pb-0">
-                            <h5 class="modal-title fw-bold" style="color: var(--text);">Trailer: <?= htmlspecialchars($titolo) ?></h5>
-                            <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body p-3 pt-1">
-                            <div class="ratio ratio-16x9 shadow-sm rounded-4 overflow-hidden" style="background: #000;">
+                <div class="modal fade" id="trailerModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-xl modal-dialog-centered">
+                        <div class="modal-content border-0" style="background: transparent; box-shadow: none; outline: none;">
+
+                            <button type="button"
+                                    data-bs-dismiss="modal"
+                                    aria-label="Chiudi"
+                                    style="position: absolute;
+                                        top: -44px; right: 0;
+                                        width: 36px; height: 36px;
+                                        border-radius: 50%;
+                                        border: 2px solid rgba(255,255,255,0.7);
+                                        background: rgba(0,0,0,0.5);
+                                        color: #fff;
+                                        font-size: 18px;
+                                        line-height: 1;
+                                        cursor: pointer;">
+                                &times;
+                            </button>
+
+                            <div class="ratio ratio-16x9" style="border-radius: 16px; overflow: hidden; box-shadow: none;">
                                 <iframe id="trailerVideo"
                                     data-src="https://www.youtube.com/embed/<?= $trailerKey ?>?rel=0&autoplay=1"
                                     allow="autoplay; encrypted-media"
-                                    allowfullscreen>
+                                    allowfullscreen
+                                    style="border: none; outline: none; display: block;">
                                 </iframe>
                             </div>
+
                         </div>
                     </div>
                 </div>
-            </div>
             <?php endif; ?>
 
         <?php else: ?>
