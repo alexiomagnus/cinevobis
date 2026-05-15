@@ -7,6 +7,8 @@ require_once(__DIR__ . '/../../includes/user_obj.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');
 require_once(__DIR__ . '/../../vendor/autoload.php');
 
+
+// Dichiarazione variabili
 $recensioni_altri = [];
 $tmdb_id = $_GET['tmdb_id'] ?? null;
 $titolo = $_GET['title'] ?? null;
@@ -122,5 +124,6 @@ if ($tmdb_id !== null) {
     <?php require_once(__DIR__ . '/../../includes/footer.php'); ?>
 
     <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/script.js"></script>
 </body>
 </html>

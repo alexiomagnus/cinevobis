@@ -1,3 +1,13 @@
+// --- GESTIONE DARK MODE IMMEDIATA (Evita FOUC) ---
+(function() {
+    const storedTheme = localStorage.getItem('theme');
+    if (storedTheme === 'dark' || (!storedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+    } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+    }
+})();
+
 document.addEventListener("DOMContentLoaded", function() {
     
     // --- 1. SALVATAGGIO PROVENIENZA (Login/Signup/Profile) ---
@@ -68,29 +78,57 @@ document.addEventListener("DOMContentLoaded", function() {
     const descrizione = document.getElementById('descrizione');
     const contatore = document.getElementById('contatore');
 
-    // 1. Definiamo la funzione di aggiornamento
-    const aggiornaContatore = () => {
-        const numeroCaratteri = descrizione.value.length;
-        
-        // Aggiorna il testo a schermo
-        contatore.textContent = `${numeroCaratteri}/200 caratteri`;
-        
-        // Gestione colore limite
-        if (numeroCaratteri >= 190) {
-            contatore.classList.add('text-danger');
-        } else {
-            contatore.classList.remove('text-danger');
+    if (descrizione && contatore) {
+        // 1. Definiamo la funzione di aggiornamento
+        const aggiornaContatore = () => {
+            const numeroCaratteri = descrizione.value.length;
+            
+            // Aggiorna il testo a schermo
+            contatore.textContent = `${numeroCaratteri}/200 caratteri`;
+            
+            // Gestione colore limite
+            if (numeroCaratteri >= 190) {
+                contatore.classList.add('text-danger');
+            } else {
+                contatore.classList.remove('text-danger');
+            }
+        };
+
+        // 2. Esegui la funzione all'avvio (per calcolare il testo già presente)
+        aggiornaContatore();
+
+        // 3. ASCOLTATORE DI EVENTI: Si attiva per ogni modifica futura
+        descrizione.addEventListener('input', aggiornaContatore);
+    }
+
+    // --- 5. GESTIONE DARK MODE ---
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+
+    if (themeToggle && themeIcon) {
+        // Imposta l'icona iniziale basata sul tema attuale (impostato nel tag html)
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        if (currentTheme === 'dark') {
+            themeIcon.classList.replace('bi-moon-fill', 'bi-sun-fill');
         }
-    };
 
-    // 2. Esegui la funzione all'avvio (per calcolare il testo già presente)
-    aggiornaContatore();
+        themeToggle.addEventListener('click', () => {
+            let theme = document.documentElement.getAttribute('data-theme');
+            let newTheme = theme === 'dark' ? 'light' : 'dark';
 
-    // 3. ASCOLTATORE DI EVENTI: Si attiva per ogni modifica futura
-    descrizione.addEventListener('input', aggiornaContatore);
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+
+            if (newTheme === 'dark') {
+                themeIcon.classList.replace('bi-moon-fill', 'bi-sun-fill');
+            } else {
+                themeIcon.classList.replace('bi-sun-fill', 'bi-moon-fill');
+            }
+        });
+    }
 });
 
-// --- 5. FUNZIONE PER TORNARE INDIETRO ---
+// --- 6. FUNZIONE PER TORNARE INDIETRO ---
 function closeAndRedirect() {
     const destinazione = sessionStorage.getItem('origin_url');
     sessionStorage.removeItem('origin_url');

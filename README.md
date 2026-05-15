@@ -59,6 +59,14 @@ Esegui i seguenti comandi nella root del progetto:
 *   **Backend**: `composer install`.
 *   **Frontend**: `npm install`.
 
+# Configurazione TMDB
+Il sistema per funzionare correttamente richiede l'API di TMDB
+
+3.  Crea un account TMDB e richiedi l'API gratuita dal sito ufficiale: https://www.themoviedb.org/
+4.  Aggiungi la tua chiave al file .env
+
+Copia la chiave più lunga
+
 ### 4. Configurazione dell'Ambiente (.env)
 
 Configura le connessioni ai database creando un file di ambiente nella root del progetto, evitando di modificare direttamente i file in `config/`:
@@ -67,33 +75,20 @@ Configura le connessioni ai database creando un file di ambiente nella root del 
 2.  Inserisci i seguenti parametri adattandoli alla tua configurazione:
 
 ```env
-# Configurazione MariaDB
+# Configurazione
+API_KEY=la_tua_api_tmdb
 DB_HOST=localhost
 DB_NAME=cinevobis
 DB_USER=tuo_utente
 DB_PASS=tua_password
+MONGODB_HOST=mongodb://localhost:27017
+MONGODB_NAME=cinevobis
+MONGODB_COLLECTION=films
 ```
 
 Questi valori verranno caricati da `config/connection.php` per gestire le connessioni al sistema
 
 (Se vuoi utilizzare l'utente root metti a DB_USER=root e a DB_PASS=root)
-
-# Configurazione MongoDB
-MONGO_URI=mongodb://localhost:27017
-MONGO_DB=cinevobis
-
-
-# Configurazione TMDB
-Il sistema per funzionare correttamente richiede l'API di TMDB
-
-3.  Crea un account TMDB e richiedi l'API gratuita dal sito ufficiale: https://www.themoviedb.org/
-4.  Aggiungi la tua chiave al file .env
-
-Usa la chiave più lunga offerta da TMDB
-
-```env
-API_KEY=la_tua_chiave_tmdb
-```
 
 ### 5. Avvio del Progetto
 
@@ -102,6 +97,10 @@ Una volta completata la configurazione, avvia il server locale di PHP all'intern
 ```bash
 php -S localhost:8000
 ```
+
+Se vuoi usare un ambiente professionale e non il server messo a disposizione da PHP puoi usare:
+
+
 
 Punta il tuo browser all'indirizzo: `http://localhost:8000`.
 

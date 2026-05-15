@@ -1,3 +1,13 @@
+<script>
+    (function() {
+        const storedTheme = localStorage.getItem('theme');
+        if (storedTheme === 'dark' || (!storedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+    })();
+</script>
 <?php
 $isLogged = isset($_SESSION['username']);
 $currentPage = basename($_SERVER['SCRIPT_NAME']);
@@ -47,6 +57,11 @@ $isAdminPage = in_array($currentPage, $adminPages);
                 </a>
             </div>
         <?php endif; ?>
+
+        <!-- Theme Toggle -->
+        <button id="theme-toggle" class="btn btn-sm btn-outline-secondary border-0 px-2 me-2" title="Cambia Tema">
+            <i class="bi bi-moon-fill" id="theme-icon"></i>
+        </button>
 
         <!-- Non loggato: bottoni Accedi / Registrati -->
         <?php if (!$isLogged): ?>

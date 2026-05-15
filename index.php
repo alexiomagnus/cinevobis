@@ -322,5 +322,6 @@ $film = search_film_by_id($topFilms, $movie_id);
     <?php require_once('includes/footer.php'); ?>
 
     <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/script.js"></script>
 </body>
 </html>

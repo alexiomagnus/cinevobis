@@ -6,8 +6,6 @@ require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');
 require_once(__DIR__ . '/../../vendor/autoload.php');
 
-use MongoDB\Client;
-
 
 // Controllo autenticazione
 $username   = $_SESSION['username']   ?? '';
@@ -26,16 +24,17 @@ $totaleSessioni = 0;
 $totaleNotifiche = 0;
 
 
-// Connessione a MongoDB
+// Conteggio film
 try {
-    $mongoClient = new Client("mongodb://localhost:27017");
-    $db = $mongoClient->selectDatabase('cinevobis');
-    $collection = $db->selectCollection('films');
+    // Controllo per evitare errori se MongoDB è offline
+    if (!$collection) {
+        throw new \Exception("Connessione a MongoDB non disponibile.");
+    }
 
     // Conteggio documenti
     $totaleFilm = $collection->countDocuments([]);
-} catch (Exception $e) {
-    error_log("Errore MongoDB: " . $e->getMessage());
+} catch (\Throwable $e) { // \Throwable cattura sia Exception che Fatal Error
+    error_log("Errore nel conteggio film: " . $e->getMessage());
 }
 
 
@@ -175,6 +174,8 @@ try {
     </main>
 
     <?php require_once(__DIR__ . '/../../includes/footer.php'); ?>
+    
     <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/script.js"></script>
 </body>
 </html>

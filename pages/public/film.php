@@ -270,10 +270,7 @@ $links = [
                                 <div class="d-flex flex-wrap gap-2 mb-4">
                                     <?php foreach ($generi as $genre): ?>
                                         <a href="search_genre.php?id=<?= urlencode($genre['id']) ?>&name=<?= urlencode($genre['name']) ?>" 
-                                            class="badge text-decoration-none px-3 py-2" 
-                                            style="background-color: var(--bg-muted); color: var(--text); border: 1px solid var(--border); transition: var(--transition);"
-                                            onmouseover="this.style.borderColor='var(--accent)'; this.style.backgroundColor='white';"
-                                            onmouseout="this.style.borderColor='var(--border)'; this.style.backgroundColor='var(--bg-muted)';">
+                                            class="badge badge-genre text-decoration-none px-3 py-2">
                                             <?= htmlspecialchars($genre['name']) ?>
                                         </a>
                                     <?php endforeach; ?>
@@ -436,12 +433,13 @@ $links = [
             <?php if ($trailerKey): ?>
             <div class="modal fade" id="trailerModal" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-xl modal-dialog-centered">
-                    <div class="modal-content bg-transparent border-0">
-                        <div class="d-flex justify-content-end mb-3">
-                            <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="modal-content shadow-lg border-0" style="background-color: var(--bg-surface);">
+                        <div class="modal-header border-0 pb-0">
+                            <h5 class="modal-title fw-bold" style="color: var(--text);">Trailer: <?= htmlspecialchars($titolo) ?></h5>
+                            <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <div class="modal-body p-0">
-                            <div class="ratio ratio-16x9 shadow-lg rounded-4 overflow-hidden" style="background: #000;">
+                        <div class="modal-body p-3 pt-1">
+                            <div class="ratio ratio-16x9 shadow-sm rounded-4 overflow-hidden" style="background: #000;">
                                 <iframe id="trailerVideo"
                                     data-src="https://www.youtube.com/embed/<?= $trailerKey ?>?rel=0&autoplay=1"
                                     allow="autoplay; encrypted-media"
@@ -467,6 +465,7 @@ $links = [
 
     <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/assets/js/script.js"></script>
+    
     <script>
         const select = document.getElementById('siteSelect');
         const iframe = document.getElementById('videoFrame');
