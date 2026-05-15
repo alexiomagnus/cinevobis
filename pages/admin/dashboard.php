@@ -39,7 +39,7 @@ try {
 }
 
 
-// Conteggio utenti
+// Conteggio utenti attivi
 try {
     $sql = "SELECT COUNT(*) FROM utenti WHERE attivo = 1";
     $stmt = $conn->prepare($sql);
@@ -51,7 +51,7 @@ try {
 }
 
 
-// Conteggio sessioni
+// Conteggio sessioni attive
 try {
     $sql = "SELECT COUNT(*) FROM sessioni WHERE data_logout IS NULL";
     $stmt = $conn->prepare($sql);

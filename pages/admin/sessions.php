@@ -19,6 +19,19 @@ $user = new userObj($conn, $username);
 // Recupero il numero di righe dal parametro GET, validandolo come intero (minimo 1)
 $righe = (int)($_GET['righe'] ?? 15);
 $sessioni = $user->readAccess($righe);
+
+// Conteggio sessioni
+$totaleSessioni = 0;
+
+try {
+    $sql = "SELECT COUNT(*) FROM sessioni";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+
+    $totaleSessioni = $stmt->fetchColumn();
+} catch (PDOException $e) {
+    error_log("Errore DB: " . $e->getMessage());
+}
 ?>
 <!DOCTYPE html>
 <html lang="it">
@@ -36,7 +49,7 @@ $sessioni = $user->readAccess($righe);
 
     <div class="container mt-4 mb-5 pb-5 flex-grow-1">
         
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
             <h1 class="fs-3 fw-bold mb-0">Log accessi</h1>
             
             <form method="GET" class="d-flex align-items-center gap-2">
@@ -49,6 +62,8 @@ $sessioni = $user->readAccess($righe);
                 </div>
             </form>
         </div>
+
+        <small class='text-uppercase fw-bold text-muted d-block mb-3' style='letter-spacing:1px'><?php echo htmlspecialchars($totaleSessioni); ?> Sessioni totali</small>
 
         <div class="card shadow-sm border-0">
             <div class="table-responsive">

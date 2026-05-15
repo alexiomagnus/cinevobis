@@ -16,6 +16,20 @@ if (!$username || $id_profilo != 1) {
 
 $user = new userObj($conn, $username);
 $utenti = $user->readAll();
+
+
+// Conteggio utenti totali
+$totaleUtenti = 0;
+
+try {
+    $sql = "SELECT COUNT(*) FROM utenti";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+
+    $totaleUtenti = $stmt->fetchColumn();
+} catch (PDOException $e) {
+    error_log("Errore DB: " . $e->getMessage());
+}
 ?>
 <!DOCTYPE html>
 <html lang="it">
@@ -33,9 +47,11 @@ $utenti = $user->readAll();
 
     <div class="container mt-4 mb-5 pb-5 flex-grow-1">
         
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
             <h1 class="fs-3 fw-bold mb-0">Utenti</h1>
             </div>
+
+            <small class='text-uppercase fw-bold text-muted d-block mb-3' style='letter-spacing:1px'><?php echo htmlspecialchars($totaleUtenti); ?> Utenti totali</small>
         
         <div class="card shadow-sm border-0">
             <div class="table-responsive">
