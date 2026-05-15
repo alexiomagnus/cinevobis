@@ -5,7 +5,6 @@ require_once(__DIR__ . '/../../config/functions.php');
 require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/user_obj.php');
 
-use MongoDB\Client;
 
 // Controllo autenticazione
 $username = $_SESSION['username'] ?? '';
@@ -16,15 +15,18 @@ if (!$username) {
 }
 
 
+// Dichiarazione variabili
 $userData = null;
 $dataRegistrazione = "N/D";
 $user = new userObj($conn, $username);
+
 
 // Gestione Cambia Password
 if (isset($_POST['change_password'])) {
     header("Location: /actions/change_password.php");
     exit();
 }
+
 
 // Gestione Disabilitazione Account
 if (isset($_POST['delete_user']) && $username) {
@@ -39,6 +41,7 @@ if (isset($_POST['delete_user']) && $username) {
         $errore = "Errore durante l'eliminazione";
     }
 }
+
 
 // Conteggi statistiche (MariaDB)
 $countWatched = 0;
@@ -70,21 +73,26 @@ try {
     error_log("Errore nel DB: " . $e->getMessage());
 }
 
+
 // Recupero dettagli preferiti da MongoDB
 $favorites = [];
 if (!empty($ids)) {
     try {
-        $mongoClient = new Client("mongodb://localhost:27017");
-        $db = $mongoClient->selectDatabase('cinevobis');
-        $collection = $db->selectCollection('films');
+        // Controllo per evitare errori se MongoDB è offline
+        if (!$collection) {
+            throw new \Exception("Connessione a MongoDB non disponibile.");
+        }
+
         $cursor = $collection->find(
-            ['id' => ['$in' => $ids]], 
-            ['typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']]);
+            ['id' => ['$in' => $ids]]
+        );
+
         $favorites = movie_sorting($cursor, $ids);
-    } catch (Exception $e) {
-        error_log("Errore MongoDB: " . $e->getMessage());
+    } catch (\Throwable $e) { // \Throwable cattura sia Exception che Fatal Error
+        error_log("Errore caricamento film preferiti: " . $e->getMessage());
     }
 }
+
 
 // Sezione user per diventare tester
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

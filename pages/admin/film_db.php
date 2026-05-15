@@ -7,11 +7,9 @@ require_once(__DIR__ . '/../../includes/movie_obj.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');
 require_once(__DIR__ . '/../../vendor/autoload.php');
 
-use MongoDB\Client;
-
 
 // Controllo autenticazione
-$username   = $_SESSION['username']   ?? '';
+$username = $_SESSION['username']   ?? '';
 $id_profilo = $_SESSION['id_profilo'] ?? 0;
 
 if (!$username || $id_profilo != 1) {
@@ -22,23 +20,25 @@ if (!$username || $id_profilo != 1) {
 
 // Dichiarazione variabili
 $movie_db = null;
-$data     = [];
-$errore   = "";
-
+$data = [];
+$errore = "";
 $movie_id = $_GET['tmdb_id'] ?? null;
 
+
+// Caricare dati film richiesto
 if (empty($movie_id)) {
     $errore = "Nessun film selezionato";
 } else {
     try {
-        $mongoClient = new Client("mongodb://localhost:27017");
-        $db          = $mongoClient->selectDatabase('cinevobis');
-        $collection  = $db->selectCollection('films');
+        // Controllo per evitare errori se MongoDB è offline
+        if (!$collection) {
+            throw new \Exception("Connessione a MongoDB non disponibile.");
+        }
 
         $movie_db = $collection->findOne(
-            ['id' => (int)$movie_id],
-            ['typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']]
+            ['id' => (int)$movie_id]
         );
+
 
         if ($movie_db === null) {
             $errore = "Film non trovato nel database";
@@ -46,9 +46,9 @@ if (empty($movie_id)) {
             $data = (new movieObj($movie_db))->toArray();
         }
 
-    } catch (Exception $e) {
-        error_log("Errore MongoDB: " . $e->getMessage());
-        $errore = "Errore di connessione al database";
+    } catch (\Throwable $e) { // \Throwable cattura sia Exception che Fatal Error
+        error_log("Errore caricamento film: " . $e->getMessage());
+        $errore = "Errore caricamento film";
     }
 }
 ?>
@@ -119,7 +119,7 @@ if (empty($movie_id)) {
                                             <?php
                                             $registi_links = array_map(function ($regista) {
                                                 $name = htmlspecialchars($regista['name']);
-                                                $id   = urlencode($regista['id']);
+                                                $id = urlencode($regista['id']);
                                                 return "<a href='https://www.themoviedb.org/person/$id' class='text-decoration-none' target='_blank' style='color: var(--accent); transition: color 0.2s;' onmousregistaeover='this.style.color=\"var(--accent-hover)\"' onmouseout='this.style.color=\"var(--accent)\"'>$name</a>";
                                             }, $data['registi']);
                                             echo implode(', ', $registi_links);

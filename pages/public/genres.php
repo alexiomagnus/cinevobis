@@ -4,15 +4,18 @@ require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');
 require_once(__DIR__ . '/../../vendor/autoload.php');
 
-use MongoDB\Client;
 
+// Dichiarazione variabili
 $generi = [];
 $errore = null;
 
+
+// Ricerca generi
 try {
-    $mongoClient = new MongoDB\Client("mongodb://localhost:27017");
-    $db = $mongoClient->selectDatabase("cinevobis");
-    $collection = $db->selectCollection("films");
+    // Controllo per evitare errori se MongoDB è offline
+    if (!$collection) {
+        throw new \Exception("Connessione a MongoDB non disponibile.");
+    }
 
     $pipeline = [
         ['$unwind' => '$genres'],
@@ -25,9 +28,9 @@ try {
 
     $generi = $collection->aggregate($pipeline)->toArray();
 
-} catch (Exception $e) {
-    error_log("Errore con MongoDB: " . $e->getMessage());
-    $errore = "Impossibile caricare i generi.";
+} catch (\Throwable $e) { // \Throwable cattura sia Exception che Fatal Error
+    error_log("Impossibile caricare i generi: " . $e->getMessage());
+    $errore = "Impossibile caricare i generi";
 }
 ?>
 <!DOCTYPE html>

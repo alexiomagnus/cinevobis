@@ -6,7 +6,6 @@ require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');
 require_once(__DIR__ . '/../../vendor/autoload.php');
 
-use MongoDB\Client;
 
 // Dichiarazione variabili
 $limit = 20;
@@ -14,6 +13,7 @@ $ids = [];
 $films = [];
 $recensioni_list = [];
 $films_map = [];
+
 
 try {
     // Recupero le ultime 20 recensioni globali includendo nome, cognome e username
@@ -50,16 +50,14 @@ try {
 
 if (!empty($ids)) {
     try {
-        $mongoClient = new Client("mongodb://localhost:27017");
-        $db = $mongoClient->selectDatabase("cinevobis");
-        $collection = $db->selectCollection("films");
+        // Controllo per evitare errori se MongoDB è offline
+        if (!$collection) {
+            throw new \Exception("Connessione a MongoDB non disponibile.");
+        }
 
         $cursor = $collection->find(
             ['id' => ['$in' => $ids]],
-            [
-                'sort' => ['vote_average' => -1],
-                'typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array'],
-            ]
+            ['sort' => ['vote_average' => -1]]
         );
 
         // Creiamo una mappa veloce per accedere ai film
@@ -67,8 +65,8 @@ if (!empty($ids)) {
             $films_map[$film['id']] = $film;
         }
 
-    } catch (Exception $e) {
-        error_log("Errore in MongoDB: " . $e->getMessage());
+    } catch (\Throwable $e) { // \Throwable cattura sia Exception che Fatal Error
+        error_log("Errore caricamento film: " . $e->getMessage());
         $films_map = [];
     }
 }
@@ -149,7 +147,7 @@ if (!empty($ids)) {
                                     
                                     <div class="small mb-2">
                                         <i class="bi bi-person-circle me-1" style="color: var(--accent);"></i>
-                                        <a href="/pages/public/users_profiles.php?id=<?= urlencode($id_autore) ?>&username=<?= urlencode($username) ?>" 
+                                        <a href="/pages/public/users_profiles.php?username=<?= urlencode($username) ?>" 
                                            class="text-decoration-none fw-semibold text-dark">
                                             <?= htmlspecialchars($nome_autore) ?>
                                         </a>

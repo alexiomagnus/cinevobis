@@ -6,7 +6,6 @@ require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');
 require_once(__DIR__ . '/../../vendor/autoload.php');
 
-use MongoDB\Client;
 
 // Controllo autenticazione
 $username   = $_SESSION['username']   ?? '';
@@ -18,32 +17,26 @@ if (!$username || $id_profilo != 1) {
 }
 
 
+// Dichiarazione variabili
 $mongoClient = null;
 $db = null;
-$collection = [];
-
-// Connessione a MongoDB
-try {
-    $mongoClient = new Client("mongodb://localhost:27017");
-    $db = $mongoClient->selectDatabase('cinevobis');
-    $collection = $db->selectCollection('films');
-
-} catch (PDOException $e) {
-    error_log("Errore MongoDB: " . $e->getMessage());
-}
-
-
 $cursor = [];
+
 
 // Recuperiamo i film (ordinati per data di aggiunta)
 try {
+    // Controllo per evitare errori se MongoDB è offline
+    if (!$collection) {
+        throw new \Exception("Connessione a MongoDB non disponibile.");
+    }
+
     $cursor = $collection->find([], [
         'sort' => ['last_updated' => -1],
         'typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']
         ]); 
 
-} catch (Exception $e) {
-    error_log("Errore MongoDB: " . $e->getMessage());
+} catch (\Throwable $e) { // \Throwable cattura sia Exception che Fatal Error
+    error_log("Errore caricamento film: " . $e->getMessage());
 }
 
 
@@ -52,14 +45,19 @@ if (isset($_POST['delete'])) {
     $id = $_POST['_id'] ?? '';
 
     try {
+        // Controllo per evitare errori se MongoDB è offline
+        if (!$collection) {
+            throw new \Exception("Connessione a MongoDB non disponibile.");
+        }
+
         $objectId = new MongoDB\BSON\ObjectId($id);
         $collection->deleteOne(['_id' => $objectId]);
 
         header("Location: films.php");
         exit();
 
-    } catch (Exception $e) {
-        error_log("Errore MongoDB: " . $e->getMessage());
+    } catch (\Throwable $e) { // \Throwable cattura sia Exception che Fatal Error
+        error_log("Errore di eliminazione: " . $e->getMessage());
     }
 }
 ?>

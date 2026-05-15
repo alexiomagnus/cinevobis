@@ -6,7 +6,6 @@ require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');
 require_once(__DIR__ . '/../../vendor/autoload.php');
 
-use MongoDB\Client;
 
 // Controllo autenticazione
 $username = $_SESSION['username'] ?? '';
@@ -68,23 +67,21 @@ if (!empty($ids)) {
     }
 
 
-    // Connessione a MongoDB e ricerca film
+    // Ricerca film
     try {
-        $mongoClient = new Client("mongodb://localhost:27017");
-        $db = $mongoClient->selectDatabase("cinevobis");
-        $collection = $db->selectCollection("films");
+        // Controllo per evitare errori se MongoDB è offline
+        if (!$collection) {
+            throw new \Exception("Connessione a MongoDB non disponibile.");
+        }
 
         $cursor = $collection->find(
-            ['id' => ['$in' => $ids]],
-            [
-                'typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']
-            ]
+            ['id' => ['$in' => $ids]]
         );
 
         $films = movie_sorting($cursor, $ids);
 
-    } catch (Exception $e) {
-        error_log("Errore in MongoDB: " . $e->getMessage());
+    } catch (\Throwable $e) { // \Throwable cattura sia Exception che Fatal Error
+        error_log("Errore caricamento film recensiti: " . $e->getMessage());
         $films = [];
     }
 }

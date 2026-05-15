@@ -94,7 +94,7 @@ if ($tmdb_id !== null) {
                                     <div>
                                         <div class="small mb-2">
                                             <i class="bi bi-person-circle me-1" style="color: var(--accent);"></i>
-                                            <a href="/pages/public/users_profiles.php?id=<?= urlencode($r['id_utente']) ?>&username=<?= urlencode($r['username']) ?>" 
+                                            <a href="/pages/public/users_profiles.php?username=<?= urlencode($r['username']) ?>" 
                                             class="text-decoration-none fw-semibold text-dark">
                                                 <?= htmlspecialchars($r['nome'] . " " . $r['cognome']) ?>
                                             </a>

@@ -4,28 +4,26 @@ require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');
 require_once(__DIR__ . '/../../vendor/autoload.php');
 
-use MongoDB\Client;
 
-// Prepara l'array di dati che verrà popolato dal database.
+// Array per stampare i dati
 $recommendedFilms = [];
 
 try {
-    // Connessione a MongoDB locale e selezione della collezione film.
-    $mongoClient = new Client("mongodb://localhost:27017");
-    $db = $mongoClient->selectDatabase('cinevobis');
-    $collection = $db->selectCollection('films');
+    // Controllo per evitare errori se MongoDB è offline
+    if (!$collection) {
+        throw new \Exception("Connessione a MongoDB non disponibile.");
+    }
 
     // Prende i film in evidenza ordinati per data di uscita.
     $cursor = $collection->find([], [
         'limit' => 36,
-        'sort' => ['release_date' => -1],
-        'typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']
+        'sort' => ['release_date' => -1]
     ]);
 
     $recommendedFilms = iterator_to_array($cursor);
 
-} catch (Exception $e) {
-    error_log("Errore MongoDB: " . $e->getMessage());
+} catch (\Throwable $e) { // \Throwable cattura sia Exception che Fatal Error
+    error_log("Errore caricamento film in evidenza: " . $e->getMessage());
 }
 ?>
 <!DOCTYPE html>
@@ -44,7 +42,7 @@ try {
     
     <main class="container mt-5 mb-5 flex-grow-1">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="fw-bold m-0">I Film in evidenza</h1>
+            <h2 class="fw-bold m-0">I Film in evidenza</h2>
         </div>
 
         <?php if (empty($recommendedFilms)): ?>

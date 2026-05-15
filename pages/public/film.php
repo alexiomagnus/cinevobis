@@ -10,7 +10,6 @@ require_once(__DIR__ . '/../../vendor/autoload.php');
 
 use Dotenv\Dotenv;
 use Kiwilan\Tmdb\Tmdb;
-use MongoDB\Client;
 
 $dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
 $dotenv->load();
@@ -22,19 +21,7 @@ $tmdb = Tmdb::client($_ENV['API_KEY']);
 $movie_api = null;
 $movie_db = null;
 $errore = "";
-
 $movie_id = $_GET['tmdb_id'] ?? null;
-$collection = [];
-
-
-// Connessione a MongoDB
-try {
-    $mongoClient = new Client("mongodb://localhost:27017");
-    $db          = $mongoClient->selectDatabase('cinevobis');
-    $collection  = $db->selectCollection('films');
-} catch (Exception $e) {
-    error_log("Errore MongoDB: " . $e->getMessage());
-}
 
 
 // 1. Recupero film da TMDB
@@ -59,12 +46,17 @@ if (!empty($movie_id)) {
 
 // 2. Controllo/inserimento o aggiornamento in MongoDB
 if (!empty($movie_api)) {
-    $now              = time();
-    $aMonthInSeconds  = 30 * 24 * 60 * 60;
+
+    // Controllo per evitare errori se MongoDB è offline
+    if (!$collection) {
+        throw new \Exception("Connessione a MongoDB non disponibile.");
+    }
+    
+    $now = time();
+    $aMonthInSeconds  = 30 * 24 * 60 * 60;  // Un mese in secondi
 
     $movie_db = $collection->findOne(
-        ['id' => (int)$movie_id],
-        ['typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']]
+        ['id' => (int)$movie_id]
     );
 
     if ($movie_db === null) {
@@ -87,13 +79,13 @@ if (!empty($movie_api)) {
 
 // 3. Estrazione dati dal film
 $titolo = $titolo_orig = $trama = $poster_path = $trailerKey = $paese = '';
-$voto   = 0;
+$voto = 0;
 $durata = $anno = '';
 $generi = $cast = $registi = [];
 
 if ($movie_db) {
     $movieObj = new movieObj($movie_db);
-    $data     = $movieObj->toArray();
+    $data = $movieObj->toArray();
 
     $titolo = $data['titolo'];
     $titolo_orig = $data['titolo_orig'];
@@ -116,7 +108,7 @@ if ($movie_db) {
 
 
 // 4. Gestione liste utente tramite userObj
-$tmdb_id   = $movie_db['id'] ?? null;
+$tmdb_id = $movie_db['id'] ?? null;
 $id_utente = $_SESSION['id_utente'] ?? null;
 
 $is_favorite = false;

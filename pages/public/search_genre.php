@@ -6,7 +6,6 @@ require_once(__DIR__ . '/../../config/connection.php');
 require_once(__DIR__ . '/../../includes/header_logic.php');
 require_once(__DIR__ . '/../../vendor/autoload.php');
 
-use MongoDB\Client;
 
 // Connessione a MongoDB e ricerca film per genere
 $id_genere = isset($_GET['id']) ? (int)$_GET['id'] : null;
@@ -15,15 +14,16 @@ $cursor = [];
 
 if (!empty($id_genere)) {
     try {
-        $mongoClient = new Client("mongodb://localhost:27017");
-        $db = $mongoClient->selectDatabase('cinevobis');
-        $collection = $db->selectCollection('films');
+        // Controllo per evitare errori se MongoDB è offline
+        if (!$collection) {
+            throw new \Exception("Connessione a MongoDB non disponibile.");
+        }
 
         $cursor = $collection->find(['genres.id' => $id_genere])->toArray();
         $count = count($cursor);
         
-    } catch(Exception $e) {
-        error_log("Errore: " . $e->getMessage());
+    } catch (\Throwable $e) { // \Throwable cattura sia Exception che Fatal Error
+        error_log("Errore caricamento ricerca genere: " . $e->getMessage());
     }
 }
 ?>
