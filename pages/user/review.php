@@ -207,11 +207,11 @@ if (isset($_POST['delete_review'])) {
                             id="descrizione"
                             class="form-control bg-light border-light"
                             rows="6"
-                            maxlength="250"
+                            maxlength="200"
                             placeholder="Scrivi qui la tua recensione..."
                             required><?= htmlspecialchars($recensione_esistente['commento'] ?? '') ?></textarea>
                         <div id="contatore" class="form-text text-end">
-                            0/250 caratteri
+                            0/200 caratteri
                         </div>
                     </div>
 

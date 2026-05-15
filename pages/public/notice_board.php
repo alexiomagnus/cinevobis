@@ -156,7 +156,7 @@ if (!empty($ids)) {
                                     </div>
 
                                     <?php if (!empty($commento)): ?>
-                                        <p class="text-muted small mb-2 text-justify">
+                                        <p class="text-muted small mb-2 text-justify text-break">
                                             "<?= nl2br(htmlspecialchars($commento)) ?>"
                                         </p>
                                     <?php endif; ?>

@@ -73,10 +73,10 @@ document.addEventListener("DOMContentLoaded", function() {
         const numeroCaratteri = descrizione.value.length;
         
         // Aggiorna il testo a schermo
-        contatore.textContent = `${numeroCaratteri}/250 caratteri`;
+        contatore.textContent = `${numeroCaratteri}/200 caratteri`;
         
         // Gestione colore limite
-        if (numeroCaratteri >= 240) {
+        if (numeroCaratteri >= 190) {
             contatore.classList.add('text-danger');
         } else {
             contatore.classList.remove('text-danger');

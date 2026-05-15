@@ -99,7 +99,7 @@ if ($tmdb_id !== null) {
                                                 <?= htmlspecialchars($r['nome'] . " " . $r['cognome']) ?>
                                             </a>
                                         </div> <?php if (!empty($r['commento'])): ?>
-                                            <p class="text-muted small mb-2 text-justify">
+                                            <p class="text-muted small mb-2 text-justify text-break">
                                                 "<?= nl2br(htmlspecialchars($r['commento'])) ?>"
                                             </p>
                                         <?php endif; ?>

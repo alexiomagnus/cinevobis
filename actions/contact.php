@@ -82,11 +82,11 @@ if (isset($_POST['invia'])) {
                                   id="descrizione"
                                   class="form-control bg-light border-light py-3"
                                   rows="6"
-                                  maxlength="250"
+                                  maxlength="200"
                                   placeholder="Descrivi il tuo messaggio..."
                                   required></textarea>
                         <div id="contatore" class="form-text text-end">
-                            0/250 caratteri
+                            0/200 caratteri
                         </div>
                     </div>
 
