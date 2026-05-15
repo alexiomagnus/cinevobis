@@ -34,6 +34,12 @@ if (isset($_POST['login'])) {
 
                 $user->createDataLogin(date('Y-m-d H:i:s'), session_id(), $utente['id_utente']);
 
+                // Generazione automatica cookie Ricordami
+                $firma = hash_hmac('sha256', $utente['username'], SECRET_KEY);
+                $valore_cookie = $utente['username'] . '|' . $firma;
+                $scadenza = time() + (30 * 24 * 60 * 60); // 30 giorni
+                setcookie('remember_me', $valore_cookie, $scadenza, '/', '', false, true);
+
                 header("Location: /index.php");
                 exit();
             } else {
@@ -102,6 +108,8 @@ if (isset($_POST['login'])) {
                                 placeholder="Password" required>
                             <i class="bi bi-eye toggle-icon" data-target="password"></i>
                         </div>
+
+
 
                         <button type="submit" name="login" class="btn btn-dark btn-lg w-100 py-3 fw-bold mb-4">Accedi</button>
                     </form>

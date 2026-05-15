@@ -339,13 +339,13 @@ footer {
 /* Overlay Scrollbar */
 html {
     overflow-y: overlay;
-    scrollbar-width: thin;
+    scrollbar-width: auto;
     scrollbar-color: var(--text-muted) transparent;
 }
 
 ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 14px;
+    height: 14px;
     background: transparent;
 }
 
@@ -356,12 +356,12 @@ html {
 ::-webkit-scrollbar-thumb {
     background-color: var(--text-muted);
     border-radius: 10px;
-    border: 2px solid transparent;
+    border: 3px solid transparent;
     background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
     background-color: var(--text);
-    border: 2px solid transparent;
+    border: 3px solid transparent;
     background-clip: padding-box;
 }

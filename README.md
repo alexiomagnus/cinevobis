@@ -84,7 +84,10 @@ DB_PASS=tua_password
 MONGODB_HOST=mongodb://localhost:27017
 MONGODB_NAME=cinevobis
 MONGODB_COLLECTION=films
+SECRET_KEY=la_tua_secret_key
 ```
+
+La secret key è necessaria per i cookie, generala con Bitwarden: https://bitwarden.com/password-generator/#password-generator
 
 Questi valori verranno caricati da `config/connection.php` per gestire le connessioni al sistema
 

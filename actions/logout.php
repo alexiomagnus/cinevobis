@@ -24,7 +24,13 @@ try {
     // Cancella completamente la sessione e reindirizza l'utente alla home con il flag di logout avvenuto
     // Viene chiamata nel blocco `finally` per garantire l'esecuzione in ogni caso
     session_unset();                                
-    session_destroy();                              
+    session_destroy();
+
+    // Rimuove anche il cookie "Ricordami" se presente
+    if (isset($_COOKIE['remember_me'])) {
+        setcookie('remember_me', '', time() - 3600, '/');
+    }
+                              
     header("Location: /index.php?logout=success");
     exit();
 }
