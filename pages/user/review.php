@@ -204,15 +204,15 @@ if (isset($_POST['delete_review'])) {
                         <label class="form-label small text-secondary">Commento</label>
                         <textarea
                             name="commento"
-                            id="commento"
+                            id="descrizione"
                             class="form-control bg-light border-light"
                             rows="6"
-                            maxlength="200"
+                            maxlength="250"
                             placeholder="Scrivi qui la tua recensione..."
                             required><?= htmlspecialchars($recensione_esistente['commento'] ?? '') ?></textarea>
-                            <div class="form-text text-end">
-                                Limite massimo: 200 caratteri
-                            </div>
+                        <div id="contatore" class="form-text text-end">
+                            0/250 caratteri
+                        </div>
                     </div>
 
                     <button type="submit" name="write_review" class="btn btn-dark btn-lg w-100 py-3 fw-bold mb-3">

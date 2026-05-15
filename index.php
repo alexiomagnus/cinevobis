@@ -236,10 +236,10 @@ $film = search_film_by_id($topFilms, $movie_id);
                     <?php 
                     /** @var array $film */
                     foreach ($topFilms as $film):
-                        $id     = $film['id'] ?? '';
+                        $id = $film['id'] ?? '';
                         $titolo = $film['title'] ?? 'Titolo non disponibile';
                         $poster = !empty($film['poster_path']) ? "https://image.tmdb.org/t/p/w500" . $film['poster_path'] : "https://via.placeholder.com/500x750?text=No+Poster";
-                        $anno   = !empty($film['release_date']) ? substr($film['release_date'], 0, 4) : '';
+                        $anno = !empty($film['release_date']) ? substr($film['release_date'], 0, 4) : '';
                     ?>
                     <div class="col">
                         <a href="/pages/public/film.php?tmdb_id=<?= $id ?>" class="text-decoration-none text-dark d-block h-100">
@@ -282,9 +282,9 @@ $film = search_film_by_id($topFilms, $movie_id);
                         
                         <blockquote class="mb-0 p-4 rounded-4 bg-light border-start border-4" style="border-color: var(--bs-gray-400) !important;">
                             <p class="fst-italic text-dark mb-2" style="font-size: 0.95rem; line-height: 1.6;">
-                                "I film non ti dicono cosa pensare. Ti insegnano come sentire."
+                                "La vita non è come l'hai vista al cinematografo, la vita è più difficile."
                             </p>
-                            <cite class="text-muted fw-semibold" style="font-size: 0.8rem; letter-spacing: 0.05em;">— Roger Ebert</cite>
+                            <cite class="text-muted fw-semibold" style="font-size: 0.8rem; letter-spacing: 0.05em;">— Citazione dal film: "Nuovo cinema paradiso"</cite>
                         </blockquote>
                     </div>
 

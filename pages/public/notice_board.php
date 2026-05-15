@@ -8,11 +8,12 @@ require_once(__DIR__ . '/../../vendor/autoload.php');
 
 use MongoDB\Client;
 
-// Configurazione query
+// Dichiarazione variabili
 $limit = 20;
 $ids = [];
-$recensioni_map = [];
 $films = [];
+$recensioni_list = [];
+$films_map = [];
 
 try {
     // Recupero le ultime 20 recensioni globali includendo nome, cognome e username
@@ -32,8 +33,8 @@ try {
         $tmdb_id = (int) $row['tmdb_id'];
         $ids[] = $tmdb_id;
 
-        // Mappatura separata per gestire correttamente URL e visualizzazione
-        $recensioni_map[$tmdb_id] = [
+        $recensioni_list[] = [
+            'tmdb_id' => $tmdb_id,
             'voto' => $row['voto'],
             'commento' => $row['commento'],
             'nome_completo' => $row['nome'] . ' ' . $row['cognome'],
@@ -61,11 +62,14 @@ if (!empty($ids)) {
             ]
         );
 
-        $films = movie_sorting($cursor, $ids);
+        // Creiamo una mappa veloce per accedere ai film
+        foreach ($cursor as $film) {
+            $films_map[$film['id']] = $film;
+        }
 
     } catch (Exception $e) {
         error_log("Errore in MongoDB: " . $e->getMessage());
-        $films = [];
+        $films_map = [];
     }
 }
 ?>
@@ -103,7 +107,7 @@ if (!empty($ids)) {
             <h1 class="fw-bold m-0">Bacheca</h1>
         </div>
 
-        <?php if (empty($films)): ?>
+        <?php if (empty($films_map) || empty($recensioni_list)): ?>
             <div class="alert alert-info shadow-sm rounded-4 border-0">
                 <i class="bi bi-info-circle me-2"></i>Non ci sono ancora recensioni in bacheca
             </div>
@@ -112,12 +116,14 @@ if (!empty($ids)) {
             
             <div class="row row-cols-1 row-cols-md-2 g-3">
                 <?php
-                foreach ($films as $film):
-                    $id = (int) ($film['id'] ?? 0);
+                foreach ($recensioni_list as $rec):
+                    $id = $rec['tmdb_id'];
+
+                    $film = $films_map[$id] ?? []; 
+                    
                     $titolo = $film['title'] ?? 'Titolo non disponibile';
                     $poster = !empty($film['poster_path']) ? "https://image.tmdb.org/t/p/w500" . $film['poster_path'] : "https://via.placeholder.com/500x750?text=No+Poster";
                     
-                    $rec = $recensioni_map[$id] ?? [];
                     $voto = isset($rec['voto']) ? (float) $rec['voto'] : null;
                     $commento = $rec['commento'] ?? '';
                     $nome_autore = $rec['nome_completo'] ?? 'Utente Anonimo';

@@ -63,9 +63,34 @@ document.addEventListener("DOMContentLoaded", function() {
             });
         }
     }
+
+    // --- 4. CONTEGGIO CARATTERI ---
+    const descrizione = document.getElementById('descrizione');
+    const contatore = document.getElementById('contatore');
+
+    // 1. Definiamo la funzione di aggiornamento
+    const aggiornaContatore = () => {
+        const numeroCaratteri = descrizione.value.length;
+        
+        // Aggiorna il testo a schermo
+        contatore.textContent = `${numeroCaratteri}/250 caratteri`;
+        
+        // Gestione colore limite
+        if (numeroCaratteri >= 240) {
+            contatore.classList.add('text-danger');
+        } else {
+            contatore.classList.remove('text-danger');
+        }
+    };
+
+    // 2. Esegui la funzione all'avvio (per calcolare il testo già presente)
+    aggiornaContatore();
+
+    // 3. ASCOLTATORE DI EVENTI: Si attiva per ogni modifica futura
+    descrizione.addEventListener('input', aggiornaContatore);
 });
 
-// --- 4. FUNZIONE PER TORNARE INDIETRO ---
+// --- 5. FUNZIONE PER TORNARE INDIETRO ---
 function closeAndRedirect() {
     const destinazione = sessionStorage.getItem('origin_url');
     sessionStorage.removeItem('origin_url');

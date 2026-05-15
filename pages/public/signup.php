@@ -27,8 +27,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $user->create();
         $messaggio = "Account creato con successo";
     } catch (PDOException $e) { 
-        $errore = "Username non disponibile";
-        error_log("Username non disponibile: " . $e->getMessage());
+        $errore = "Esiste già un utente con questo username o questa email";
+        error_log("Esiste già un utente con questo username o questa email: " . $e->getMessage());
     }
 }
 ?>

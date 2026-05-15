@@ -82,11 +82,11 @@ if (isset($_POST['invia'])) {
                                   id="descrizione"
                                   class="form-control bg-light border-light py-3"
                                   rows="6"
-                                  maxlength="200"
+                                  maxlength="250"
                                   placeholder="Descrivi il tuo messaggio..."
                                   required></textarea>
-                        <div class="form-text text-end">
-                            Limite massimo: 200 caratteri
+                        <div id="contatore" class="form-text text-end">
+                            0/250 caratteri
                         </div>
                     </div>
 
@@ -101,6 +101,5 @@ if (isset($_POST['invia'])) {
 
     <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/assets/js/script.js"></script>
-
 </body>
 </html>
