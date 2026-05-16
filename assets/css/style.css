@@ -371,3 +371,12 @@ html {
 .table tbody tr:last-child th {
     border-bottom: none !important;
 }
+
+/* Form Text - Dark Mode Support */
+.form-text {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .form-text {
+    color: var(--text-muted) !important;
+}
