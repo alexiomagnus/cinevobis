@@ -17,8 +17,7 @@ try {
     // Prende i migliori film ordinati per voto medio.
     $cursor = $collection->find([], [
         'limit' => 36,
-        'sort' => ['vote_average' => -1],
-        'typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']
+        'sort' => ['vote_average' => -1]
     ]);
 
     $topFilms = iterator_to_array($cursor);

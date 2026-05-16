@@ -28,6 +28,13 @@ if (isset($_POST['change_password'])) {
 }
 
 
+// Gestione logout
+if (isset($_POST['logout'])) {
+    header("Location: /actions/logout.php");
+    exit();
+}
+
+
 // Gestione Disabilitazione Account
 if (isset($_POST['delete_user']) && $username) {
     try {
@@ -317,25 +324,39 @@ if ($userData && $userData['data_registrazione']) {
 
                         <form method="POST">
                             <div class="mb-4">
-                                <div class="form-check form-switch">
+
+                                <div class="form-check form-switch mb-3">
                                     <input class="form-check-input"
                                         type="checkbox" 
                                         name="tester" 
                                         id="tester"
                                         <?= ($userData['tester'] == 1) ? 'checked' : '' ?>>
+
                                     <label class="form-check-label fw-semibold" for="tester">
                                         Tester
                                     </label>
                                 </div>
-                                <p class="small mt-2 text-start" style="color: var(--text-muted);">
+
+                                <p class="small text-start mb-4" style="color: var(--text-muted);">
                                     <i class="bi bi-info-circle me-1"></i>
                                     Attivando questa modalità, accetti la presenza di contenuti aggiuntivi utilizzati per verificare il funzionamento del sistema (ad esempio annunci e nuove implementazioni). 
                                     Il comportamento del sito potrebbe non essere quello definitivo. Clicca salva per applicare le modifiche.
                                 </p>
-                                <button type="submit" name="update_tester"
-                                    class="btn btn-outline-secondary">
-                                    Salva
-                                </button>
+
+                                <div class="d-flex justify-content-between align-items-center">
+                                    
+                                    <button type="submit" name="update_tester"
+                                        class="btn btn-outline-secondary px-4">
+                                        Salva
+                                    </button>
+
+                                    <button type="submit" name="logout"
+                                        class="btn btn-outline-danger px-4">
+                                        Logout
+                                    </button>
+
+                                </div>
+
                             </div>
                         </form>
                     <?php endif; ?>

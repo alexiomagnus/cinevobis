@@ -365,3 +365,9 @@ html {
     border: 3px solid transparent;
     background-clip: padding-box;
 }
+
+/* Rimuove il bordo inferiore dall'ultima riga delle tabelle */
+.table tbody tr:last-child td,
+.table tbody tr:last-child th {
+    border-bottom: none !important;
+}

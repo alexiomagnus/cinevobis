@@ -41,34 +41,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="/assets/css/style.css">
-    <script>
-        (function() {
-            const storedTheme = localStorage.getItem('theme');
-            if (storedTheme === 'dark' || (!storedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.documentElement.setAttribute('data-theme', 'dark');
-            } else {
-                document.documentElement.setAttribute('data-theme', 'light');
-            }
-        })();
-    </script>
-    <style>
-        .ts-wrapper .ts-control {
-            min-height: calc(1.5em + 1rem + 2px) !important;
-            padding: 1rem 0.75rem !important;
-            background-color: #f8f9fa !important;
-            border-color: #f8f9fa !important;
-            border-radius: 0.375rem !important;
-            font-size: 1rem !important;
-            line-height: 1.5 !important;
-            box-shadow: none !important;
-        }
-        .ts-wrapper .ts-control .item { line-height: 1.5 !important; }
-        .ts-wrapper .ts-control .dropdown-indicator { padding-top: 0.25rem !important; }
-        .ts-wrapper.focus .ts-control {
-            box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.05) !important;
-            border-color: #dee2e6 !important;
-        }
-    </style>
 </head>
 <body>
 

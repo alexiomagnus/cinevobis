@@ -86,7 +86,7 @@ if (isset($_SESSION['last_activity'])) {
         
         session_unset();
         session_destroy();
-        header("Location: /login.php?error=session_expired");
+        header("Location: /index.php?error=session_expired");
         exit();
     }
 }
