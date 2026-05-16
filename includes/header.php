@@ -66,7 +66,7 @@ $isAdminPage = in_array($currentPage, $adminPages);
                         <?php if ($isLogged && !$isAdminPage): ?>
                             <li><a class="dropdown-item py-2 small" href="/pages/user/favorites.php"><i class="bi bi-heart-fill me-2 text-secondary"></i>Preferiti</a></li>
                             <li><a class="dropdown-item py-2 small" href="/pages/user/watchlist.php"><i class="bi bi-bookmark me-2 text-secondary"></i>Watchlist</a></li>
-                            <li><a class="dropdown-item py-2 small" href="/pages/user/watched.php"><i class="bi bi-eye-fill me-2 text-secondary"></i>Visti</a></li>
+                            <li><a class="dropdown-item py-2 small" href="/pages/user/watched.php"><i class="bi bi-eye-fill me-2 text-secondary"></i>Watched</a></li>
                             <li><a class="dropdown-item py-2 small" href="/pages/user/reviews.php"><i class="bi bi-pencil-fill me-2 text-secondary"></i>Recensioni</a></li>
                             <li><hr class="dropdown-divider"></li>
                         <?php endif; ?>
