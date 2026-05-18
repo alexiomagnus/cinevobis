@@ -130,16 +130,20 @@ if ($tmdb_id !== null && $id_utente !== null) {
 
         // Gestione POST watched
         if (isset($_POST['watched'])) $userObj->addWatched((int)$tmdb_id, $id_utente);
-        if (isset($_POST['delete_watched'])) $userObj->removeWatched((int)$tmdb_id, $id_utente);
+
+        if (isset($_POST['delete_watched'])) { 
+            $is_review = $userObj->hasReview((int)$tmdb_id, $id_utente);
+
+            if ($is_review === false) {
+                $userObj->removeWatched((int)$tmdb_id, $id_utente);
+            }
+        }
 
         // Stato corrente (DOPO aver gestito i POST)
         $is_favorite = $userObj->isFavorite((int)$tmdb_id, $id_utente);
         $is_watchlist = $userObj->isInWatchlist((int)$tmdb_id, $id_utente);
         $is_watched = $userObj->isWatched((int)$tmdb_id, $id_utente);
         $is_review = $userObj->hasReview((int)$tmdb_id, $id_utente);
-
-        // Se ha una recensione, il film è implicitamente "visto"
-        if ($is_review) $is_watched = true;
 
     } catch (PDOException $e) {
         error_log("Errore nel DB: " . $e->getMessage());

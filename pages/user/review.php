@@ -2,6 +2,8 @@
 // Pagina per scrivere o modificare una recensione dell'utente.
 require_once(__DIR__ . '/../../config/config.php');
 require_once(__DIR__ . '/../../config/connection.php');
+require_once(__DIR__ . '/../../includes/user_obj.php');
+
 
 // Controllo autenticazione + tmdb_id
 $username = $_SESSION['username'] ?? '';
@@ -17,6 +19,8 @@ if (!$username && !$tmdb_id) {
 $errore = '';
 $messaggio = '';
 $recensione_esistente = null;
+
+$userObj = new userObj($conn, $_SESSION['username']);
 
 // id utente dalla sessione
 $id_utente = $_SESSION['id_utente'] ?? null;
@@ -42,10 +46,13 @@ try {
 // Gestione POST
 if (isset($_POST['write_review'])) {
     $voto = $_POST['rating'] ?? null;
-    $commento = $_POST['commento'] ?? null;
+    $commento = isset($_POST['commento']) ? trim($_POST['commento']) : '';
 
-    if (!$voto || !$commento) {
-        $errore = "Compila tutti i campi";
+    if ($commento == '') 
+        $commento = "Nessun commento"; 
+    
+    if (!$voto) {
+        $errore = "Inserisce un voto";
 
     } elseif ($voto < 1 || $voto > 10) {
         $errore = "Il voto deve essere compreso tra 1 e 10";
@@ -114,6 +121,9 @@ if (isset($_POST['delete_review'])) {
             ':id_utente' => $id_utente, 
             ':tmdb_id' => $tmdb_id
         ]);
+
+        // Rimuovere dalla watched
+        $userObj->removeWatched((int)$tmdb_id, $id_utente);
 
         header("Location: /pages/public/film.php?tmdb_id=" . urlencode($tmdb_id));
         exit();
@@ -208,8 +218,7 @@ if (isset($_POST['delete_review'])) {
                             class="form-control bg-light border-light"
                             rows="6"
                             maxlength="200"
-                            placeholder="Scrivi qui la tua recensione..."
-                            required><?= htmlspecialchars($recensione_esistente['commento'] ?? '') ?></textarea>
+                            placeholder="Scrivi qui la tua recensione..."><?= htmlspecialchars($recensione_esistente['commento'] ?? '') ?></textarea>
                         <div id="contatore" class="form-text text-end">
                             0/200 caratteri
                         </div>

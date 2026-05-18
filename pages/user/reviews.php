@@ -171,14 +171,18 @@ if (!empty($ids)) {
                     <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden transition-hover position-relative">
                         <div class="d-flex">
 
-                            <img src="<?= htmlspecialchars($poster) ?>"
-                                alt="<?= htmlspecialchars($titolo) ?>"
-                                class="review-poster">
+                            <!-- Link inserito solo sulla copertina -->
+                            <a href="/pages/public/film.php?tmdb_id=<?= $id ?>" class="flex-shrink-0">
+                                <img src="<?= htmlspecialchars($poster) ?>"
+                                    alt="<?= htmlspecialchars($titolo) ?>"
+                                    class="review-poster">
+                            </a>
 
                             <div class="card-body d-flex flex-column justify-content-between p-3">
                                 <div>
                                     <h5 class="fw-bold mb-1">
-                                        <a href="/pages/public/film.php?tmdb_id=<?= $id ?>" class="text-decoration-none text-dark stretched-link">
+                                        <!-- Rimossa la classe stretched-link per liberare la card -->
+                                        <a href="/pages/public/film.php?tmdb_id=<?= $id ?>" class="text-decoration-none text-dark">
                                             <?= htmlspecialchars($titolo) ?>
                                         </a>
                                     </h5>
