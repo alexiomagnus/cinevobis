@@ -53,13 +53,13 @@ try {
 
 
 // Film casuale ogni settimana in prima pagina
-// srand((int)date('oW'));
-// $film = $topFilms[array_rand($topFilms)] ?? null;
+srand((int)date('oW'));
+$film = $topFilms[array_rand($topFilms)] ?? null;
 
 
 // Film statico in prima pagina
-$movie_id = 129;  // La città incantata
-$film = search_film_by_id($topFilms, $movie_id);
+// $movie_id = 129;  // La città incantata
+// $film = search_film_by_id($topFilms, $movie_id);
 ?>
 <!DOCTYPE html>
 <html lang="it">

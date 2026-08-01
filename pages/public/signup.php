@@ -28,8 +28,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $messaggio = "Account creato con successo";
     } catch (PDOException $e) { 
         $errore = "Esiste già un utente con questo username o questa email";
-        error_log("Esiste già un utente con questo username o questa email: " . $e->getMessage());
-    }
+        error_log("Errore registrazione: " . $e->getMessage());
+}
 }
 ?>
 <!DOCTYPE html>

@@ -1,0 +1,39 @@
+services:
+  mariadb:
+    image: docker.io/library/mariadb:latest
+    container_name: local_mariadb
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+
+  mongodb:
+    image: docker.io/library/mongo:latest
+    container_name: local_mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  webserver:
+    build: .
+    container_name: local_web
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html:z
+    depends_on:
+      - mariadb
+      - mongodb
+
+volumes:
+  mariadb_data:
+  mongodb_data:
